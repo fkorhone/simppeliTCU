@@ -13,6 +13,8 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 
+![Screenshot of the Web UI from mobile phone browser](screenshot.jpg)
+
 ## Hardware Requirements
 1. **Lilygo T-2CAN** (ESP32 with built-in CAN transceiver).
 2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended: a flush-mount 12V USB car socket).
