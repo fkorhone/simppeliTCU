@@ -13,12 +13,13 @@ WebServer server(80);
 #define CAN_RX_PIN 6
 
 // Leafin taikatavut
-uint8_t wakeup_data[1]       = {0x00};                   // Herätyspingi (0x68C)
-uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Lämmitys PÄÄLLE (0x56E)
-uint8_t heat_off_data[4]     = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E)
-
-uint8_t charge_on_data[4]    = {0x66, 0x08, 0x00, 0x00}; // Lataus PÄÄLLE (0x56E)
-uint8_t charge_abort_data[4] = {0xA6, 0x00, 0x00, 0x00}; // Lataus KESKEYTÄ (0x56E)
+static uint8_t wakeup_data[1]       = {0x00};                   // Herätyspingi (0x68C)
+static uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Lämmitys PÄÄLLE (0x56E)
+static uint8_t sleep_data[4]        = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E) Vaatii tarkistusta!
+static uint8_t charge_on_data[4]    = {0x66, 0x08, 0x00, 0x00}; // Lataus PÄÄLLE (0x56E)
+static uint8_t climate_stop_data[4] = {0x56, 0x08, 0x00, 0x00}; // Lämmity POIS (0x56E)
+static uint8_t abort_data[4]        = {0x96, 0x00, 0x00, 0x00}; // Vaatii selvittelyä! (0x56E)
+static uint8_t idle_data[4]         = {0x46, 0x08, 0x00, 0x00}; // Vaatii selvittelyä! (0x56E)
 
 // Tilamuuttujat
 bool isHeating = false;
@@ -118,16 +119,10 @@ void handleChargeOn() {
 void handleOff() { // Yhdistetty sammutusfunktio
   isHeating = false; isCharging = false;
 
-  uint8_t abort_data[4] = {0x96, 0x00, 0x00, 0x00};
   for(int i = 0; i < 5; i++) { sendCAN(0x56E, abort_data, 4); delay(100); }
-  
-  uint8_t transition_data[4] = {0x56, 0x08, 0x00, 0x00};
-  for(int i = 0; i < 5; i++) { sendCAN(0x56E, transition_data, 4); delay(100); }
-  
-  uint8_t idle_data[4] = {0x46, 0x08, 0x00, 0x00};
+  for(int i = 0; i < 5; i++) { sendCAN(0x56E, climate_stop_data, 4); delay(100); }
   for(int i = 0; i < 5; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
-  
-  for(int i = 0; i < 10; i++) { sendCAN(0x56E, heat_off_data, 4); delay(100); }
+  for(int i = 0; i < 10; i++) { sendCAN(0x56E, sleep_data, 4); delay(100); }
 
   server.sendHeader("Location", "/"); server.send(303);
 }
@@ -150,7 +145,6 @@ void setup() {
   server.on("/heat_on", handleHeatOn);
   server.on("/heat_off", handleOff);
   server.on("/charge_on", handleChargeOn);
-  server.on("/charge_off", handleOff); // Käytetään samaa turvallista alasajoa
   server.begin();
 }
 
