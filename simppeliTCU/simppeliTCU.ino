@@ -14,12 +14,15 @@ WebServer server(80);
 
 // Leafin taikatavut
 static uint8_t wakeup_data[1]       = {0x00};                   // Herätyspingi (0x68C)
+static uint8_t wakeup_601[2]        = {0x83, 0xC0};
+static uint8_t heating_init[4]      = {0x46, 0x08, 0x00, 0x00}; // Lämmitys valmistelu (0x56E)
+static uint8_t idle_data[4]         = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E) Vaatii tarkistusta!
+
 static uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Lämmitys PÄÄLLE (0x56E)
-static uint8_t sleep_data[4]        = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E) Vaatii tarkistusta!
-static uint8_t charge_on_data[4]    = {0x66, 0x08, 0x00, 0x00}; // Lataus PÄÄLLE (0x56E)
-static uint8_t climate_stop_data[4] = {0x56, 0x08, 0x00, 0x00}; // Lämmity POIS (0x56E)
-static uint8_t abort_data[4]        = {0x96, 0x00, 0x00, 0x00}; // Vaatii selvittelyä! (0x56E)
-static uint8_t idle_data[4]         = {0x46, 0x08, 0x00, 0x00}; // Vaatii selvittelyä! (0x56E)
+static uint8_t start_charge_data[4] = {0x66, 0x08, 0x00, 0x00}; // Lataus PÄÄLLE (0x56E)
+
+static uint8_t interrupt_data[4]    = {0x96, 0x00, 0x00, 0x00}; // Toiminnon keskeytys (0x56E)
+static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Lämmitys pois (0x56E)
 
 // Tilamuuttujat
 bool isHeating = false;
@@ -89,14 +92,46 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-// Päivitä tiedot (Herätys)
-void handleRefresh() {
+
+void readAndHandleCANMessage() {
+  twai_message_t message;
+  if (twai_receive(&message, 0) == ESP_OK) { // 0 = ei odota, lukee vain jos dataa on
+    // SOC (Akun varaus) ID: 0x55B
+    if (message.identifier == 0x55B && message.data_length_code >= 2) {
+      uint16_t soc_raw = (message.data[0] << 2) | (message.data[1] >> 6);
+      currentSOC = soc_raw / 10.0;
+    }
+    // Sisälämpötila ID: 0x54F
+    else if (message.identifier == 0x54F && message.data_length_code >= 1) {
+      cabinTemp = (message.data[0] / 2.0) - 40.0;
+    }
+  }
+}
+
+void wakeup() {
+  for(int i=0; i<60; i++) { sendCAN(0x68C, wakeup_data, 1); delay(15); }
+  sendCAN(0x601, wakeup_601, 2);
+  delay(15);
   sendCAN(0x68C, wakeup_data, 1);
   delay(50);
-  sendCAN(0x68C, wakeup_data, 1);
+}
+
+// Päivitä tiedot (Herätys)
+void handleRefresh() {
+
+  wakeup();
+
+  for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
   
-  // Odotetaan sekunti, että auto ehtii lähettää uudet arvot
-  delay(1000); 
+  // kuunnellaan sekunti, että auto ehtii lähettää uudet arvot:
+  unsigned long start_time = millis();
+  while (millis() - start_time < 1000) {
+    readAndHandleCANMessage(); 
+    sleep(1);
+  }
+
+  // ja sitten nukkumaan:
+  for(int i=0; i<20; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
   
   server.sendHeader("Location", "/");
   server.send(303);
@@ -104,24 +139,37 @@ void handleRefresh() {
 
 void handleHeatOn() {
   isHeating = true; isCharging = false;
-  sendCAN(0x68C, wakeup_data, 1); delay(100); sendCAN(0x68C, wakeup_data, 1);
+
+  wakeup();
+  for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
+  for(int i=0; i<20; i++) { sendCAN(0x56E, heat_on_data, 4); delay(100); }
+  for(int i=0; i<20; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  
+  // After this the bus goes quiet, but the heating is on. 
+  server.sendHeader("Location", "/"); server.send(303);
+}
+
+void handleHeatOff() {
+  isHeating = false; isCharging = false;
+
+  wakeup();
+  for(int i=0; i<10; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
+  for(int i=0; i<9; i++) { sendCAN(0x56E, interrupt_data, 4); delay(100); }
+  for(int i=0; i<8; i++) { sendCAN(0x56E, heat_off_data, 4); delay(100); }
+  for(int i=0; i<4; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
+  for(int i=0; i<8; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  
+  // After this the bus goes quiet, and the heating is off.
   server.sendHeader("Location", "/"); server.send(303);
 }
 
 void handleChargeOn() {
   isCharging = true; isHeating = false;
-  sendCAN(0x68C, wakeup_data, 1); delay(100); sendCAN(0x68C, wakeup_data, 1);
-  server.sendHeader("Location", "/"); server.send(303);
-}
 
-void handleOff() { // Yhdistetty sammutusfunktio
-  isHeating = false; isCharging = false;
-
-  for(int i = 0; i < 5; i++) { sendCAN(0x56E, abort_data, 4); delay(100); }
-  for(int i = 0; i < 5; i++) { sendCAN(0x56E, climate_stop_data, 4); delay(100); }
-  for(int i = 0; i < 5; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
-  for(int i = 0; i < 10; i++) { sendCAN(0x56E, sleep_data, 4); delay(100); }
-
+  wakeup();
+  for(int i=0; i<20; i++) { sendCAN(0x56E, start_charge_data, 4); delay(100); }
+  for(int i=0; i<8; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  
   server.sendHeader("Location", "/"); server.send(303);
 }
 
@@ -141,36 +189,12 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/refresh", handleRefresh);
   server.on("/heat_on", handleHeatOn);
-  server.on("/heat_off", handleOff);
+  server.on("/heat_off", handleHeatOff);
   server.on("/charge_on", handleChargeOn);
   server.begin();
 }
 
 void loop() {
   server.handleClient();
-  
-  // LUE CAN-VIESTEJÄ (Non-blocking)
-  twai_message_t message;
-  while (twai_receive(&message, 0) == ESP_OK) { // 0 = ei odota, lukee vain jos dataa on
-    
-    // SOC (Akun varaus) ID: 0x55B
-    if (message.identifier == 0x55B && message.data_length_code >= 2) {
-      uint16_t soc_raw = (message.data[0] << 2) | (message.data[1] >> 6);
-      currentSOC = soc_raw / 10.0;
-    }
-    
-    // Sisälämpötila ID: 0x54F
-    else if (message.identifier == 0x54F && message.data_length_code >= 1) {
-      cabinTemp = (message.data[0] / 2.0) - 40.0;
-    }
-  }
-
-  // TILA-KONE (Jatkuva lähetys, jos jokin laite on päällä)
-  if (isHeating || isCharging) {
-    if (millis() - lastMsgTime >= 100) {
-      if (isHeating) sendCAN(0x56E, heat_on_data, 4);
-      else if (isCharging) sendCAN(0x56E, charge_on_data, 4);
-      lastMsgTime = millis();
-    }
-  }
+  readAndHandleCANMessage();
 }
