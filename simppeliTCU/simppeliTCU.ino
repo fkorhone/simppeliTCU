@@ -52,7 +52,6 @@ void handleRoot() {
   html += ".btn-heat-on { background-color: #ff5722; }";
   html += ".btn-heat-off { background-color: #795548; }";
   html += ".btn-charge-on { background-color: #4CAF50; }";
-  html += ".btn-charge-off { background-color: #607d8b; }";
   html += ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }";
   html += "</style></head><body>";
   
@@ -85,7 +84,6 @@ void handleRoot() {
   html += "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>";
   html += "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>";
   html += "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>";
-  html += "<a href='/charge_off' class='btn btn-charge-off'>Keskeyt&auml; Lataus</a>";
   
   html += "</body></html>";
   server.send(200, "text/html", html);
