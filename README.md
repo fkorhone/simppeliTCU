@@ -38,7 +38,7 @@ This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the comm
   * **Charge ON:** `66 08 00 00`
 
 ## Known Limitations / Research
-* 🛑 **Charge Abort (`0xA6...`):** We captured what appears to be the TCU's charge abort sequence. However, seems that the Leaf's Vehicle Control Module (VCM) possibly ignores this command. The sequence is included in the code and documentation for research purposes, but it does NOT stop an active charge. If you want to stop charging, you currently need to rely on a smart EVSE (wallbox) or the car's physical unplug button.
+* (`0xA6...`):** Captured what appears to be some sort of TCU termination/stop sequence but no real understanding yet what it actually does.
 
 ## License & Disclaimer (MIT License)
 This project is licensed under the MIT License. 
