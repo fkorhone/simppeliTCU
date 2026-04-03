@@ -1,10 +1,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include "driver/twai.h"
-
-// --- WI-FI ASETUKSET ---
-const char* ssid = "SINUN_WIFI_NIMI";
-const char* password = "SINUN_WIFI_SALASANA";
+#include "configuration.h"
 
 WebServer server(80);
 
