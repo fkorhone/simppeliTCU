@@ -26,7 +26,6 @@ static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Lämmitys poi
 
 // Tilamuuttujat
 bool isHeating = false;
-bool isCharging = false;
 unsigned long lastMsgTime = 0;
 
 // Autosta luetut arvot
@@ -81,7 +80,6 @@ void handleRoot() {
 
   // Tilaindikaattorit
   if (isHeating) html += "<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>";
-  else if (isCharging) html += "<h3 style='color: #4CAF50;'>LATAUS P&Auml;&Auml;LL&Auml;</h3>";
   
   // Napit
   html += "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>";
@@ -138,7 +136,7 @@ void handleRefresh() {
 }
 
 void handleHeatOn() {
-  isHeating = true; isCharging = false;
+  isHeating = true;
 
   wakeup();
   for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
@@ -150,7 +148,7 @@ void handleHeatOn() {
 }
 
 void handleHeatOff() {
-  isHeating = false; isCharging = false;
+  isHeating = false;
 
   wakeup();
   for(int i=0; i<10; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
@@ -164,7 +162,6 @@ void handleHeatOff() {
 }
 
 void handleChargeOn() {
-  isCharging = true; isHeating = false;
 
   wakeup();
   for(int i=0; i<20; i++) { sendCAN(0x56E, start_charge_data, 4); delay(100); }
