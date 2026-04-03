@@ -27,6 +27,29 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * Power the Lilygo using a standard USB cable from the adapter.
 * Connect `CAN-H` and `CAN-L` to the Lilygo's TWAI pins (Port B: TX 7, RX 6 in this code).
 
+## Configuration
+
+Before compiling, you must set up your Wi-Fi credentials so the device can connect to your desired wireless network or mobile hotspot. This is required to access the device's web interface.
+
+Open `simppeliTCU/configuration.h` and update the following variables with your network details:
+```cpp
+const char* ssid = "SINUN_WIFI_NIMI";      // Your Wi-Fi SSID
+const char* password = "SINUN_WIFI_SALASANA";  // Your Wi-Fi Password
+```
+
+## Compiling and Uploading with Arduino IDE
+
+To compile and upload the firmware for the Lilygo T-2CAN board using the Arduino IDE, please configure the following settings:
+
+1. **Board Selection**: Select **ESP32S3 Dev Module** as your target board.
+   * If you haven't set up the ESP32 core yet, please follow the [LilyGO T-2CAN Quick Start Guide](https://wiki.lilygo.cc/get_started/en/High_speed/T-2Can/T-2Can.html#Quick-Start) to download the required board files.
+   
+   ![Select ESP32S3 Dev Module](arduino_ide_esp32s3_dev_module.jpg)
+
+2. **Serial Output Configuration**: **USB CDC On Boot** needs to be set to **"Enabled"** for the printouts to appear in the Serial Monitor.
+   
+   ![Enable USB CDC on Boot](set-cdc-on-boot-enabled.jpg)
+
 ## The CAN Magic (Discoveries)
 This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the community). While climate commands are somewhat known, this project also maps the previously undocumented remote charging sequences for the ZE1:
 
