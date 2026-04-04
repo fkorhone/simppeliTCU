@@ -15,6 +15,10 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 
 ![Screenshot of the Web UI from mobile phone browser](screenshot.jpg)
 
+## Videos
+* **First trials:** [https://youtu.be/qn05-901b3Y](https://youtu.be/qn05-901b3Y)
+* **Web interface through wifi:** [https://youtube.com/shorts/XqAgwizNodE](https://youtube.com/shorts/XqAgwizNodE)
+
 ## Hardware Requirements
 1. **Lilygo T-2CAN** (ESP32 with built-in CAN transceiver).
 2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended: a flush-mount 12V USB car socket).
@@ -29,7 +33,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 
 ## Configuration
 
-Before compiling, you must set up your Wi-Fi credentials so the device can connect to your desired wireless network or mobile hotspot. This is required to access the device's web interface.
+Before compiling, set up your Wi-Fi credentials so the device can connect to your desired wireless network or mobile hotspot. This is required to access the device's web interface.
 
 Open `simppeliTCU/configuration.h` and update the following variables with your network details:
 ```cpp
@@ -62,6 +66,10 @@ This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the comm
   * **Climate ABORT (Force Stop):** Sequence starting with `96 00 00 00`
   * **Climate OFF:** `56 08 00 00` Explicit deactivation, sent after Climate ABORT in the shutdown sequence. (`0x46` Init with bit 4 set)
   * **Charge ON:** `66 08 00 00` Called instead of Init/Prepare `46` but with one bit (0x20) being set
+
+## Known Issues
+* **Waking the car from sleep is unreliable:** This means that requesting live value readouts and initiating temperature control do not always work as expected.
+* **CAN communication errors:** When the original TCU is disconnected from the CAN bus, other modules raise a set of CAN-related communication errors. The current implementation does not mimic the correct responses to keep other modules happy. However, no dashboard warning lights have illuminated, and no other issues have been noticed while driving.
 
 ## Known Limitations / Research
 * **Sleep (charging):** `A6 00 00 00` Captured what appears to be variant of 0x86, not sure if this was error related (charging did not start this time) or always used at end of every charge start sequence.
