@@ -24,6 +24,8 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended: a flush-mount 12V USB car socket).
 3. Connectors/pins to mate with the original TCU harness.
 
+**See the [Installation Guide](INSTALLATION.md) for full step-by-step instructions, wiring diagrams, and required tools.**
+
 ### ⚠️ CRITICAL WIRING WARNING
 **DO NOT connect the car's 12V line directly to the Lilygo board!** Automotive 12V systems experience massive voltage spikes (transients) that will most likely damage the ESP32. 
 * Unplug the IT-CAN wires from original TCU.
