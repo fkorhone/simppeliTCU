@@ -21,6 +21,7 @@ static uint8_t interrupt_data[4]    = {0x96, 0x00, 0x00, 0x00}; // Toiminnon kes
 static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Lämmitys pois (0x56E)
 
 // Tilamuuttujat
+bool wifiEnabled = false;
 bool isHeating = false;
 bool carIsAwake = false;
 unsigned long wakeTime = 0;
@@ -233,16 +234,40 @@ void handleChargeOn() {
   server.sendHeader("Location", "/"); server.send(303);
 }
 
+void manageWiFi() {
+  if(!wifiEnabled) return;
+  static unsigned long previousAttemptTime = 0;
+  static bool wifiAvailable = false;
+  const unsigned long retryInterval = 10000;
+  unsigned long currentTime = millis();
+
+  if ((WiFi.status() != WL_CONNECTED) && (currentTime - previousAttemptTime >= retryInterval))
+  {
+    Serial.println("WiFi-yhteys puuttuu, yritetään yhdistää...");
+    WiFi.disconnect();
+    wifiAvailable = false;
+    WiFi.begin(ssid, password);
+    previousAttemptTime = currentTime;
+  }
+  else if (WiFi.status() == WL_CONNECTED && !wifiAvailable) {
+    Serial.println("\nWi-Fi yhdistetty!");
+    Serial.print("Löydät käyttöliittymän selaimella osoitteesta: http://");
+    Serial.println(WiFi.localIP());
+    wifiAvailable = true;
+  }
+}
+
 void setup() {
   Serial.begin(115200);
-  
-  Serial.print("Yhdistetään verkkoon ");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) { delay(500); }
-  Serial.println("\nWi-Fi yhdistetty!");
-  Serial.print("Löydät käyttöliittymän selaimella osoitteesta: http://");
-  Serial.println(WiFi.localIP());
-  
+  if (ssid != "") {
+      WiFi.begin(ssid, password);
+      wifiEnabled = true;
+  }
+  else {
+    Serial.println("Wifi pois");
+    wifiEnabled = false;
+  }
+
   twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
   twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)CAN_TX_PIN, (gpio_num_t)CAN_RX_PIN, TWAI_MODE_NORMAL);
   twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
@@ -250,15 +275,18 @@ void setup() {
   twai_driver_install(&g_config, &t_config, &f_config);
   twai_start();
 
-  server.on("/", handleRoot);
-  server.on("/refresh", handleRefresh);
-  server.on("/heat_on", handleHeatOn);
-  server.on("/heat_off", handleHeatOff);
-  server.on("/charge_on", handleChargeOn);
-  server.begin();
+  if (wifiEnabled) {
+      server.on("/", handleRoot);
+      server.on("/refresh", handleRefresh);
+      server.on("/heat_on", handleHeatOn);
+      server.on("/heat_off", handleHeatOff);
+      server.on("/charge_on", handleChargeOn);
+      server.begin();
+  }
 }
 
 void loop() {
   server.handleClient();
   readAndHandleCANMessage();
+  manageWiFi();
 }

@@ -39,8 +39,8 @@ Before compiling, set up your Wi-Fi credentials so the device can connect to you
 
 Open `simppeliTCU/configuration.h` and update the following variables with your network details:
 ```cpp
-const char* ssid = "SINUN_WIFI_NIMI";      // Your Wi-Fi SSID
-const char* password = "SINUN_WIFI_SALASANA";  // Your Wi-Fi Password
+const char* ssid = "";
+const char* password = "";
 ```
 
 ## Compiling and Uploading with Arduino IDE
