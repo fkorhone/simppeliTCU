@@ -30,6 +30,11 @@ float currentSOC = -1.0;
 float cabinTemp = -99.0;
 float batteryVoltage = -1.0;
 
+void resetData() {
+    float currentSOC = -1.0;
+    float cabinTemp = -99.0;
+}
+
 // Apufunktio CAN-viestin lähettämiseen
 void sendCAN(uint32_t id, uint8_t* data, uint8_t len) {
   twai_message_t message;
@@ -128,7 +133,7 @@ void wakeup() {
 
 // Päivitä tiedot (Herätys)
 void handleRefresh() {
-
+  resetData();
   wakeup();
 
   for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
