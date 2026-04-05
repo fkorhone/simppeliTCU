@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 // --- WI-FI ASETUKSET ---
-const char* ssid = "SINUN_WIFI_NIMI";
-const char* password = "SINUN_WIFI_SALASANA";
+const char* ssid = "";
+const char* password = "";
 
 #endif
