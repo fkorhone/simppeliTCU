@@ -114,10 +114,15 @@ void readAndHandleCANMessage() {
 }
 
 void wakeup() {
-  for(int i=0; i<60; i++) { sendCAN(0x68C, wakeup_data, 1); delay(15); }
-  sendCAN(0x601, wakeup_601, 2);
+  twai_message_t message;
+  for(int i=0; i<130; i++) { 
+    sendCAN(0x68C, wakeup_data, 1);
+    if (twai_receive(&message, 0) == ESP_OK) {
+        if (message.identifier == 0x601) break;
+    }
+    
   delay(15);
-  sendCAN(0x68C, wakeup_data, 1);
+  }
   delay(50);
 }
 

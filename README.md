@@ -70,7 +70,6 @@ This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the comm
   * **Charge ON:** `66 08 00 00` Called instead of Init/Prepare `46` but with one bit (0x20) being set
 
 ## Known Issues
-* **Waking the car from sleep is unreliable:** This means that requesting live value readouts and initiating temperature control do not always work as expected.
 * **CAN communication errors:** When the original TCU is disconnected from the CAN bus, other modules raise a set of CAN-related communication errors. The current implementation does not mimic the correct responses to keep other modules happy. However, no dashboard warning lights have illuminated, and no other issues have been noticed while driving.
 
 ## Known Limitations / Research
