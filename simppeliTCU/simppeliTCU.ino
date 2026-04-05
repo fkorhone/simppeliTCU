@@ -11,7 +11,6 @@ WebServer server(80);
 
 // Leafin taikatavut
 static uint8_t wakeup_data[1]       = {0x00};                   // Herätyspingi (0x68C)
-static uint8_t wakeup_601[2]        = {0x83, 0xC0};
 static uint8_t heating_init[4]      = {0x46, 0x08, 0x00, 0x00}; // Lämmitys valmistelu (0x56E)
 static uint8_t idle_data[4]         = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E) Vaatii tarkistusta!
 
@@ -23,16 +22,32 @@ static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Lämmitys poi
 
 // Tilamuuttujat
 bool isHeating = false;
-unsigned long lastMsgTime = 0;
-
+bool carIsAwake = false;
+unsigned long wakeTime = 0;
 // Autosta luetut arvot
 float currentSOC = -1.0;
 float cabinTemp = -99.0;
 float batteryVoltage = -1.0;
 
 void resetData() {
-    float currentSOC = -1.0;
-    float cabinTemp = -99.0;
+    currentSOC = -1.0;
+    cabinTemp = -99.0;
+    batteryVoltage = -1.0;
+}
+
+void print_can_message(twai_message_t &message) {
+      unsigned long message_time = millis() - wakeTime;
+      Serial.print(message_time/1000.0, 3);
+      Serial.print(" 0x");
+      Serial.print(message.identifier, HEX);
+      Serial.print(" ");
+      for (int d = 0; d < message.data_length_code; d++) {
+        Serial.print(" 0x");
+        if (message.data[d] < 0x10) Serial.print("0");
+        Serial.print(message.data[d], HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
 }
 
 // Apufunktio CAN-viestin lähettämiseen
@@ -45,7 +60,28 @@ void sendCAN(uint32_t id, uint8_t* data, uint8_t len) {
   for (int i = 0; i < len; i++) {
     message.data[i] = data[i];
   }
-  twai_transmit(&message, pdMS_TO_TICKS(10));
+
+  if(twai_transmit(&message, pdMS_TO_TICKS(10)) == ESP_OK) {
+    Serial.print("> ");
+  } else {
+    Serial.print("! ");
+  }
+  print_can_message(message);
+}
+
+void waitCan(int delayMs) {
+    unsigned long startTime = millis();
+    while (millis() - startTime < delayMs) {
+      readAndHandleCANMessage();
+    }
+    delay(1);
+}
+
+void sendCAN(uint32_t id, uint8_t* data, uint8_t len, int repeat, int delayMs) {
+  for (int i = 0; i < repeat; i++) {
+    sendCAN(id, data, len);
+    waitCan(delayMs);
+  }
 }
 
 // 1. Pääsivu (HTML Käyttöliittymä)
@@ -99,7 +135,6 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-
 void readAndHandleCANMessage() {
   twai_message_t message;
   if (twai_receive(&message, 0) == ESP_OK) { // 0 = ei odota, lukee vain jos dataa on
@@ -115,74 +150,85 @@ void readAndHandleCANMessage() {
     else if (message.identifier == 0x5BC) {
       batteryVoltage = message.data[4] / 12.8;
     }
+    else if (message.identifier == 0x601) {
+      carIsAwake = true;
+    }
+    Serial.print("< ");
+    print_can_message(message);
   }
 }
 
+
+
 void wakeup() {
-  twai_message_t message;
+  Serial.print("### Wakeup! ###");
+  Serial.println();
+  Serial.print("# type(<,>,!) time(s) identifier data...");
+  Serial.println();
+  wakeTime = millis();
+  carIsAwake = false;
   for(int i=0; i<130; i++) { 
     sendCAN(0x68C, wakeup_data, 1);
-    if (twai_receive(&message, 0) == ESP_OK) {
-        if (message.identifier == 0x601) break;
+    waitCan(15);
+    if (carIsAwake) {
+      Serial.println("### Car is awake! ###");
+      break;
     }
-    
-  delay(15);
   }
-  delay(50);
+  waitCan(50);
 }
 
 // Päivitä tiedot (Herätys)
 void handleRefresh() {
+  Serial.println("### Refresh! ###");
   resetData();
   wakeup();
 
-  for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
+  sendCAN(0x56E, heating_init, 4, 20, 100);
   
   // kuunnellaan sekunti, että auto ehtii lähettää uudet arvot:
-  unsigned long start_time = millis();
-  while (millis() - start_time < 1000) {
-    readAndHandleCANMessage(); 
-    sleep(1);
-  }
+  waitCan(1000);
 
   // ja sitten nukkumaan:
-  for(int i=0; i<20; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  sendCAN(0x56E, idle_data, 4, 20, 100);
   
   server.sendHeader("Location", "/");
   server.send(303);
 }
 
 void handleHeatOn() {
+  Serial.println("### Heat ON! ###");
   isHeating = true;
 
   wakeup();
-  for(int i=0; i<20; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
-  for(int i=0; i<20; i++) { sendCAN(0x56E, heat_on_data, 4); delay(100); }
-  for(int i=0; i<20; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  sendCAN(0x56E, heating_init, 4,20,100);
+  sendCAN(0x56E, heat_on_data, 4,20,100);
+  sendCAN(0x56E, idle_data, 4,20,100);
   
   // After this the bus goes quiet, but the heating is on. 
   server.sendHeader("Location", "/"); server.send(303);
 }
 
 void handleHeatOff() {
+  Serial.println("### Heat OFF! ###");
   isHeating = false;
 
   wakeup();
-  for(int i=0; i<10; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
-  for(int i=0; i<9; i++) { sendCAN(0x56E, interrupt_data, 4); delay(100); }
-  for(int i=0; i<8; i++) { sendCAN(0x56E, heat_off_data, 4); delay(100); }
-  for(int i=0; i<4; i++) { sendCAN(0x56E, heating_init, 4); delay(100); }
-  for(int i=0; i<8; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  sendCAN(0x56E, heating_init, 4, 10, 100); 
+  sendCAN(0x56E, interrupt_data, 4, 9, 100);
+  sendCAN(0x56E, heat_off_data, 4, 8, 100);
+  sendCAN(0x56E, heating_init, 4, 4, 100);
+  sendCAN(0x56E, idle_data, 4, 8, 100);
   
   // After this the bus goes quiet, and the heating is off.
   server.sendHeader("Location", "/"); server.send(303);
 }
 
 void handleChargeOn() {
-
+  Serial.println("### Charge ON! ###");
   wakeup();
-  for(int i=0; i<20; i++) { sendCAN(0x56E, start_charge_data, 4); delay(100); }
-  for(int i=0; i<8; i++) { sendCAN(0x56E, idle_data, 4); delay(100); }
+  sendCAN(0x56E, start_charge_data, 4, 20, 100);
+  sendCAN(0x56E, idle_data, 4, 8, 100);
   
   server.sendHeader("Location", "/"); server.send(303);
 }
