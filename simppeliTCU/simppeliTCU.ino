@@ -6,27 +6,27 @@
 
 WebServer server(80);
 
-// --- CAN ASETUKSET (Portti B) ---
+// --- CAN SETTINGS (Port B) ---
 #define CAN_TX_PIN 7 
 #define CAN_RX_PIN 6
 
-// Leafin taikatavut
-static uint8_t wakeup_data[1]       = {0x00};                   // Herätyspingi (0x68C)
-static uint8_t heating_init[4]      = {0x46, 0x08, 0x00, 0x00}; // Lämmitys valmistelu (0x56E)
-static uint8_t idle_data[4]         = {0x86, 0x00, 0x00, 0x00}; // Nukahtaminen (0x56E) Vaatii tarkistusta!
+// Leaf can messages
+static uint8_t wakeup_data[1]       = {0x00};                   // Wakeup ping (0x68C)
+static uint8_t heating_init[4]      = {0x46, 0x08, 0x00, 0x00}; // Heating init (0x56E)
+static uint8_t idle_data[4]         = {0x86, 0x00, 0x00, 0x00}; // Go to sleep (0x56E) Needs verification!
 
-static uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Lämmitys PÄÄLLE (0x56E)
-static uint8_t start_charge_data[4] = {0x66, 0x08, 0x00, 0x00}; // Lataus PÄÄLLE (0x56E)
+static uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Heating ON (0x56E)
+static uint8_t start_charge_data[4] = {0x66, 0x08, 0x00, 0x00}; // Charging ON (0x56E)
 
-static uint8_t interrupt_data[4]    = {0x96, 0x00, 0x00, 0x00}; // Toiminnon keskeytys (0x56E)
-static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Lämmitys pois (0x56E)
+static uint8_t interrupt_data[4]    = {0x96, 0x00, 0x00, 0x00}; // Interrupt action (0x56E)
+static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Heating OFF (0x56E)
 
-// Tilamuuttujat
+// State variables
 bool wifiEnabled = false;
 bool isHeating = false;
 bool carIsAwake = false;
 unsigned long wakeTime = 0;
-// Autosta luetut arvot
+// Values read from car
 float currentSOC = -1.0;
 float cabinTemp = -99.0;
 
@@ -50,7 +50,7 @@ void print_can_message(twai_message_t &message) {
       Serial.println();
 }
 
-// Apufunktio CAN-viestin lähettämiseen
+// Helper function to send CAN message
 void sendCAN(uint32_t id, uint8_t* data, uint8_t len) {
   twai_message_t message;
   message.identifier = id;
@@ -84,7 +84,7 @@ void sendCAN(uint32_t id, uint8_t* data, uint8_t len, int repeat, int delayMs) {
   }
 }
 
-// 1. Pääsivu (HTML Käyttöliittymä)
+// 1. Main page (HTML UI)
 void handleRoot() {
   String html = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>";
   html += "body { font-family: Arial; text-align: center; margin-top: 20px; }";
@@ -98,7 +98,7 @@ void handleRoot() {
   
   html += "<h1>Leaf Et&auml;ohjaus</h1>";
 
-  // Näytetään luetut auton tiedot
+  // Show read car data
   html += "<div class='data-box'>";
   html += "<h3>Auton Tila</h3>";
   
@@ -117,10 +117,10 @@ void handleRoot() {
 
   html += "<a href='/refresh' class='btn btn-refresh'>P&auml;ivit&auml; tiedot (Her&auml;t&auml;)</a><br><hr style='width: 80%; max-width: 300px;'>";
 
-  // Tilaindikaattorit
+  // Status indicators
   if (isHeating) html += "<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>";
   
-  // Napit
+  // Buttons
   html += "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>";
   html += "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>";
   html += "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>";
@@ -131,13 +131,13 @@ void handleRoot() {
 
 void readAndHandleCANMessage() {
   twai_message_t message;
-  if (twai_receive(&message, 0) == ESP_OK) { // 0 = ei odota, lukee vain jos dataa on
-    // SOC (Akun varaus) ID: 0x55B
+  if (twai_receive(&message, 0) == ESP_OK) { // 0 = do not wait, read only if data is available
+    // SOC (State of Charge) ID: 0x55B
     if (message.identifier == 0x55B && message.data_length_code >= 2) {
       uint16_t soc_raw = (message.data[0] << 2) | (message.data[1] >> 6);
       currentSOC = soc_raw / 10.0;
     }
-    // Sisälämpötila ID: 0x54F
+    // Cabin temperature ID: 0x54F
     else if (message.identifier == 0x54F && message.data_length_code >= 1) {
       cabinTemp = (message.data[0] / 2.0) - 40.0;
     }
@@ -169,7 +169,7 @@ void wakeup() {
   waitCan(50);
 }
 
-// Päivitä tiedot (Herätys)
+// Update data (Wake up)
 void handleRefresh() {
   Serial.println("### Refresh! ###");
   resetData();
@@ -177,10 +177,10 @@ void handleRefresh() {
 
   sendCAN(0x56E, heating_init, 4, 20, 100);
   
-  // kuunnellaan sekunti, että auto ehtii lähettää uudet arvot:
+  // listen for a second so car has time to send new values:
   waitCan(1000);
 
-  // ja sitten nukkumaan:
+  // and then go to sleep:
   sendCAN(0x56E, idle_data, 4, 20, 100);
   
   server.sendHeader("Location", "/");
