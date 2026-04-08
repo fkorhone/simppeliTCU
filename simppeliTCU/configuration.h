@@ -1,7 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-// --- WI-FI ASETUKSET ---
+// --- WI-FI SETTINGS ---
 const char* ssid = "";
 const char* password = "";
 
