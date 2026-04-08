@@ -21,8 +21,7 @@ void resetData() {
 }
 
 void handleRoot() {
-  String html = mainPage(currentSOC, cabinTemp, isHeating);
-  server.send(200, "text/html", html);
+  sendMainPage(server, currentSOC, cabinTemp, isHeating);
 }
 
 void handleCarAwake() {

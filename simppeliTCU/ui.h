@@ -1,49 +1,65 @@
 #ifndef UI_H
 #define UI_H
 
-// 1. Main page (HTML UI)
-String mainPage(float currentSOC, float cabinTemp, int isHeating) {
-  String html = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>";
-  html += "body { font-family: Arial; text-align: center; margin-top: 20px; }";
-  html += ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}";
-  html += ".btn-refresh { background-color: #2196F3; }";
-  html += ".btn-heat-on { background-color: #ff5722; }";
-  html += ".btn-heat-off { background-color: #795548; }";
-  html += ".btn-charge-on { background-color: #4CAF50; }";
-  html += ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }";
-  html += "</style></head><body>";
-  
-  html += "<h1>Leaf Et&auml;ohjaus</h1>";
+#include <Arduino.h>
+#include <WebServer.h>
 
-  // Show read car data
-  html += "<div class='data-box'>";
-  html += "<h3>Auton Tila</h3>";
+// 1. Main page (HTML UI)
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isHeating) {
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  server.send(200, "text/html", "");
+
+  server.sendContent(F(
+    "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>\n"
+    "body { font-family: Arial; text-align: center; margin-top: 20px; }\n"
+    ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}\n"
+    ".btn-refresh { background-color: #2196F3; }\n"
+    ".btn-heat-on { background-color: #ff5722; }\n"
+    ".btn-heat-off { background-color: #795548; }\n"
+    ".btn-charge-on { background-color: #4CAF50; }\n"
+    ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }\n"
+    "</style></head><body>\n"
+    "<h1>Leaf Et&auml;ohjaus</h1>\n"
+    "<div class='data-box'>\n"
+    "<h3>Auton Tila</h3>\n"
+  ));
   
   if (currentSOC >= 0) {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> " + String(currentSOC, 1) + " %</p>";
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> "));
+    server.sendContent(String(currentSOC, 1));
+    server.sendContent(F(" %</p>\n"));
   } else {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> Odotetaan...</p>";
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> Odotetaan...</p>\n"));
   }
 
   if (cabinTemp > -30.0 && cabinTemp < 80.0) {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> " + String(cabinTemp, 1) + " &deg;C</p>";
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> "));
+    server.sendContent(String(cabinTemp, 1));
+    server.sendContent(F(" &deg;C</p>\n"));
   } else {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> Odotetaan...</p>";
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> Odotetaan...</p>\n"));
   }
-  html += "</div>";
 
-  html += "<a href='/refresh' class='btn btn-refresh'>P&auml;ivit&auml; tiedot (Her&auml;t&auml;)</a><br><hr style='width: 80%; max-width: 300px;'>";
+  server.sendContent(F(
+    "</div>\n"
+    "<a href='/refresh' class='btn btn-refresh'>P&auml;ivit&auml; tiedot (Her&auml;t&auml;)</a><br><hr style='width: 80%; max-width: 300px;'>\n"
+  ));
 
   // Status indicators
-  if (isHeating) html += "<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>";
+  if (isHeating) {
+    server.sendContent(F("<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>\n"));
+  }
   
   // Buttons
-  html += "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>";
-  html += "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>";
-  html += "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>";
-  
-  html += "</body></html>";
-  return html;
+  server.sendContent(F(
+    "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>\n"
+    "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>\n"
+    "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>\n"
+    "</body></html>\n"
+  ));
+
+  // An empty sendContent tells the client the chunked stream has ended
+  server.sendContent("");
 }
 
 #endif
