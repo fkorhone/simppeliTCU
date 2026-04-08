@@ -103,15 +103,15 @@ void manageWiFi() {
 
   if ((WiFi.status() != WL_CONNECTED) && (currentTime - previousAttemptTime >= retryInterval))
   {
-    Serial.println("WiFi-yhteys puuttuu, yritetään yhdistää...");
+    Serial.println("WiFi connection missing, trying to connect...");
     WiFi.disconnect();
     wifiAvailable = false;
     WiFi.begin(ssid, password);
     previousAttemptTime = currentTime;
   }
   else if (WiFi.status() == WL_CONNECTED && !wifiAvailable) {
-    Serial.println("\nWi-Fi yhdistetty!");
-    Serial.print("Löydät käyttöliittymän selaimella osoitteesta: http://");
+    Serial.println("\nWi-Fi connected!");
+    Serial.print("You can find the UI in the browser at: http://");
     Serial.println(WiFi.localIP());
     wifiAvailable = true;
   }
@@ -124,7 +124,7 @@ void setup() {
       wifiEnabled = true;
   }
   else {
-    Serial.println("Wifi pois");
+    Serial.println("WiFi disabled");
     wifiEnabled = false;
   }
 

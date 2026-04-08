@@ -19,42 +19,42 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isH
     ".btn-charge-on { background-color: #4CAF50; }\n"
     ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }\n"
     "</style></head><body>\n"
-    "<h1>Leaf Et&auml;ohjaus</h1>\n"
+    "<h1>Leaf Remote Control</h1>\n"
     "<div class='data-box'>\n"
-    "<h3>Auton Tila</h3>\n"
+    "<h3>Car Status</h3>\n"
   ));
   
   if (currentSOC >= 0) {
-    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> "));
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Battery:</b> "));
     server.sendContent(String(currentSOC, 1));
     server.sendContent(F(" %</p>\n"));
   } else {
-    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> Odotetaan...</p>\n"));
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Battery:</b> Waiting...</p>\n"));
   }
 
   if (cabinTemp > -30.0 && cabinTemp < 80.0) {
-    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> "));
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Cabin Temp:</b> "));
     server.sendContent(String(cabinTemp, 1));
     server.sendContent(F(" &deg;C</p>\n"));
   } else {
-    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> Odotetaan...</p>\n"));
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Cabin Temp:</b> Waiting...</p>\n"));
   }
 
   server.sendContent(F(
     "</div>\n"
-    "<a href='/refresh' class='btn btn-refresh'>P&auml;ivit&auml; tiedot (Her&auml;t&auml;)</a><br><hr style='width: 80%; max-width: 300px;'>\n"
+    "<a href='/refresh' class='btn btn-refresh'>Update Data (Wake Up)</a><br><hr style='width: 80%; max-width: 300px;'>\n"
   ));
 
   // Status indicators
   if (isHeating) {
-    server.sendContent(F("<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>\n"));
+    server.sendContent(F("<h3 style='color: #ff5722;'>HEATING ON</h3>\n"));
   }
   
   // Buttons
   server.sendContent(F(
-    "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>\n"
-    "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>\n"
-    "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>\n"
+    "<a href='/heat_on' class='btn btn-heat-on'>Start Heating</a><br>\n"
+    "<a href='/heat_off' class='btn btn-heat-off'>Stop Heating</a><br><br>\n"
+    "<a href='/charge_on' class='btn btn-charge-on'>Start Charging</a><br>\n"
     "</body></html>\n"
   ));
 
