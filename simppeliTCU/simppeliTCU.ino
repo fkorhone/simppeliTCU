@@ -3,23 +3,12 @@
 #include "driver/twai.h"
 #include "configuration.h"
 #include "canLeafZE1.h"
-
-WebServer server(80);
+#include "ui.h"
 
 // --- CAN SETTINGS (Port B) ---
 #define CAN_TX_PIN 7 
 #define CAN_RX_PIN 6
 
-// Leaf can messages
-static uint8_t wakeup_data[1]       = {0x00};                   // Wakeup ping (0x68C)
-static uint8_t heating_init[4]      = {0x46, 0x08, 0x00, 0x00}; // Heating init (0x56E)
-static uint8_t idle_data[4]         = {0x86, 0x00, 0x00, 0x00}; // Go to sleep (0x56E) Needs verification!
-
-static uint8_t heat_on_data[4]      = {0x4E, 0x08, 0x00, 0x00}; // Heating ON (0x56E)
-static uint8_t start_charge_data[4] = {0x66, 0x08, 0x00, 0x00}; // Charging ON (0x56E)
-
-static uint8_t interrupt_data[4]    = {0x96, 0x00, 0x00, 0x00}; // Interrupt action (0x56E)
-static uint8_t heat_off_data[4]     = {0x56, 0x08, 0x00, 0x00}; // Heating OFF (0x56E)
 
 // State variables
 bool wifiEnabled = false;
@@ -84,72 +73,27 @@ void sendCAN(uint32_t id, uint8_t* data, uint8_t len, int repeat, int delayMs) {
   }
 }
 
-// 1. Main page (HTML UI)
-void handleRoot() {
-  String html = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>";
-  html += "body { font-family: Arial; text-align: center; margin-top: 20px; }";
-  html += ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}";
-  html += ".btn-refresh { background-color: #2196F3; }";
-  html += ".btn-heat-on { background-color: #ff5722; }";
-  html += ".btn-heat-off { background-color: #795548; }";
-  html += ".btn-charge-on { background-color: #4CAF50; }";
-  html += ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }";
-  html += "</style></head><body>";
-  
-  html += "<h1>Leaf Et&auml;ohjaus</h1>";
-
-  // Show read car data
-  html += "<div class='data-box'>";
-  html += "<h3>Auton Tila</h3>";
-  
-  if (currentSOC >= 0) {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> " + String(currentSOC, 1) + " %</p>";
-  } else {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> Odotetaan...</p>";
-  }
-
-  if (cabinTemp > -30.0 && cabinTemp < 80.0) {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> " + String(cabinTemp, 1) + " &deg;C</p>";
-  } else {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> Odotetaan...</p>";
-  }
-  html += "</div>";
-
-  html += "<a href='/refresh' class='btn btn-refresh'>P&auml;ivit&auml; tiedot (Her&auml;t&auml;)</a><br><hr style='width: 80%; max-width: 300px;'>";
-
-  // Status indicators
-  if (isHeating) html += "<h3 style='color: #ff5722;'>L&Auml;MMITYS P&Auml;&Auml;LL&Auml;</h3>";
-  
-  // Buttons
-  html += "<a href='/heat_on' class='btn btn-heat-on'>K&auml;ynnist&auml; L&auml;mmitys</a><br>";
-  html += "<a href='/heat_off' class='btn btn-heat-off'>Sammuta L&auml;mmitys</a><br><br>";
-  html += "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>";
-  
-  html += "</body></html>";
-  server.send(200, "text/html", html);
+bool receivedMessageIs(twai_message_t &message, CANMessageReadout &readout) {
+  return message.identifier == readout.identifier && message.data_length_code >= readout.length;
 }
 
 void readAndHandleCANMessage() {
   twai_message_t message;
   if (twai_receive(&message, 0) == ESP_OK) { // 0 = do not wait, read only if data is available
-    // SOC (State of Charge) ID: 0x55B
-    if (message.identifier == 0x55B && message.data_length_code >= 2) {
+    if (receivedMessageIs(message, raw_soc_readout)) {
       uint16_t soc_raw = (message.data[0] << 2) | (message.data[1] >> 6);
       currentSOC = soc_raw / 10.0;
     }
-    // Cabin temperature ID: 0x54F
-    else if (message.identifier == 0x54F && message.data_length_code >= 1) {
+    else if (receivedMessageIs(message, cabin_temp_readout)) {
       cabinTemp = (message.data[0] / 2.0) - 40.0;
     }
-    else if (message.identifier == 0x601) {
+    else if (receivedMessageIs(message, car_awake_readout)) {
       carIsAwake = true;
     }
     Serial.print("< ");
     print_can_message(message);
   }
 }
-
-
 
 void wakeup() {
   Serial.print("### Wakeup! ###");
