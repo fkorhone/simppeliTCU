@@ -2,6 +2,7 @@
 #include <WebServer.h>
 #include "driver/twai.h"
 #include "configuration.h"
+#include "canLeafZE1.h"
 
 WebServer server(80);
 
@@ -28,12 +29,10 @@ unsigned long wakeTime = 0;
 // Autosta luetut arvot
 float currentSOC = -1.0;
 float cabinTemp = -99.0;
-float batteryVoltage = -1.0;
 
 void resetData() {
     currentSOC = -1.0;
     cabinTemp = -99.0;
-    batteryVoltage = -1.0;
 }
 
 void print_can_message(twai_message_t &message) {
@@ -109,12 +108,6 @@ void handleRoot() {
     html += "<p style='font-size: 20px; margin: 5px;'><b>Akku:</b> Odotetaan...</p>";
   }
 
-  if (batteryVoltage > 0 && batteryVoltage < 32) {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>12V Akku:</b> " + String(batteryVoltage, 1) + " V</p>";
-  } else {
-    html += "<p style='font-size: 20px; margin: 5px;'><b>12V Akku:</b> Odotetaan...</p>";
-  }
-
   if (cabinTemp > -30.0 && cabinTemp < 80.0) {
     html += "<p style='font-size: 20px; margin: 5px;'><b>Sis&auml;l&auml;mp&ouml;:</b> " + String(cabinTemp, 1) + " &deg;C</p>";
   } else {
@@ -147,9 +140,6 @@ void readAndHandleCANMessage() {
     // Sisälämpötila ID: 0x54F
     else if (message.identifier == 0x54F && message.data_length_code >= 1) {
       cabinTemp = (message.data[0] / 2.0) - 40.0;
-    }
-    else if (message.identifier == 0x5BC) {
-      batteryVoltage = message.data[4] / 12.8;
     }
     else if (message.identifier == 0x601) {
       carIsAwake = true;
