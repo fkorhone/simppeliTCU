@@ -1,10 +1,8 @@
 #ifndef UI_H
 #define UI_H
 
-WebServer server(80);
-
 // 1. Main page (HTML UI)
-void handleRoot() {
+String mainPage(float currentSOC, float cabinTemp, int isHeating) {
   String html = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>";
   html += "body { font-family: Arial; text-align: center; margin-top: 20px; }";
   html += ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}";
@@ -45,7 +43,7 @@ void handleRoot() {
   html += "<a href='/charge_on' class='btn btn-charge-on'>K&auml;ynnist&auml; Lataus</a><br>";
   
   html += "</body></html>";
-  server.send(200, "text/html", html);
+  return html;
 }
 
 #endif
