@@ -259,7 +259,7 @@ void manageWiFi() {
 
 void setup() {
   Serial.begin(115200);
-  if (ssid != "") {
+  if (strlen(ssid) > 0) {
       WiFi.begin(ssid, password);
       wifiEnabled = true;
   }
