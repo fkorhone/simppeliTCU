@@ -1,5 +1,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
+#include <ESPmDNS.h>
+#include <NetBIOS.h>
 #include "configuration.h"
 #include "canLeafZE1.h"
 #include "ui.h"
@@ -101,17 +103,42 @@ void manageWiFi() {
   const unsigned long retryInterval = 10000;
   unsigned long currentTime = millis();
 
-  if ((WiFi.status() != WL_CONNECTED) && (currentTime - previousAttemptTime >= retryInterval))
+  if (WiFi.status() != WL_CONNECTED)
   {
-    Serial.println("WiFi connection missing, trying to connect...");
-    WiFi.disconnect();
-    wifiAvailable = false;
-    WiFi.begin(ssid, password);
-    previousAttemptTime = currentTime;
+    if (wifiAvailable) {
+      Serial.println("WiFi disconnected, stopping mDNS/NBNS services...");
+      MDNS.end();
+      NBNS.end();
+      wifiAvailable = false;
+    }
+
+    if (currentTime - previousAttemptTime >= retryInterval) {
+      Serial.println("WiFi connection missing, trying to connect...");
+      WiFi.disconnect();
+      WiFi.begin(ssid, password);
+      previousAttemptTime = currentTime;
+    }
   }
-  else if (WiFi.status() == WL_CONNECTED && !wifiAvailable) {
+  else if (!wifiAvailable) {
     Serial.println("\nWi-Fi connected!");
+  
+    if (!MDNS.begin(hostName)) {
+      Serial.println("Error starting mDNS service!");
+    } else {
+      Serial.println("mDNS service started.");
+      MDNS.addService("http", "tcp", 80);
+    }
+    if (!NBNS.begin(hostName)) {
+      Serial.println("Error starting NBNS service!");
+    } else {
+      Serial.println("NBNS service started.");
+    }
+
     Serial.print("You can find the UI in the browser at: http://");
+    Serial.print(hostName);
+    Serial.print(".local or http://");
+    Serial.print(hostName);
+    Serial.println(" or by IP address:");
     Serial.println(WiFi.localIP());
     wifiAvailable = true;
   }
