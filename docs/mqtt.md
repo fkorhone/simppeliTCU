@@ -91,6 +91,12 @@ Where:
 | `ovms/<user>/<vehicle>/metric/v/c/charging` | Yes | Charging status: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/c/state` | Yes | Charging state: `charging`, `done`, `stopped`, `wait`, or empty |
 | `ovms/<user>/<vehicle>/metric/v/e/hvac` | Yes | HVAC status: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/d/fl` | Yes | Front left door open: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/d/fr` | Yes | Front right door open: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/d/rl` | Yes | Rear left door open: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/d/rr` | Yes | Rear right door open: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/d/trunk` | Yes | Trunk open: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/e/locked` | Yes | Vehicle locked: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/s/v3/connected` | Yes | Connection status (LWT): `yes` or `no` |
 | `ovms/<user>/<vehicle>/client/<clientid>/response/<commandid>` | No | Response to specific commands. |
 
@@ -107,4 +113,6 @@ Where:
 | `climatecontrol on` | Triggers `handleMqttHvacOn()` |
 | `climatecontrol off` | Triggers `handleMqttHvacOff()` |
 | `charge start` | Triggers `handleMqttChargeOn()` |
+| `lock <pin>` | Triggers `handleMqttLock()` (PIN is optional and ignored) |
+| `unlock <pin>` | Triggers `handleMqttUnlock()` (PIN is optional and ignored) |
 | `server v3 update modified` | Triggers `handleMqttRefresh()`, returns current SOC and cabin temp |

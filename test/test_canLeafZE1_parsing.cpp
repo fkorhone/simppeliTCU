@@ -9,6 +9,12 @@ extern float lastTemp_value;
 extern bool lastCharging_value;
 extern ChargerState lastChargerState_value;
 extern bool lastHVAC_value;
+extern bool lastDoor_fl;
+extern bool lastDoor_fr;
+extern bool lastDoor_rl;
+extern bool lastDoor_rr;
+extern bool lastDoor_trunk;
+extern bool lastLockStatus;
 
 // Accessor functions for the test
 namespace {
@@ -19,6 +25,12 @@ namespace {
         lastCharging_value = false;
         lastChargerState_value = ChargerState::IDLE;
         lastHVAC_value = false;
+        lastDoor_fl = false;
+        lastDoor_fr = false;
+        lastDoor_rl = false;
+        lastDoor_rr = false;
+        lastDoor_trunk = false;
+        lastLockStatus = false;
     }
 }
 
@@ -134,6 +146,83 @@ TEST(CanLeafZE1Parsing, HVACStatus_Parsing) {
     uint8_t hvacData4[] = {0x00, 0x31};
     handleReceivedMessage(0x54B, hvacData4, sizeof(hvacData4));
     EXPECT_TRUE(lastHVAC_value);
+}
+
+// Test Doors and Locks parsing
+TEST(CanLeafZE1Parsing, DoorsAndLocks_Parsing) {
+    resetMocks();
+    
+    // Everything closed and unlocked
+    uint8_t closedUnlockedData[] = {0x00, 0x00, 0x00};
+    handleReceivedMessage(0x60D, closedUnlockedData, sizeof(closedUnlockedData));
+    EXPECT_FALSE(lastDoor_trunk);
+    EXPECT_FALSE(lastDoor_rr);
+    EXPECT_FALSE(lastDoor_rl);
+    EXPECT_FALSE(lastDoor_fr);
+    EXPECT_FALSE(lastDoor_fl);
+    EXPECT_FALSE(lastLockStatus);
+    
+    resetMocks();
+
+    // All doors open and locked
+    // Trunk=1(0x80), RL=1(0x40), RR=1(0x20), FR=1(0x10), FL=1(0x08) -> 0xF8
+    // Locked d[2] byte field bit 3 = 0x10 -> byte[2]=0x10 
+    uint8_t allOpenLockedData[] = {0xF8, 0x00, 0x10};
+    handleReceivedMessage(0x60D, allOpenLockedData, sizeof(allOpenLockedData));
+    EXPECT_TRUE(lastDoor_trunk);
+    EXPECT_TRUE(lastDoor_rr);
+    EXPECT_TRUE(lastDoor_rl);
+    EXPECT_TRUE(lastDoor_fr);
+    EXPECT_TRUE(lastDoor_fl);
+    EXPECT_TRUE(lastLockStatus);
+
+    resetMocks();
+
+    // Just Trunk Open + Unlocked
+    uint8_t trunkOpenUnlockedData[] = {0x80, 0x00, 0x00};
+    handleReceivedMessage(0x60D, trunkOpenUnlockedData, sizeof(trunkOpenUnlockedData));
+    EXPECT_TRUE(lastDoor_trunk);
+    EXPECT_FALSE(lastDoor_rr);
+    EXPECT_FALSE(lastDoor_rl);
+    EXPECT_FALSE(lastDoor_fr);
+    EXPECT_FALSE(lastDoor_fl);
+    EXPECT_FALSE(lastLockStatus);
+
+    resetMocks();
+
+    // Rear Left Open + Unlocked
+    uint8_t rlOpenUnlockedData[] = {0x40, 0x00, 0x00};
+    handleReceivedMessage(0x60D, rlOpenUnlockedData, sizeof(rlOpenUnlockedData));
+    EXPECT_FALSE(lastDoor_trunk);
+    EXPECT_FALSE(lastDoor_rr);
+    EXPECT_TRUE(lastDoor_rl);
+    EXPECT_FALSE(lastDoor_fr);
+    EXPECT_FALSE(lastDoor_fl);
+    EXPECT_FALSE(lastLockStatus);
+
+    resetMocks();
+
+    // Rear Right Open + Unlocked
+    uint8_t rrOpenUnlockedData[] = {0x20, 0x00, 0x00};
+    handleReceivedMessage(0x60D, rrOpenUnlockedData, sizeof(rrOpenUnlockedData));
+    EXPECT_FALSE(lastDoor_trunk);
+    EXPECT_TRUE(lastDoor_rr);
+    EXPECT_FALSE(lastDoor_rl);
+    EXPECT_FALSE(lastDoor_fr);
+    EXPECT_FALSE(lastDoor_fl);
+    EXPECT_FALSE(lastLockStatus);
+
+    resetMocks();
+
+    // Front Left Open + Locked
+    uint8_t flOpenLockedData[] = {0x08, 0x00, 0x10};
+    handleReceivedMessage(0x60D, flOpenLockedData, sizeof(flOpenLockedData));
+    EXPECT_FALSE(lastDoor_trunk);
+    EXPECT_FALSE(lastDoor_rr);
+    EXPECT_FALSE(lastDoor_rl);
+    EXPECT_FALSE(lastDoor_fr);
+    EXPECT_TRUE(lastDoor_fl);
+    EXPECT_TRUE(lastLockStatus);
 }
 
 // Test that unknown message IDs are ignored

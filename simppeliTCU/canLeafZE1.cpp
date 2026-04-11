@@ -63,6 +63,18 @@ void handleHVACMessage(const uint8_t* data, uint8_t len) {
     handleHVACStatus(isOn);
 }
 
+void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
+    bool trunk = extractBool(data, door_trunk_field);
+    bool rr = extractBool(data, door_rr_field);
+    bool rl = extractBool(data, door_rl_field);
+    bool fr = extractBool(data, door_fr_field);
+    bool fl = extractBool(data, door_fl_field);
+    bool locked = extractBool(data, locked_field);
+
+    handleDoorStatus(fl, fr, rl, rr, trunk);
+    handleLockStatus(locked);
+}
+
 // Message parser dispatch table
 static const MessageParser parsers[] = {
     CAN_PARSER(raw_soc_readout, handleSOCMessage),
@@ -70,6 +82,7 @@ static const MessageParser parsers[] = {
     CAN_PARSER(car_awake_readout, handleCarAwakeMessage),
     CAN_PARSER(charger_status_readout, handleChargerMessage),
     CAN_PARSER(hvac_status_readout, handleHVACMessage),
+    CAN_PARSER(doors_and_locks_readout, handleDoorsAndLocksMessage),
 };
 
 // Can message reception handler, to be called when a CAN message is received
@@ -135,6 +148,16 @@ static const SequenceStep seq_charge_on[] = {
     MSG_STEP(idle_data, 8, 100)
 };
 
+static const SequenceStep seq_unlock_doors[] = {
+    MSG_STEP(unlock_doors_data, 1, 100),
+    MSG_STEP(idle_data, 8, 100)
+};
+
+static const SequenceStep seq_lock_doors[] = {
+    MSG_STEP(lock_doors_data, 1, 100),
+    MSG_STEP(idle_data, 8, 100)
+};
+
 struct SequenceDef {
     CanSequence seq;
     const SequenceStep* steps;
@@ -145,7 +168,9 @@ static const SequenceDef sequence_map[] = {
     { CanSequence::REFRESH, seq_refresh, sizeof(seq_refresh)/sizeof(seq_refresh[0]) },
     { CanSequence::HVAC_ON, seq_hvac_on, sizeof(seq_hvac_on)/sizeof(seq_hvac_on[0]) },
     { CanSequence::HVAC_OFF, seq_hvac_off, sizeof(seq_hvac_off)/sizeof(seq_hvac_off[0]) },
-    { CanSequence::CHARGE_ON, seq_charge_on, sizeof(seq_charge_on)/sizeof(seq_charge_on[0]) }
+    { CanSequence::CHARGE_ON, seq_charge_on, sizeof(seq_charge_on)/sizeof(seq_charge_on[0]) },
+    { CanSequence::UNLOCK_DOORS, seq_unlock_doors, sizeof(seq_unlock_doors)/sizeof(seq_unlock_doors[0]) },
+    { CanSequence::LOCK_DOORS, seq_lock_doors, sizeof(seq_lock_doors)/sizeof(seq_lock_doors[0]) }
 };
 
 void startSequence(CanSequence seq, unsigned long currentTimeMs) {
@@ -236,4 +261,3 @@ CanSeqResult manageCANSequence(unsigned long currentTimeMs) {
     }
     return CanSeqResult::PROCESSING;
 }
-

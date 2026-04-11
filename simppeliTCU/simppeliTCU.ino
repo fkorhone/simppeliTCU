@@ -21,6 +21,7 @@ float cabinTemp = -99.0;
 bool isChargingNow = false;
 ChargerState currentChargerState = ChargerState::IDLE;
 bool isHvacOn = false;
+int8_t lockState = -1;
 
 void resetData() {
     currentSOC = -1.0;
@@ -28,11 +29,12 @@ void resetData() {
     isChargingNow = false;
     currentChargerState = ChargerState::IDLE;
     isHvacOn = false;
+    lockState = -1;
 }
 
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState);
 }
 
 void handleCarAwake() {
@@ -54,6 +56,15 @@ void handleHVACStatus(bool isOn) {
 void handleCabinTemp(float temp) {
   cabinTemp = temp;
   mqttUpdateCabinTemp(temp);
+}
+
+void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk) {
+  mqttUpdateDoors(fl, fr, rl, rr, trunk);
+}
+
+void handleLockStatus(bool locked) {
+  lockState = locked ? 1 : 0;
+  mqttUpdateLock(locked);
 }
 
 void handleRawSOC(float soc) {
@@ -111,12 +122,62 @@ void handleMqttHvacOff() {
   startSequence(CanSequence::HVAC_OFF, millis());
 }
 
+void handleMqttLock() {
+  if (!getLockingEnabled()) {
+    Serial.println("### Lock Doors: Feature disabled (MQTT) ###");
+    mqttPublishStatus("Door locking is disabled. Enable it via CLI: set locking_enabled true");
+    return;
+  }
+  Serial.println("### Lock Doors! (MQTT) ###");
+  logSequenceStart();
+  startSequence(CanSequence::LOCK_DOORS, millis());
+}
+
+void handleMqttUnlock() {
+  if (!getLockingEnabled()) {
+    Serial.println("### Unlock Doors: Feature disabled (MQTT) ###");
+    mqttPublishStatus("Door locking is disabled. Enable it via CLI: set locking_enabled true");
+    return;
+  }
+  Serial.println("### Unlock Doors! (MQTT) ###");
+  logSequenceStart();
+  startSequence(CanSequence::UNLOCK_DOORS, millis());
+}
+
 void handleChargeOn() {
   Serial.println("### Charge ON! ###");
   logSequenceStart();
   startSequence(CanSequence::CHARGE_ON, millis());
   server.sendHeader("Location", "/"); 
   server.send(303);
+}
+
+void handleUnlock() {
+  if (!getLockingEnabled()) {
+    Serial.println("### Unlock Doors: Feature disabled ###");
+    server.send(403, "text/plain", "Door locking is disabled. Enable it via CLI: set locking_enabled true");
+    return;
+  }
+  Serial.println("### Unlock Doors! ###");
+
+  logSequenceStart();
+  startSequence(CanSequence::UNLOCK_DOORS, millis());
+
+  server.sendHeader("Location", "/"); server.send(303);
+}
+
+void handleLock() {
+  if (!getLockingEnabled()) {
+    Serial.println("### Lock Doors: Feature disabled ###");
+    server.send(403, "text/plain", "Door locking is disabled. Enable it via CLI: set locking_enabled true");
+    return;
+  }
+  Serial.println("### Lock Doors! ###");
+
+  logSequenceStart();
+  startSequence(CanSequence::LOCK_DOORS, millis());
+
+  server.sendHeader("Location", "/"); server.send(303);
 }
 
 void handleMqttChargeOn() {
@@ -257,6 +318,8 @@ void setup() {
       server.on("/hvac_on", handleHvacOn);
       server.on("/hvac_off", handleHvacOff);
       server.on("/charge_on", handleChargeOn);
+      server.on("/unlock", handleUnlock);
+      server.on("/lock", handleLock);
       server.begin();
   }
 }

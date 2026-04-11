@@ -14,6 +14,8 @@ struct OvmsCommands {
   const char* hvacOff = "climatecontrol off";
   const char* chargeOn = "charge start";
   const char* status = "server v3 update modified";
+  const char* lock = "lock";
+  const char* unlock = "unlock";
 };
 static const OvmsCommands ovmsCmds;
 
@@ -23,16 +25,37 @@ struct OvmsMetrics {
   const char* chargingState = "metric/v/c/state";
   const char* chargingActive = "metric/v/c/charging";
   const char* hvacActive = "metric/v/e/hvac";
+  const char* doorFL = "metric/v/d/fl";
+  const char* doorFR = "metric/v/d/fr";
+  const char* doorRL = "metric/v/d/rl";
+  const char* doorRR = "metric/v/d/rr";
+  const char* doorTrunk = "metric/v/d/trunk";
+  const char* locked = "metric/v/e/locked";
 };
 static const OvmsMetrics ovmsMetrics;
 
 static float lastSOC = -1.0;
+static bool socDirty = false;
 static float lastCabinTemp = -99.0;
+static bool cabinTempDirty = false;
 static bool lastChargingStateSet = false;
 static bool lastIsCharging = false;
 static ChargerState lastChargerState = ChargerState::IDLE;
+static bool chargingDirty = false;
 static bool lastHvacStateSet = false;
 static bool lastIsHvacOn = false;
+static bool hvacDirty = false;
+static bool lastDoorsStateSet = false;
+static bool lastDoorFL = false;
+static bool lastDoorFR = false;
+static bool lastDoorRL = false;
+static bool lastDoorRR = false;
+static bool lastDoorTrunk = false;
+static bool doorsDirty = false;
+static bool lastLockStateSet = false;
+static bool lastLockState = false;
+static bool lockDirty = false;
+
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
 
@@ -70,11 +93,16 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
       
       // Prepare the response topic to reply to this specific command
       currentResponseTopic.format("%sclient/%s/response/%s", mqttPrefix.c_str(), clientId.c_str(), commandId);
-
-      if (msg.equals(ovmsCmds.hvacOn)) {
+      
+      // The app sends "lock <pin>" or "unlock <pin>"
+      // We need to check for the command prefix and ignore the pin.
+      if (msg.startsWith(ovmsCmds.lock)) {
+        handleMqttLock();
+      } else if (msg.startsWith(ovmsCmds.unlock)) {
+        handleMqttUnlock();
+      } else if (msg.equals(ovmsCmds.hvacOn)) {
         handleMqttHvacOn();
-      } 
-      else if (msg.equals(ovmsCmds.hvacOff)) {
+      } else if (msg.equals(ovmsCmds.hvacOff)) {
         handleMqttHvacOff();
       }
       else if (msg.equals(ovmsCmds.chargeOn)) {
@@ -121,11 +149,13 @@ boolean reconnectMQTT() {
     cmdTopic.format("%sclient/+/command/+", mqttPrefix.c_str());
     mqttClient.subscribe(cmdTopic.c_str());
     
-    // Send latest metrics on reconnect
-    if (lastSOC >= 0) mqttUpdateSOC(lastSOC);
-    if (lastCabinTemp > -30) mqttUpdateCabinTemp(lastCabinTemp);
-    if (lastChargingStateSet) mqttUpdateCharging(lastIsCharging, lastChargerState);
-    if (lastHvacStateSet) mqttUpdateHVAC(lastIsHvacOn);
+    // Force sync latest known metrics on reconnect
+    if (lastSOC >= 0) { socDirty = true; mqttUpdateSOC(lastSOC); }
+    if (lastCabinTemp > -30) { cabinTempDirty = true; mqttUpdateCabinTemp(lastCabinTemp); }
+    if (lastChargingStateSet) { chargingDirty = true; mqttUpdateCharging(lastIsCharging, lastChargerState); }
+    if (lastHvacStateSet) { hvacDirty = true; mqttUpdateHVAC(lastIsHvacOn); }
+    if (lastDoorsStateSet) { doorsDirty = true; mqttUpdateDoors(lastDoorFL, lastDoorFR, lastDoorRL, lastDoorRR, lastDoorTrunk); }
+    if (lastLockStateSet) { lockDirty = true; mqttUpdateLock(lastLockState); }
     
     return true;
   }
@@ -184,54 +214,114 @@ void manageMQTT() {
   }
 }
 
-void mqttPublishMetric(const char* metric, float value, const char* format = "%.1f") {
+bool mqttPublishMetric(const char* metric, float value, const char* format = "%.1f") {
   if (mqttClient.connected()) {
     StringBuffer<128> topic;
     topic.format("%s%s", mqttPrefix.c_str(), metric);
     StringBuffer<16> payload;
     payload.format(format, value);
     // retained = true
-    mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
+    return mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
   }
+  return false;
 }
 
-void mqttPublishMetricStr(const char* metric, const char* payload) {
+bool mqttPublishMetricStr(const char* metric, const char* payload) {
   if (mqttClient.connected()) {
     StringBuffer<128> topic;
     topic.format("%s%s", mqttPrefix.c_str(), metric);
-    mqttClient.publish(topic.c_str(), (const uint8_t*)payload, strlen(payload), true);
+    return mqttClient.publish(topic.c_str(), (const uint8_t*)payload, strlen(payload), true);
   }
+  return false;
 }
 
 void mqttUpdateCharging(bool isCharging, ChargerState state) {
+  if (lastChargingStateSet && lastIsCharging == isCharging && lastChargerState == state && !chargingDirty) {
+    return;
+  }
   lastChargingStateSet = true;
   lastIsCharging = isCharging;
   lastChargerState = state;
-  mqttPublishMetricStr(ovmsMetrics.chargingActive, isCharging ? "yes" : "no");
+
+  bool success = true;
+  success &= mqttPublishMetricStr(ovmsMetrics.chargingActive, isCharging ? "yes" : "no");
   switch (state) {
-    case ChargerState::CHARGING: mqttPublishMetricStr(ovmsMetrics.chargingState, "charging"); break;
-    case ChargerState::FINISHED: mqttPublishMetricStr(ovmsMetrics.chargingState, "done"); break;
-    case ChargerState::INTERRUPTED: mqttPublishMetricStr(ovmsMetrics.chargingState, "stopped"); break;
-    case ChargerState::WAITING: mqttPublishMetricStr(ovmsMetrics.chargingState, "wait"); break;
+    case ChargerState::CHARGING: success &= mqttPublishMetricStr(ovmsMetrics.chargingState, "charging"); break;
+    case ChargerState::FINISHED: success &= mqttPublishMetricStr(ovmsMetrics.chargingState, "done"); break;
+    case ChargerState::INTERRUPTED: success &= mqttPublishMetricStr(ovmsMetrics.chargingState, "stopped"); break;
+    case ChargerState::WAITING: success &= mqttPublishMetricStr(ovmsMetrics.chargingState, "wait"); break;
     case ChargerState::IDLE:
-    default: mqttPublishMetricStr(ovmsMetrics.chargingState, ""); break;
+    default: success &= mqttPublishMetricStr(ovmsMetrics.chargingState, ""); break;
   }
+  chargingDirty = !success;
 }
 
 void mqttUpdateHVAC(bool isOn) {
+  if (lastHvacStateSet && lastIsHvacOn == isOn && !hvacDirty) return;
   lastHvacStateSet = true;
   lastIsHvacOn = isOn;
-  mqttPublishMetricStr(ovmsMetrics.hvacActive, isOn ? "yes" : "no");
+  hvacDirty = !mqttPublishMetricStr(ovmsMetrics.hvacActive, isOn ? "yes" : "no");
 }
 
 void mqttUpdateSOC(float soc) {
+  if (lastSOC == soc && !socDirty) return;
   lastSOC = soc;
-  mqttPublishMetric(ovmsMetrics.soc, soc);
+  socDirty = !mqttPublishMetric(ovmsMetrics.soc, soc);
 }
 
 void mqttUpdateCabinTemp(float temp) {
+  if (lastCabinTemp == temp && !cabinTempDirty) return;
   lastCabinTemp = temp;
-  mqttPublishMetric(ovmsMetrics.cabinTemp, temp);
+  cabinTempDirty = !mqttPublishMetric(ovmsMetrics.cabinTemp, temp);
+}
+
+void mqttUpdateDoors(bool fl, bool fr, bool rl, bool rr, bool trunk) {
+  static unsigned long stableSince = 0;
+  static bool candFL = false, candFR = false, candRL = false, candRR = false, candTrunk = false;
+  static bool candSet = false;
+
+  if (lastDoorsStateSet && lastDoorFL == fl && lastDoorFR == fr &&
+      lastDoorRL == rl && lastDoorRR == rr && lastDoorTrunk == trunk && !doorsDirty) {
+    candSet = false;
+    return;
+  }
+
+  bool isRetry = (lastDoorsStateSet && lastDoorFL == fl && lastDoorFR == fr &&
+                  lastDoorRL == rl && lastDoorRR == rr && lastDoorTrunk == trunk);
+
+  if (!isRetry && (!candSet || candFL != fl || candFR != fr || candRL != rl || candRR != rr || candTrunk != trunk)) {
+    candFL = fl; candFR = fr; candRL = rl; candRR = rr; candTrunk = trunk;
+    stableSince = millis();
+    candSet = true;
+    return;
+  }
+
+  if (isRetry || millis() - stableSince >= 250) {
+    bool outFL = isRetry ? fl : candFL;
+    bool outFR = isRetry ? fr : candFR;
+    bool outRL = isRetry ? rl : candRL;
+    bool outRR = isRetry ? rr : candRR;
+    bool outTrunk = isRetry ? trunk : candTrunk;
+
+    bool success = true;
+    success &= mqttPublishMetricStr(ovmsMetrics.doorFL, outFL ? "yes" : "no");
+    success &= mqttPublishMetricStr(ovmsMetrics.doorFR, outFR ? "yes" : "no");
+    success &= mqttPublishMetricStr(ovmsMetrics.doorRL, outRL ? "yes" : "no");
+    success &= mqttPublishMetricStr(ovmsMetrics.doorRR, outRR ? "yes" : "no");
+    success &= mqttPublishMetricStr(ovmsMetrics.doorTrunk, outTrunk ? "yes" : "no");
+
+    lastDoorsStateSet = true;
+    lastDoorFL = outFL; lastDoorFR = outFR; lastDoorRL = outRL; lastDoorRR = outRR; lastDoorTrunk = outTrunk;
+    doorsDirty = !success;
+    candSet = false;
+  }
+}
+
+void mqttUpdateLock(bool locked) {
+  if (lastLockStateSet && lastLockState == locked && !lockDirty) return;
+  lastLockStateSet = true;
+  lastLockState = locked;
+  lockDirty = !mqttPublishMetricStr(ovmsMetrics.locked, locked ? "yes" : "no");
 }
 
 void mqttPublishStatus(const char* msg) {

@@ -47,4 +47,7 @@ ConfigStatus setMqttPassword(const char* value);
 const char* getVehicleId();
 ConfigStatus setVehicleId(const char* value);
 
+bool getLockingEnabled();
+ConfigStatus setLockingEnabled(bool value);
+
 #endif
