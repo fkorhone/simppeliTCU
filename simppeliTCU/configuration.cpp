@@ -65,6 +65,34 @@ public:
     }
 };
 
+class ConfigBool {
+private:
+    bool value;
+    const char* key;
+    bool default_val;
+public:
+    ConfigBool(const char* k, bool def) : value(def), key(k), default_val(def) {}
+    
+    void load() {
+        if (nvsReady && preferences.isKey(key)) {
+            value = preferences.getBool(key, default_val);
+        } else {
+            value = default_val;
+            if (nvsReady) preferences.putBool(key, value);
+        }
+    }
+    
+    ConfigStatus set(bool val) {
+        value = val;
+        if (nvsReady) preferences.putBool(key, value);
+        return ConfigStatus::OK;
+    }
+    
+    bool get() const { 
+        return value; 
+    }
+};
+
 // Define config objects
 static ConfigString<64> conf_ssid("ssid", "");
 static ConfigString<64> conf_password("password", "");
@@ -76,6 +104,7 @@ static ConfigInt        conf_mqtt_port("mqtt_port", 8883);
 static ConfigString<64> conf_mqtt_user("mqtt_user", "");
 static ConfigString<64> conf_mqtt_password("mqtt_password", "");
 static ConfigString<64> conf_vehicle_id("vehicle_id", "");
+static ConfigBool       conf_locking_enabled("locking_enabled", false);
 
 void initConfiguration() {
     nvsReady = preferences.begin("config", false);
@@ -93,6 +122,7 @@ void initConfiguration() {
     conf_mqtt_user.load();
     conf_mqtt_password.load();
     conf_vehicle_id.load();
+    conf_locking_enabled.load();
 }
 
 void factoryReset() {
@@ -157,3 +187,6 @@ ConfigStatus setMqttPassword(const char* value) { return conf_mqtt_password.set(
 
 const char* getVehicleId() { return conf_vehicle_id.get(); }
 ConfigStatus setVehicleId(const char* value) { return conf_vehicle_id.set(value); }
+
+bool getLockingEnabled() { return conf_locking_enabled.get(); }
+ConfigStatus setLockingEnabled(bool value) { return conf_locking_enabled.set(value); }

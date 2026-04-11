@@ -10,6 +10,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 ## Features
 * 🌡️ **Remote Climate Control:** Start and active abort of the cabin heater/AC.
 * 🔋 **Remote Charging:** Override the charge timer to start charging.
+* 🔐 **Door Locking:** Lock and unlock doors remotely (disabled by default, enable via configuration).
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 * 📡 **MQTT Support:** Integrate with home automation or mobile apps over encrypted transport. Note: unless proper certificate validation is implemented, the MQTT server is not authenticated. See the [MQTT Setup Guide](docs/mqtt.md).
@@ -57,6 +58,7 @@ set password MySecretPassword
 set ap_ssid LeafLocalAP
 set ap_password LeafLocalPassword
 set mqtt_server 192.168.1.100
+set locking_enabled true
 reboot
 ```
 
@@ -65,6 +67,7 @@ reboot
 * `ap_ssid`, `ap_password` (For creating a local Wi-Fi Access Point / AP mode)
 * `hostName`
 * `mqtt_server`, `mqtt_port`, `mqtt_user`, `mqtt_password`, `vehicle_id`
+* `locking_enabled` (Enable door lock/unlock functionality; default: `false`)
 
 **Wi-Fi Modes:**
 * **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.

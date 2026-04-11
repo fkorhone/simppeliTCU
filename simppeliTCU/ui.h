@@ -6,7 +6,7 @@
 #include "vehicleTypes.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -24,6 +24,8 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
     ".btn-hvac-on { background-color: #ff5722; }\n"
     ".btn-hvac-off { background-color: #795548; }\n"
     ".btn-charge-on { background-color: #4CAF50; }\n"
+    ".btn-unlock { background-color: #9C27B0; }\n"
+    ".btn-lock { background-color: #673AB7; }\n"
     ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }\n"
     "</style></head><body>\n"
     "<h1>Leaf Remote Control</h1>\n"
@@ -62,6 +64,14 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   }
   server.sendContent(F("</p>\n"));
 
+  if (lockState == 1) {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Locked</p>\n"));
+  } else if (lockState == 0) {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Unlocked</p>\n"));
+  } else {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Waiting...</p>\n"));
+  }
+
   server.sendContent(F(
     "</div>\n"
     "<a href='/refresh' class='btn btn-refresh'>Update Data (Wake Up)</a><br><hr style='width: 80%; max-width: 300px;'>\n"
@@ -79,7 +89,18 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   server.sendContent(F(
     "<a href='/hvac_on' class='btn btn-hvac-on'>Start HVAC</a><br>\n"
     "<a href='/hvac_off' class='btn btn-hvac-off'>Stop HVAC</a><br><br>\n"
-    "<a href='/charge_on' class='btn btn-charge-on'>Start Charging</a><br>\n"
+    "<a href='/charge_on' class='btn btn-charge-on'>Start Charging</a><br><br>\n"
+  ));
+
+  // Door control buttons (conditional)
+  if (lockingEnabled) {
+    server.sendContent(F(
+      "<a href='/unlock' class='btn btn-unlock'>Unlock Doors</a><br>\n"
+      "<a href='/lock' class='btn btn-lock'>Lock Doors</a><br>\n"
+    ));
+  }
+
+  server.sendContent(F(
     "</body></html>\n"
   ));
 

@@ -10,6 +10,7 @@ inline constexpr CANMessage<1> cabin_temp_readout = {0x54F};
 inline constexpr CANMessage<0> car_awake_readout = {0x601};
 inline constexpr CANMessage<6> charger_status_readout = {0x390};
 inline constexpr CANMessage<2> hvac_status_readout = {0x54B};
+inline constexpr CANMessage<3> doors_and_locks_readout = {0x60D};
 
 // Leaf can messages
 inline constexpr CANMessage<1> wakeup_data       = {0x68C, {0x00}};                  // Wakeup ping
@@ -19,6 +20,8 @@ inline constexpr CANMessage<4> hvac_on_data      = {0x56E, {0x4E, 0x08, 0x00, 0x
 inline constexpr CANMessage<4> start_charge_data = {0x56E, {0x66, 0x08, 0x00, 0x00}}; // Charging ON
 inline constexpr CANMessage<4> interrupt_data    = {0x56E, {0x96, 0x00, 0x00, 0x00}}; // Interrupt action
 inline constexpr CANMessage<4> hvac_off_data     = {0x56E, {0x56, 0x08, 0x00, 0x00}}; // HVAC OFF
+inline constexpr CANMessage<4> unlock_doors_data = {0x56E, {0x11, 0x00, 0x00, 0x00}}; // Unlock doors
+inline constexpr CANMessage<4> lock_doors_data   = {0x56E, {0x60, 0x80, 0x00, 0x00}}; // Lock doors
 
 // ===== CAN Field Definitions (bit 0 = MSB of byte 0) =====
 inline constexpr CANField soc_field = { 0, 10 };    
@@ -30,6 +33,12 @@ inline constexpr CANField chargeVolt_field = { 27, 2 };
 inline constexpr CANField hvac_bit0_field  = { 15, 1 };
 inline constexpr CANField hvac_bit4_field  = { 11, 1 }; 
 inline constexpr CANField hvac_bit5_field  = { 10, 1 }; 
+inline constexpr CANField door_trunk_field = { 0, 1 };
+inline constexpr CANField door_rl_field    = { 1, 1 };
+inline constexpr CANField door_rr_field    = { 2, 1 };
+inline constexpr CANField door_fr_field    = { 3, 1 };
+inline constexpr CANField door_fl_field    = { 4, 1 };
+inline constexpr CANField locked_field     = { 19, 1 };
 
 // Scaling definitions
 inline constexpr FieldScaling soc_scaling        = {false, 0.1f,   0.0f};
@@ -42,6 +51,8 @@ void handleCabinTemp(float temp);
 void handleCarAwake();
 void handleChargerStatus(bool isCharging, ChargerState state);
 void handleHVACStatus(bool isOn);
+void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk);
+void handleLockStatus(bool locked);
 
 // Sequence State Machine
 enum class CanSequence {
@@ -49,7 +60,9 @@ enum class CanSequence {
     REFRESH,
     HVAC_ON,
     HVAC_OFF,
-    CHARGE_ON
+    CHARGE_ON,
+    UNLOCK_DOORS,
+    LOCK_DOORS
 };
 
 enum class CanSeqResult { IDLE, PROCESSING, WAKE_SUCCESS, WAKE_TIMEOUT, SEQUENCE_FINISHED };
