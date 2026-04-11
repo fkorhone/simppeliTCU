@@ -81,3 +81,13 @@ void chargeOnSequence() {
   sendCAN(start_charge_data, 20, 100);
   sendCAN(idle_data, 8, 100);
 }
+
+void unlockDoorsSequence() {
+  sendCAN(unlock_doors_data, 1, 100);
+  sendCAN(idle_data, 8, 100);
+}
+
+void lockDoorsSequence() {
+  sendCAN(lock_doors_data, 1, 100);
+  sendCAN(idle_data, 8, 100);
+}
