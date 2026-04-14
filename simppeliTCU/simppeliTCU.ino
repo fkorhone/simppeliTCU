@@ -5,8 +5,10 @@
 #include "configuration.h"
 #include "canLeafZE1.h"
 #include "ui.h"
+#include "mqttInterface.h"
 
 WebServer server(80);
+
 
 // State variables
 bool wifiEnabled = false;
@@ -32,10 +34,12 @@ void handleCarAwake() {
 
 void handleCabinTemp(float temp) {
   cabinTemp = temp;
+  mqttUpdateCabinTemp(temp);
 }
 
 void handleRawSOC(float soc) {
   currentSOC = soc;
+  mqttUpdateSOC(soc);
 }
 
 void wakeup() {
@@ -67,6 +71,14 @@ void handleRefresh() {
   server.send(303);
 }
 
+void handleMqttRefresh() {
+  Serial.println("### Refresh! (MQTT) ###");
+  resetData();
+  
+  wakeup();
+  refreshSequence();
+}
+
 void handleHeatOn() {
   Serial.println("### Heat ON! ###");
   isHeating = true;
@@ -75,6 +87,15 @@ void handleHeatOn() {
   heatOnSequence();
   
   server.sendHeader("Location", "/"); server.send(303);
+}
+
+void handleMqttHeatOn() {
+  Serial.println("### Heat ON! (MQTT) ###");
+  isHeating = true;
+
+  wakeup();
+  heatOnSequence();
+  mqttPublishStatus("Heating started!");
 }
 
 void handleHeatOff() {
@@ -87,6 +108,15 @@ void handleHeatOff() {
   server.sendHeader("Location", "/"); server.send(303);
 }
 
+void handleMqttHeatOff() {
+  Serial.println("### Heat OFF! (MQTT) ###");
+  isHeating = false;
+
+  wakeup();
+  heatOffSequence();
+  mqttPublishStatus("Heating stopped.");
+}
+
 void handleChargeOn() {
   Serial.println("### Charge ON! ###");
   
@@ -94,6 +124,14 @@ void handleChargeOn() {
   chargeOnSequence();
   
   server.sendHeader("Location", "/"); server.send(303);
+}
+
+void handleMqttChargeOn() {
+  Serial.println("### Charge ON! (MQTT) ###");
+  
+  wakeup();
+  chargeOnSequence();
+  mqttPublishStatus("Charging forced on!");
 }
 
 void manageWiFi() {
@@ -155,6 +193,7 @@ void setup() {
     wifiEnabled = false;
   }
 
+  setupMQTT();
   setupCAN();
 
   if (wifiEnabled) {
@@ -169,6 +208,7 @@ void setup() {
 
 void loop() {
   server.handleClient();
+  manageMQTT();
   readAndHandleCANMessage();
   manageWiFi();
 }
