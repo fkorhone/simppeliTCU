@@ -1,0 +1,21 @@
+#ifndef MQTT_INTERFACE_H
+#define MQTT_INTERFACE_H
+
+#include <Arduino.h>
+
+// Initialization and Loop
+void setupMQTT();
+void manageMQTT();
+
+// Status updates
+void mqttUpdateSOC(float soc);
+void mqttUpdateCabinTemp(float temp);
+void mqttPublishStatus(const char* msg);
+
+// Optional callbacks implemented in simppeliTCU.ino
+extern void handleMqttHeatOn();
+extern void handleMqttHeatOff();
+extern void handleMqttChargeOn();
+extern void handleMqttRefresh();
+
+#endif
