@@ -3,63 +3,132 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include "configuration.h"
+#include "stringBuffer.h"
 
 WiFiClientSecure espClient;
 PubSubClient mqttClient(espClient);
 unsigned long lastMqttReconnectAttempt = 0;
+
+struct OvmsCommands {
+  const char* heatOn = "climatecontrol on";
+  const char* heatOff = "climatecontrol off";
+  const char* chargeOn = "charge start";
+  const char* status = "server v3 update modified";
+};
+static const OvmsCommands ovmsCmds;
+
+struct OvmsMetrics {
+  const char* soc = "metric/v/b/soc";
+  const char* cabinTemp = "metric/v/e/temp";
+};
+static const OvmsMetrics ovmsMetrics;
 
 static float lastSOC = -1.0;
 static float lastCabinTemp = -99.0;
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
 
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  String msg = "";
-  for (unsigned int i = 0; i < length; i++) {
-    msg += (char)payload[i];
-  }
-  
-  Serial.println("MQTT Command received: " + msg);
+static StringBuffer<64> mqttPrefix;
+static StringBuffer<128> currentResponseTopic;
 
-  if (msg == "HEAT_ON") {
-    handleMqttHeatOn();
-  } 
-  else if (msg == "HEAT_OFF") {
-    handleMqttHeatOff();
-  }
-  else if (msg == "CHARGE_ON") {
-    handleMqttChargeOn();
-  }
-  else if (msg == "STATUS") {
-    handleMqttRefresh();
-    mqttStatusRequested = true;
-    statusRequestTime = millis();
-    mqttPublishStatus("Reading CAN bus...");
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  StringBuffer<64> msg;
+  msg.copyFromData(payload, length);
+  msg.trim();
+  msg.toLowerCase();
+
+  Serial.print("MQTT Command received on topic: ");
+  Serial.println(topic);
+  Serial.print("Payload: ");
+  Serial.println(msg.c_str());
+
+  StringBuffer<80> clientPrefix;
+  clientPrefix.format("%sclient/", mqttPrefix.c_str());
+  
+  StringBuffer<128> topicStr;
+  topicStr.copyFrom(topic);
+  
+  // OVMS app sends commands to client/<clientid>/command/<commandid>
+  if (topicStr.startsWith(clientPrefix.c_str())) {
+    const char* clientInfo = topicStr.c_str() + clientPrefix.length();
+    const char* cmdMarker = strstr(clientInfo, "/command/");
+    
+    if (cmdMarker != NULL) {
+      size_t clientIdLen = cmdMarker - clientInfo;
+      StringBuffer<64> clientId;
+      clientId.copyFromData((const byte*)clientInfo, clientIdLen);
+      
+      const char* commandId = cmdMarker + 9;
+      
+      // Prepare the response topic to reply to this specific command
+      currentResponseTopic.format("%sclient/%s/response/%s", mqttPrefix.c_str(), clientId.c_str(), commandId);
+
+      if (msg.equals(ovmsCmds.heatOn)) {
+        handleMqttHeatOn();
+      } 
+      else if (msg.equals(ovmsCmds.heatOff)) {
+        handleMqttHeatOff();
+      }
+      else if (msg.equals(ovmsCmds.chargeOn)) {
+        handleMqttChargeOn();
+      }
+      else if (msg.equals(ovmsCmds.status)) {
+        handleMqttRefresh();
+        mqttStatusRequested = true;
+        statusRequestTime = millis();
+        // Respond immediately, full status sent later in manageMQTT()
+        mqttPublishStatus("Reading CAN bus...");
+      }
+      else {
+        StringBuffer<64> unknownMsg;
+        unknownMsg.format("Unknown command: %s", msg.c_str());
+        mqttPublishStatus(unknownMsg.c_str());
+      }
+    }
   }
 }
 
 boolean reconnectMQTT() {
-  String clientId = "simppeliTCU-" + String(random(0xffff), HEX);
+  StringBuffer<32> clientId;
+  clientId.format("simppeliTCU-%04X", (unsigned int)random(0xffff));
+  
+  StringBuffer<128> willTopic;
+  willTopic.format("%smetric/s/v3/connected", mqttPrefix.c_str());
   
   bool connected = false;
   if (strlen(mqtt_user) > 0) {
-    connected = mqttClient.connect(clientId.c_str(), mqtt_user, mqtt_password);
+    connected = mqttClient.connect(clientId.c_str(), mqtt_user, mqtt_password, willTopic.c_str(), 0, true, "no");
   } else {
-    connected = mqttClient.connect(clientId.c_str());
+    connected = mqttClient.connect(clientId.c_str(), "", "", willTopic.c_str(), 0, true, "no");
   }
 
   if (connected) {
     Serial.println("SECURE MQTT Connected!");
-    mqttClient.subscribe(mqtt_topic_commands);
-    mqttPublishStatus("simppeliTCU (TLS) connected to network!");
+    
+    // Mark as connected in Retained message (for OVMS app to see vehicle is online)
+    mqttClient.publish(willTopic.c_str(), (const uint8_t*)"yes", 3, true);
+    
+    // Subscribe to OVMS commands from any client
+    StringBuffer<128> cmdTopic;
+    cmdTopic.format("%sclient/+/command/+", mqttPrefix.c_str());
+    mqttClient.subscribe(cmdTopic.c_str());
+    
+    // Send latest metrics on reconnect
+    if (lastSOC >= 0) mqttUpdateSOC(lastSOC);
+    if (lastCabinTemp > -30) mqttUpdateCabinTemp(lastCabinTemp);
+    
     return true;
   }
   return false;
 }
 
 void setupMQTT() {
+  mqttPrefix.format("ovms/%s/%s/", mqtt_user, vehicle_id);
   espClient.setInsecure(); // Skip certificate validation for simplicity
   mqttClient.setServer(mqtt_server, mqtt_port);
+  
+  // OVMS messages have longer topics, so enlarging buffer is recommended
+  mqttClient.setBufferSize(512);
   mqttClient.setCallback(mqttCallback);
 }
 
@@ -79,23 +148,56 @@ void manageMQTT() {
 
   // Send status with delay if requested
   if (mqttStatusRequested && (millis() - statusRequestTime > 1500)) {
-    String statusMsg = "Battery: " + (lastSOC >= 0 ? String(lastSOC, 1) + "%" : "No data") + 
-                       " | Temp: " + (lastCabinTemp > -30 ? String(lastCabinTemp, 1) + "C" : "No data");
+    StringBuffer<16> socStr;
+    if (lastSOC >= 0) {
+      socStr.format("%.1f%%", lastSOC);
+    } else {
+      socStr.copyFrom("No data");
+    }
+    
+    StringBuffer<16> tempStr;
+    if (lastCabinTemp > -30) {
+      tempStr.format("%.1fC", lastCabinTemp);
+    } else {
+      tempStr.copyFrom("No data");
+    }
+    
+    StringBuffer<128> statusMsg;
+    statusMsg.format("Battery: %s | Temp: %s", socStr.c_str(), tempStr.c_str());
     mqttPublishStatus(statusMsg.c_str());
+    
     mqttStatusRequested = false;
+  }
+}
+
+void mqttPublishMetric(const char* metric, float value, const char* format = "%.1f") {
+  if (mqttClient.connected()) {
+    StringBuffer<128> topic;
+    topic.format("%s%s", mqttPrefix.c_str(), metric);
+    StringBuffer<16> payload;
+    payload.format(format, value);
+    // retained = true
+    mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
   }
 }
 
 void mqttUpdateSOC(float soc) {
   lastSOC = soc;
+  mqttPublishMetric(ovmsMetrics.soc, soc);
 }
 
 void mqttUpdateCabinTemp(float temp) {
   lastCabinTemp = temp;
+  mqttPublishMetric(ovmsMetrics.cabinTemp, temp);
 }
 
 void mqttPublishStatus(const char* msg) {
-  if (mqttClient.connected()) {
-    mqttClient.publish(mqtt_topic_status, msg);
+  if (mqttClient.connected() && !currentResponseTopic.isEmpty()) {
+    mqttClient.publish(currentResponseTopic.c_str(), msg);
+    
+    // Once the reading CAN bus status returns, we clear the response topic
+    if (!mqttStatusRequested) {
+      currentResponseTopic.clear(); 
+    }
   }
 }

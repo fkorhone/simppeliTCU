@@ -14,11 +14,10 @@ static const char* password = "";
 static const char* hostName = "leaf";
 
 // --- MQTT SETTINGS (Secure TLS connection) ---
-static const char* mqtt_server = ""; 
+static const char* mqtt_server = "";
 static const int mqtt_port = 8883; // 8883 is the port for secure traffic
-static const char* mqtt_user = ""; // Leave empty if no authentication is required
+static const char* mqtt_user = "";
 static const char* mqtt_password = "";
-static const char* mqtt_topic_commands = "testi/simppeliTCU/komennot";
-static const char* mqtt_topic_status = "testi/simppeliTCU/tila";
+static const char* vehicle_id = "";
 
 #endif
