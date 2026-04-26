@@ -18,10 +18,16 @@ bool carIsAwake = false;
 // Values read from car
 float currentSOC = -1.0;
 float cabinTemp = -99.0;
+bool isChargingNow = false;
+ChargerState currentChargerState = ChargerState::IDLE;
+bool isHvacOn = false;
 
 void resetData() {
     currentSOC = -1.0;
     cabinTemp = -99.0;
+    isChargingNow = false;
+    currentChargerState = ChargerState::IDLE;
+    isHvacOn = false;
 }
 
 void handleRoot() {
@@ -30,6 +36,17 @@ void handleRoot() {
 
 void handleCarAwake() {
   carIsAwake = true;
+}
+
+void handleChargerStatus(bool isCharging, ChargerState state) {
+  isChargingNow = isCharging;
+  currentChargerState = state;
+}
+
+void handleHVACStatus(bool isOn) {
+  isHvacOn = isOn;
+  isHeating = isOn; // Sync the manual switch with actual car state
+  
 }
 
 void handleCabinTemp(float temp) {

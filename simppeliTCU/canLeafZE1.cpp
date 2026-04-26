@@ -12,6 +12,41 @@ void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len) {
     else if (receivedMessageIs(identifier, len, car_awake_readout)) {
       handleCarAwake();
     }
+    else if (receivedMessageIs(identifier, len, charger_status_readout)) {
+      uint8_t cStatus = (data[5] >> 1) & 0x3f;
+      bool qc_state = (data[4] & 0x40) == 0x40;
+      bool vg_state = (data[0] >> 4) == 0x09;
+      float chargeVoltage = ((data[3] >> 3) & 0x03) * 110.0f;
+      
+      bool isCharging = false;
+      ChargerState state = ChargerState::IDLE;
+
+      if (cStatus == 0x01) {
+        if (qc_state && !vg_state) {
+          state = ChargerState::CHARGING;
+          isCharging = true;
+        } else {
+          state = ChargerState::IDLE;
+        }
+      } else if (cStatus == 0x04) {
+        if (chargeVoltage > 0) {
+          state = ChargerState::CHARGING;
+          isCharging = true;
+        } else {
+          state = ChargerState::INTERRUPTED;
+        }
+      } else if (cStatus == 0x02) {
+        state = ChargerState::FINISHED;
+      } else if (cStatus == 0x0c) {
+        state = ChargerState::WAITING;
+      }
+      
+      handleChargerStatus(isCharging, state);
+    }
+    else if (receivedMessageIs(identifier, len, hvac_status_readout)) {
+      bool isOn = (data[1] & 0x01) || (data[1] & 0x30);
+      handleHVACStatus(isOn);
+    }
 }
 
 // Control Sequences

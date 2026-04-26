@@ -2,11 +2,14 @@
 #define CAN_LEAF_ZE1_H
 
 #include "canInterface.h"
+#include "vehicleTypes.h"
 
 // Leaf readout messages
 inline constexpr CANMessage<2> raw_soc_readout = {0x55B};
 inline constexpr CANMessage<1> cabin_temp_readout = {0x54F};
 inline constexpr CANMessage<0> car_awake_readout = {0x601};
+inline constexpr CANMessage<6> charger_status_readout = {0x390};
+inline constexpr CANMessage<2> hvac_status_readout = {0x54B};
 
 // Leaf can messages
 inline constexpr CANMessage<1> wakeup_data       = {0x68C, {0x00}};                  // Wakeup ping
@@ -21,6 +24,8 @@ inline constexpr CANMessage<4> heat_off_data     = {0x56E, {0x56, 0x08, 0x00, 0x
 void handleRawSOC(float soc);
 void handleCabinTemp(float temp);
 void handleCarAwake();
+void handleChargerStatus(bool isCharging, ChargerState state);
+void handleHVACStatus(bool isOn);
 
 // Control Sequences
 void wake();
