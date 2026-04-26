@@ -6,7 +6,7 @@
 #include "vehicleTypes.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHeating) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -15,8 +15,8 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
     "body { font-family: Arial; text-align: center; margin-top: 20px; }\n"
     ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}\n"
     ".btn-refresh { background-color: #2196F3; }\n"
-    ".btn-heat-on { background-color: #ff5722; }\n"
-    ".btn-heat-off { background-color: #795548; }\n"
+    ".btn-hvac-on { background-color: #ff5722; }\n"
+    ".btn-hvac-off { background-color: #795548; }\n"
     ".btn-charge-on { background-color: #4CAF50; }\n"
     ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }\n"
     "</style></head><body>\n"
@@ -58,7 +58,7 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   ));
 
   // Status indicators
-  if (isHeating) {
+  if (isHvacOn) {
     server.sendContent(F("<h3 style='color: #ff5722;'>HVAC ON</h3>\n"));
   }
   if (isCharging) {
@@ -67,8 +67,8 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   
   // Buttons
   server.sendContent(F(
-    "<a href='/heat_on' class='btn btn-heat-on'>Start Heating</a><br>\n"
-    "<a href='/heat_off' class='btn btn-heat-off'>Stop Heating</a><br><br>\n"
+    "<a href='/hvac_on' class='btn btn-hvac-on'>Start HVAC</a><br>\n"
+    "<a href='/hvac_off' class='btn btn-hvac-off'>Stop HVAC</a><br><br>\n"
     "<a href='/charge_on' class='btn btn-charge-on'>Start Charging</a><br>\n"
     "</body></html>\n"
   ));

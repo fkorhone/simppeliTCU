@@ -12,7 +12,6 @@ WebServer server(80);
 
 // State variables
 bool wifiEnabled = false;
-bool isHeating = false;
 bool carIsAwake = false;
 
 // Values read from car
@@ -31,7 +30,7 @@ void resetData() {
 }
 
 void handleRoot() {
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn || isHeating);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn);
 }
 
 void handleCarAwake() {
@@ -46,7 +45,6 @@ void handleChargerStatus(bool isCharging, ChargerState state) {
 
 void handleHVACStatus(bool isOn) {
   isHvacOn = isOn;
-  isHeating = isOn; // Sync the manual switch with actual car state
   
   mqttUpdateHVAC(isOn);
 }
@@ -98,42 +96,42 @@ void handleMqttRefresh() {
   refreshSequence();
 }
 
-void handleHeatOn() {
-  Serial.println("### Heat ON! ###");
-  isHeating = true;
+void handleHvacOn() {
+  Serial.println("### HVAC ON! ###");
+  isHvacOn = true;
 
   wakeup();
-  heatOnSequence();
+  hvacOnSequence();
   
   server.sendHeader("Location", "/"); server.send(303);
 }
 
-void handleMqttHeatOn() {
-  Serial.println("### Heat ON! (MQTT) ###");
-  isHeating = true;
+void handleMqttHvacOn() {
+  Serial.println("### HVAC ON! (MQTT) ###");
+  isHvacOn = true;
 
   wakeup();
-  heatOnSequence();
-  mqttPublishStatus("Heating started!");
+  hvacOnSequence();
+  mqttPublishStatus("HVAC started!");
 }
 
-void handleHeatOff() {
-  Serial.println("### Heat OFF! ###");
-  isHeating = false;
+void handleHvacOff() {
+  Serial.println("### HVAC OFF! ###");
+  isHvacOn = false;
 
   wakeup();
-  heatOffSequence();
+  hvacOffSequence();
   
   server.sendHeader("Location", "/"); server.send(303);
 }
 
-void handleMqttHeatOff() {
-  Serial.println("### Heat OFF! (MQTT) ###");
-  isHeating = false;
+void handleMqttHvacOff() {
+  Serial.println("### HVAC OFF! (MQTT) ###");
+  isHvacOn = false;
 
   wakeup();
-  heatOffSequence();
-  mqttPublishStatus("Heating stopped.");
+  hvacOffSequence();
+  mqttPublishStatus("HVAC stopped.");
 }
 
 void handleChargeOn() {
@@ -218,8 +216,8 @@ void setup() {
   if (wifiEnabled) {
       server.on("/", handleRoot);
       server.on("/refresh", handleRefresh);
-      server.on("/heat_on", handleHeatOn);
-      server.on("/heat_off", handleHeatOff);
+      server.on("/hvac_on", handleHvacOn);
+      server.on("/hvac_off", handleHvacOff);
       server.on("/charge_on", handleChargeOn);
       server.begin();
   }

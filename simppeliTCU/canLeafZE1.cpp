@@ -56,25 +56,25 @@ void wake() {
 }
 
 void refreshSequence() {
-  sendCAN(heating_init, 20, 100);
+  sendCAN(hvac_init, 20, 100);
   waitCAN(1000);
   sendCAN(idle_data, 20, 100);
 }
 
-void heatOnSequence() {
-  sendCAN(heating_init, 20, 100);
-  sendCAN(heat_on_data, 20, 100);
+void hvacOnSequence() {
+  sendCAN(hvac_init, 20, 100);
+  sendCAN(hvac_on_data, 20, 100);
   sendCAN(idle_data, 20, 100);
-  // After this the bus goes quiet, but the heating is on. 
+  // After this the bus goes quiet, but the HVAC is on. 
 }
 
-void heatOffSequence() {
-  sendCAN(heating_init, 10, 100); 
+void hvacOffSequence() {
+  sendCAN(hvac_init, 10, 100); 
   sendCAN(interrupt_data, 9, 100);
-  sendCAN(heat_off_data, 8, 100);
-  sendCAN(heating_init, 4, 100);
+  sendCAN(hvac_off_data, 8, 100);
+  sendCAN(hvac_init, 4, 100);
   sendCAN(idle_data, 8, 100);
-  // After this the bus goes quiet, and the heating is off.
+  // After this the bus goes quiet, and the HVAC is off.
 }
 
 void chargeOnSequence() {
