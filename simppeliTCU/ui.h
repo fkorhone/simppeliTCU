@@ -3,9 +3,10 @@
 
 #include <Arduino.h>
 #include <WebServer.h>
+#include "vehicleTypes.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isHeating) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHeating) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -40,6 +41,17 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isH
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Cabin Temp:</b> Waiting...</p>\n"));
   }
 
+  server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Charger:</b> "));
+  switch (chargerState) {
+    case ChargerState::CHARGING: server.sendContent(F("Charging")); break;
+    case ChargerState::FINISHED: server.sendContent(F("Finished")); break;
+    case ChargerState::INTERRUPTED: server.sendContent(F("Interrupted")); break;
+    case ChargerState::WAITING: server.sendContent(F("Waiting")); break;
+    case ChargerState::IDLE:
+    default: server.sendContent(F("Idle")); break;
+  }
+  server.sendContent(F("</p>\n"));
+
   server.sendContent(F(
     "</div>\n"
     "<a href='/refresh' class='btn btn-refresh'>Update Data (Wake Up)</a><br><hr style='width: 80%; max-width: 300px;'>\n"
@@ -47,7 +59,10 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isH
 
   // Status indicators
   if (isHeating) {
-    server.sendContent(F("<h3 style='color: #ff5722;'>HEATING ON</h3>\n"));
+    server.sendContent(F("<h3 style='color: #ff5722;'>HVAC ON</h3>\n"));
+  }
+  if (isCharging) {
+    server.sendContent(F("<h3 style='color: #4CAF50;'>CHARGING ON</h3>\n"));
   }
   
   // Buttons

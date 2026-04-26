@@ -31,7 +31,7 @@ void resetData() {
 }
 
 void handleRoot() {
-  sendMainPage(server, currentSOC, cabinTemp, isHeating);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn || isHeating);
 }
 
 void handleCarAwake() {
