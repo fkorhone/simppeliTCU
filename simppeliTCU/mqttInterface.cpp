@@ -19,7 +19,7 @@ static const OvmsCommands ovmsCmds;
 
 struct OvmsMetrics {
   const char* soc = "metric/v/b/soc";
-  const char* cabinTemp = "metric/v/e/temp";
+  const char* cabinTemp = "metric/v/e/cabintemp";
   const char* chargingState = "metric/v/c/state";
   const char* chargingActive = "metric/v/c/charging";
   const char* hvacActive = "metric/v/e/hvac";
