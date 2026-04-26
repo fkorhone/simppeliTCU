@@ -10,8 +10,8 @@ PubSubClient mqttClient(espClient);
 unsigned long lastMqttReconnectAttempt = 0;
 
 struct OvmsCommands {
-  const char* heatOn = "climatecontrol on";
-  const char* heatOff = "climatecontrol off";
+  const char* hvacOn = "climatecontrol on";
+  const char* hvacOff = "climatecontrol off";
   const char* chargeOn = "charge start";
   const char* status = "server v3 update modified";
 };
@@ -71,11 +71,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
       // Prepare the response topic to reply to this specific command
       currentResponseTopic.format("%sclient/%s/response/%s", mqttPrefix.c_str(), clientId.c_str(), commandId);
 
-      if (msg.equals(ovmsCmds.heatOn)) {
-        handleMqttHeatOn();
+      if (msg.equals(ovmsCmds.hvacOn)) {
+        handleMqttHvacOn();
       } 
-      else if (msg.equals(ovmsCmds.heatOff)) {
-        handleMqttHeatOff();
+      else if (msg.equals(ovmsCmds.hvacOff)) {
+        handleMqttHvacOff();
       }
       else if (msg.equals(ovmsCmds.chargeOn)) {
         handleMqttChargeOn();

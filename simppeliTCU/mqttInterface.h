@@ -16,8 +16,8 @@ void mqttUpdateHVAC(bool isOn);
 void mqttPublishStatus(const char* msg);
 
 // Optional callbacks implemented in simppeliTCU.ino
-extern void handleMqttHeatOn();
-extern void handleMqttHeatOff();
+extern void handleMqttHvacOn();
+extern void handleMqttHvacOff();
 extern void handleMqttChargeOn();
 extern void handleMqttRefresh();
 
