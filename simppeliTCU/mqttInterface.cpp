@@ -20,11 +20,19 @@ static const OvmsCommands ovmsCmds;
 struct OvmsMetrics {
   const char* soc = "metric/v/b/soc";
   const char* cabinTemp = "metric/v/e/temp";
+  const char* chargingState = "metric/v/c/state";
+  const char* chargingActive = "metric/v/c/charging";
+  const char* hvacActive = "metric/v/e/hvac";
 };
 static const OvmsMetrics ovmsMetrics;
 
 static float lastSOC = -1.0;
 static float lastCabinTemp = -99.0;
+static bool lastChargingStateSet = false;
+static bool lastIsCharging = false;
+static ChargerState lastChargerState = ChargerState::IDLE;
+static bool lastHvacStateSet = false;
+static bool lastIsHvacOn = false;
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
 
@@ -116,6 +124,8 @@ boolean reconnectMQTT() {
     // Send latest metrics on reconnect
     if (lastSOC >= 0) mqttUpdateSOC(lastSOC);
     if (lastCabinTemp > -30) mqttUpdateCabinTemp(lastCabinTemp);
+    if (lastChargingStateSet) mqttUpdateCharging(lastIsCharging, lastChargerState);
+    if (lastHvacStateSet) mqttUpdateHVAC(lastIsHvacOn);
     
     return true;
   }
@@ -179,6 +189,35 @@ void mqttPublishMetric(const char* metric, float value, const char* format = "%.
     // retained = true
     mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
   }
+}
+
+void mqttPublishMetricStr(const char* metric, const char* payload) {
+  if (mqttClient.connected()) {
+    StringBuffer<128> topic;
+    topic.format("%s%s", mqttPrefix.c_str(), metric);
+    mqttClient.publish(topic.c_str(), (const uint8_t*)payload, strlen(payload), true);
+  }
+}
+
+void mqttUpdateCharging(bool isCharging, ChargerState state) {
+  lastChargingStateSet = true;
+  lastIsCharging = isCharging;
+  lastChargerState = state;
+  mqttPublishMetricStr(ovmsMetrics.chargingActive, isCharging ? "yes" : "no");
+  switch (state) {
+    case ChargerState::CHARGING: mqttPublishMetricStr(ovmsMetrics.chargingState, "charging"); break;
+    case ChargerState::FINISHED: mqttPublishMetricStr(ovmsMetrics.chargingState, "done"); break;
+    case ChargerState::INTERRUPTED: mqttPublishMetricStr(ovmsMetrics.chargingState, "stopped"); break;
+    case ChargerState::WAITING: mqttPublishMetricStr(ovmsMetrics.chargingState, "wait"); break;
+    case ChargerState::IDLE:
+    default: mqttPublishMetricStr(ovmsMetrics.chargingState, ""); break;
+  }
+}
+
+void mqttUpdateHVAC(bool isOn) {
+  lastHvacStateSet = true;
+  lastIsHvacOn = isOn;
+  mqttPublishMetricStr(ovmsMetrics.hvacActive, isOn ? "yes" : "no");
 }
 
 void mqttUpdateSOC(float soc) {

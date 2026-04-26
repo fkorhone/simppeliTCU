@@ -41,12 +41,14 @@ void handleCarAwake() {
 void handleChargerStatus(bool isCharging, ChargerState state) {
   isChargingNow = isCharging;
   currentChargerState = state;
+  mqttUpdateCharging(isCharging, state);
 }
 
 void handleHVACStatus(bool isOn) {
   isHvacOn = isOn;
   isHeating = isOn; // Sync the manual switch with actual car state
   
+  mqttUpdateHVAC(isOn);
 }
 
 void handleCabinTemp(float temp) {
