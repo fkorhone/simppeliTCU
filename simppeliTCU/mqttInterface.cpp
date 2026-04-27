@@ -125,16 +125,16 @@ boolean reconnectMQTT() {
     if (lastSOC >= 0) mqttUpdateSOC(lastSOC);
     if (lastCabinTemp > -30) mqttUpdateCabinTemp(lastCabinTemp);
     if (lastChargingStateSet) mqttUpdateCharging(lastIsCharging, lastChargerState);
-    if (lastHvacStateSet) mqttUpdateHVAC(lastIsHvacOn);
-    
+    Serial.println("MQTT Connected over TLS (certificate validation disabled)!");
+    mqttClient.subscribe(mqtt_topic_commands);
+    mqttPublishStatus("simppeliTCU connected over TLS with certificate validation disabled!");
     return true;
   }
   return false;
 }
 
 void setupMQTT() {
-  mqttPrefix.format("ovms/%s/%s/", mqtt_user, vehicle_id);
-  espClient.setInsecure(); // Skip certificate validation for simplicity
+  espClient.setInsecure(); // Disable TLS certificate validation; connection is encrypted but unauthenticated
   mqttClient.setServer(mqtt_server, mqtt_port);
   
   // OVMS messages have longer topics, so enlarging buffer is recommended
