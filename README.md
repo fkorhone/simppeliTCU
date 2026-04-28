@@ -56,6 +56,52 @@ To compile and upload the firmware for the Lilygo T-2CAN board using the Arduino
    
    ![Enable USB CDC on Boot](set-cdc-on-boot-enabled.jpg)
 
+## Compiling and Uploading with Arduino CLI
+
+If you prefer using the command line, you can build and flash the firmware using the [Arduino CLI](https://arduino.github.io/arduino-cli/).
+
+1. **Install the ESP32 core and required libraries**:
+   ```bash
+   arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+   arduino-cli core install esp32:esp32 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+   arduino-cli lib install PubSubClient
+   ```
+
+2. **Compile the sketch** (ensuring USB CDC On Boot is enabled):
+   ```bash
+   arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc simppeliTCU
+   ```
+
+3. **Upload to the board** (replace `<PORT>` with your COM port, e.g., `COM3` or `/dev/cu.usbserial...`):
+   ```bash
+   arduino-cli upload -p <PORT> --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc simppeliTCU
+   ```
+
+## Flashing Pre-compiled Binaries
+
+To get the pre-compiled binaries, go to the **Actions** tab of this GitHub repository, click on the latest successful "Build" run, and download the `simppeliTCU-firmware` zip from the Artifacts section. These pre-compiled binaries already have "USB CDC On Boot" enabled.
+
+### Option 1: Easy Offline GUI (Windows)
+For the easiest offline flashing experience, use Espressif's official tool:
+1. Download the **Flash Download Tools** from [Espressif's website](https://www.espressif.com/en/support/download/other-tools).
+2. Extract and run the tool. Select **Chip Type: ESP32-S3** and **WorkMode: Develop**.
+3. In the tool:
+   - Select the downloaded `simppeliTCU.ino.bin` file and set the address to `0x10000`.
+   - Check the box next to the file path to enable it.
+   - Select your LilyGo board's COM port at the bottom right.
+4. Click **START** to flash the firmware.
+
+### Option 2: Command Line (esptool)
+If you prefer using the command line, you can flash it with `esptool` command (the tool automatically detects most of the hardware parameters):
+
+```bash
+# Install esptool if you haven't already: pip install esptool
+esptool --chip esp32s3 -p <PORT> write_flash 0x10000 simppeliTCU.ino.bin
+```
+*(Replace `<PORT>` with your COM port, e.g., `COM3` on Windows or `/dev/cu.usbserial...` on Mac/Linux)*
+
+Alternatively, you could use a browser-based tool like [Adafruit ESPTool](https://adafruit.github.io/Adafruit_WebSerial_ESPTool/) to flash the `.bin` to offset `0x10000`.
+
 ## The CAN Magic (Discoveries)
 This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the community). While climate commands are somewhat known, this project also maps the previously undocumented remote charging sequences for the ZE1:
 
