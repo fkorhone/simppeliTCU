@@ -57,6 +57,6 @@
 11. **Install back the TCU and glove box. Connect negative 12V battery terminal.**
 
 12. **Connect USB cable to PC and flash the LilyGo T-2CAN board with Arduino IDE.**
-    You can also try the board directly.
+    After flashing, open the Serial Monitor (at 115200 baud) to configure your Wi-Fi and MQTT settings (e.g., type `set ssid MyWiFi` and `reboot` - see README for all commands).
 
 13. **Connect USB cable to the 12V converter in the car to power the LilyGo.**

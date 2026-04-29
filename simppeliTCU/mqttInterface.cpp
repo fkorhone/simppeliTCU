@@ -104,8 +104,8 @@ boolean reconnectMQTT() {
   willTopic.format("%smetric/s/v3/connected", mqttPrefix.c_str());
   
   bool connected = false;
-  if (strlen(mqtt_user) > 0) {
-    connected = mqttClient.connect(clientId.c_str(), mqtt_user, mqtt_password, willTopic.c_str(), 0, true, "no");
+  if (strlen(getMqttUser()) > 0) {
+    connected = mqttClient.connect(clientId.c_str(), getMqttUser(), getMqttPassword(), willTopic.c_str(), 0, true, "no");
   } else {
     connected = mqttClient.connect(clientId.c_str(), "", "", willTopic.c_str(), 0, true, "no");
   }
@@ -133,9 +133,9 @@ boolean reconnectMQTT() {
 }
 
 void setupMQTT() {
-  mqttPrefix.format("ovms/%s/%s/", mqtt_user, vehicle_id);
+  mqttPrefix.format("ovms/%s/%s/", getMqttUser(), getVehicleId());
   espClient.setInsecure(); // Skip certificate validation for simplicity
-  mqttClient.setServer(mqtt_server, mqtt_port);
+  mqttClient.setServer(getMqttServer(), getMqttPort());
   
   // OVMS messages have longer topics, so enlarging buffer is recommended
   mqttClient.setBufferSize(512);

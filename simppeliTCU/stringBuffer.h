@@ -19,6 +19,10 @@ public:
     
     const char* c_str() const { return buffer; }
     
+    char* data() { return buffer; }
+    
+    size_t capacity() const { return N; }
+    
     size_t length() const { return strlen(buffer); }
     
     void copyFrom(const char* str) {

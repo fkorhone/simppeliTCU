@@ -35,13 +35,25 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 
 ## Configuration
 
-Before compiling, set up your Wi-Fi credentials so the device can connect to your desired wireless network or mobile hotspot. This is required to access the device's web interface.
+The device configuration (Wi-Fi, MQTT credentials, etc.) is stored in persistent memory. You configure the system through the USB serial connection using a terminal (such as the Arduino IDE Serial Monitor, PuTTY, or similar) set to **115200 baud** with Newline (`\n`) or Carriage Return (`\r`) enabled.
 
-Open `simppeliTCU/configuration.h` and update the following variables with your network details:
-```cpp
-const char* ssid = "";
-const char* password = "";
+Available commands:
+* `list` - Shows all current configuration properties.
+* `get <key>` - Prints the current value of the specified key.
+* `set <key> <value>` - Updates the specified key with a new value (saved persistently).
+* `reboot` - Restarts the device to apply the changes immediately.
+
+**Example configuration session:**
+```text
+set ssid MyWiFiNetwork
+set password MySecretPassword
+set mqtt_server 192.168.1.100
+reboot
 ```
+
+*Supported Configuration Keys:*
+* `ssid`, `password`, `hostName`
+* `mqtt_server`, `mqtt_port`, `mqtt_user`, `mqtt_password`, `vehicle_id`
 
 ## Compiling and Uploading with Arduino IDE
 
