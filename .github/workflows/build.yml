@@ -15,7 +15,7 @@ jobs:
     - name: Compile Sketch
       uses: arduino/compile-sketches@v1
       with:
-        fqbn: esp32:esp32:esp32s3
+        fqbn: esp32:esp32:esp32s3:CDCOnBoot=cdc
         sketch-paths: |
           simppeliTCU
         cli-compile-flags: |
