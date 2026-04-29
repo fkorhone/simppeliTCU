@@ -3,6 +3,7 @@
 #include <ESPmDNS.h>
 #include <NetBIOS.h>
 #include "configuration.h"
+#include "cliParser.h"
 #include "canLeafZE1.h"
 #include "ui.h"
 #include "mqttInterface.h"
@@ -170,29 +171,29 @@ void manageWiFi() {
     if (currentTime - previousAttemptTime >= retryInterval) {
       Serial.println("WiFi connection missing, trying to connect...");
       WiFi.disconnect();
-      WiFi.begin(ssid, password);
+      WiFi.begin(getWifiSSID(), getWifiPassword());
       previousAttemptTime = currentTime;
     }
   }
   else if (!wifiAvailable) {
     Serial.println("\nWi-Fi connected!");
   
-    if (!MDNS.begin(hostName)) {
+    if (!MDNS.begin(getHostName())) {
       Serial.println("Error starting mDNS service!");
     } else {
       Serial.println("mDNS service started.");
       MDNS.addService("http", "tcp", 80);
     }
-    if (!NBNS.begin(hostName)) {
+    if (!NBNS.begin(getHostName())) {
       Serial.println("Error starting NBNS service!");
     } else {
       Serial.println("NBNS service started.");
     }
 
     Serial.print("You can find the UI in the browser at: http://");
-    Serial.print(hostName);
+    Serial.print(getHostName());
     Serial.print(".local or http://");
-    Serial.print(hostName);
+    Serial.print(getHostName());
     Serial.println(" or by IP address:");
     Serial.println(WiFi.localIP());
     wifiAvailable = true;
@@ -201,8 +202,10 @@ void manageWiFi() {
 
 void setup() {
   Serial.begin(115200);
-  if (strlen(ssid) > 0) {
-      WiFi.begin(ssid, password);
+  initConfiguration();
+  
+  if (strlen(getWifiSSID()) > 0) {
+      WiFi.begin(getWifiSSID(), getWifiPassword());
       wifiEnabled = true;
   }
   else {
@@ -228,4 +231,5 @@ void loop() {
   manageMQTT();
   readAndHandleCANMessage();
   manageWiFi();
+  processSerialInput();
 }
