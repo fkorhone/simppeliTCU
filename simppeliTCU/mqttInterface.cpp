@@ -143,6 +143,10 @@ void setupMQTT() {
 }
 
 void manageMQTT() {
+  if (strlen(getMqttServer()) == 0) {
+    return; // Don't try to connect if MQTT server is not configured
+  }
+
   if (WiFi.status() == WL_CONNECTED) {
     if (!mqttClient.connected()) {
       if (millis() - lastMqttReconnectAttempt > 5000) {
