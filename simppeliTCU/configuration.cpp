@@ -68,6 +68,8 @@ public:
 // Define config objects
 static ConfigString<64> conf_ssid("ssid", "");
 static ConfigString<64> conf_password("password", "");
+static ConfigString<64> conf_ap_ssid("ap_ssid", "");
+static ConfigString<64> conf_ap_password("ap_password", "");
 static ConfigString<64> conf_hostName("hostName", "leaf");
 static ConfigString<64> conf_mqtt_server("mqtt_server", "");
 static ConfigInt        conf_mqtt_port("mqtt_port", 8883);
@@ -83,6 +85,8 @@ void initConfiguration() {
 
     conf_ssid.load();
     conf_password.load();
+    conf_ap_ssid.load();
+    conf_ap_password.load();
     conf_hostName.load();
     conf_mqtt_server.load();
     conf_mqtt_port.load();
@@ -96,6 +100,12 @@ ConfigStatus setWifiSSID(const char* value) { return conf_ssid.set(value); }
 
 const char* getWifiPassword() { return conf_password.get(); }
 ConfigStatus setWifiPassword(const char* value) { return conf_password.set(value); }
+
+const char* getApSSID() { return conf_ap_ssid.get(); }
+ConfigStatus setApSSID(const char* value) { return conf_ap_ssid.set(value); }
+
+const char* getApPassword() { return conf_ap_password.get(); }
+ConfigStatus setApPassword(const char* value) { return conf_ap_password.set(value); }
 
 const char* getHostName() { return conf_hostName.get(); }
 ConfigStatus setHostName(const char* value) {

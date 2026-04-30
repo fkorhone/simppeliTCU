@@ -21,6 +21,12 @@ ConfigStatus setWifiSSID(const char* value);
 const char* getWifiPassword();
 ConfigStatus setWifiPassword(const char* value);
 
+const char* getApSSID();
+ConfigStatus setApSSID(const char* value);
+
+const char* getApPassword();
+ConfigStatus setApPassword(const char* value);
+
 const char* getHostName();
 ConfigStatus setHostName(const char* value);
 

@@ -154,6 +154,13 @@ void handleMqttChargeOn() {
 
 void manageWiFi() {
   if(!wifiEnabled) return;
+  bool staEnabled = strlen(getWifiSSID()) > 0;
+
+  if (!staEnabled) {
+    // AP-only mode, no need to manage STA connection
+    return;
+  }
+
   static unsigned long previousAttemptTime = 0;
   static bool wifiAvailable = false;
   const unsigned long retryInterval = 10000;
@@ -203,9 +210,22 @@ void manageWiFi() {
 void setup() {
   Serial.begin(115200);
   initConfiguration();
+
+  bool staEnabled = strlen(getWifiSSID()) > 0;
+  bool apEnabled = strlen(getApSSID()) > 0;
   
-  if (strlen(getWifiSSID()) > 0) {
+  if (staEnabled && apEnabled) {
+      WiFi.mode(WIFI_AP_STA);
+      WiFi.softAP(getApSSID(), getApPassword());
       WiFi.begin(getWifiSSID(), getWifiPassword());
+      wifiEnabled = true;
+  } else if (staEnabled) {
+      WiFi.mode(WIFI_STA);
+      WiFi.begin(getWifiSSID(), getWifiPassword());
+      wifiEnabled = true;
+  } else if (apEnabled) {
+      WiFi.mode(WIFI_AP);
+      WiFi.softAP(getApSSID(), getApPassword());
       wifiEnabled = true;
   }
   else {
