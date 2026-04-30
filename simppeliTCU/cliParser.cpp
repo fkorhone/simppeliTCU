@@ -16,6 +16,8 @@ void executeCommand(char* cmd) {
         Serial.println("Current Configuration:");
         Serial.printf("  ssid: %s\n", getWifiSSID());
         Serial.printf("  password: %s\n", showSecrets ? getWifiPassword() : "****");
+        Serial.printf("  ap_ssid: %s\n", getApSSID());
+        Serial.printf("  ap_password: %s\n", showSecrets ? getApPassword() : "****");
         Serial.printf("  hostName: %s\n", getHostName());
         Serial.printf("  mqtt_server: %s\n", getMqttServer());
         Serial.printf("  mqtt_port: %d\n", getMqttPort());
@@ -31,6 +33,8 @@ void executeCommand(char* cmd) {
         if (key != NULL) {
             if (strcmp(key, "ssid") == 0) Serial.println(getWifiSSID());
             else if (strcmp(key, "password") == 0) Serial.println("****");
+            else if (strcmp(key, "ap_ssid") == 0) Serial.println(getApSSID());
+            else if (strcmp(key, "ap_password") == 0) Serial.println("****");
             else if (strcmp(key, "hostName") == 0) Serial.println(getHostName());
             else if (strcmp(key, "mqtt_server") == 0) Serial.println(getMqttServer());
             else if (strcmp(key, "mqtt_port") == 0) Serial.println(getMqttPort());
@@ -52,6 +56,8 @@ void executeCommand(char* cmd) {
 
             if (strcmp(key, "ssid") == 0) status = setWifiSSID(val);
             else if (strcmp(key, "password") == 0) status = setWifiPassword(val);
+            else if (strcmp(key, "ap_ssid") == 0) status = setApSSID(val);
+            else if (strcmp(key, "ap_password") == 0) status = setApPassword(val);
             else if (strcmp(key, "hostName") == 0) status = setHostName(val);
             else if (strcmp(key, "mqtt_server") == 0) status = setMqttServer(val);
             else if (strcmp(key, "mqtt_port") == 0) {

@@ -47,13 +47,22 @@ Available commands:
 ```text
 set ssid MyWiFiNetwork
 set password MySecretPassword
+set ap_ssid LeafLocalAP
+set ap_password LeafLocalPassword
 set mqtt_server 192.168.1.100
 reboot
 ```
 
 *Supported Configuration Keys:*
-* `ssid`, `password`, `hostName`
+* `ssid`, `password` (For connecting to an existing Wi-Fi network / STA mode)
+* `ap_ssid`, `ap_password` (For creating a local Wi-Fi Access Point / AP mode)
+* `hostName`
 * `mqtt_server`, `mqtt_port`, `mqtt_user`, `mqtt_password`, `vehicle_id`
+
+**Wi-Fi Modes:**
+* **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.
+* **AP Mode:** Active when `ap_ssid` is configured. The device broadcasts its own Wi-Fi network (useful when away from home).
+* **AP + STA Mode:** Active when both `ssid` and `ap_ssid` are configured. The device will connect to your home Wi-Fi while simultaneously broadcasting its own Access Point.
 
 ## Compiling and Uploading with Arduino IDE
 
