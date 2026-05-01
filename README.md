@@ -13,7 +13,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 
-![Screenshot of the Web UI from mobile phone browser](screenshot.jpg)
+![Screenshot of the Web UI from mobile phone browser](docs/screenshot.jpg)
 
 ## Videos
 * **First trials:** [https://youtu.be/qn05-901b3Y](https://youtu.be/qn05-901b3Y)
@@ -24,7 +24,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended: a flush-mount 12V USB car socket).
 3. Connectors/pins to mate with the original TCU harness.
 
-**See the [Installation Guide](INSTALLATION.md) for full step-by-step instructions, wiring diagrams, and required tools.**
+**See the [Installation Guide](docs/INSTALLATION.md) for full step-by-step instructions, wiring diagrams, and required tools.**
 
 ### ⚠️ CRITICAL WIRING WARNING
 **DO NOT connect the car's 12V line directly to the Lilygo board!** Automotive 12V systems experience massive voltage spikes (transients) that will most likely damage the ESP32. 
@@ -71,11 +71,11 @@ To compile and upload the firmware for the Lilygo T-2CAN board using the Arduino
 1. **Board Selection**: Select **ESP32S3 Dev Module** as your target board.
    * If you haven't set up the ESP32 core yet, please follow the [LilyGO T-2CAN Quick Start Guide](https://wiki.lilygo.cc/get_started/en/High_speed/T-2Can/T-2Can.html#Quick-Start) to download the required board files.
    
-   ![Select ESP32S3 Dev Module](arduino_ide_esp32s3_dev_module.jpg)
+   ![Select ESP32S3 Dev Module](docs/arduino_ide_esp32s3_dev_module.jpg)
 
 2. **Serial Output Configuration**: **USB CDC On Boot** needs to be set to **"Enabled"** for the printouts to appear in the Serial Monitor.
    
-   ![Enable USB CDC on Boot](set-cdc-on-boot-enabled.jpg)
+   ![Enable USB CDC on Boot](docs/set-cdc-on-boot-enabled.jpg)
 
 ## Compiling and Uploading with Arduino CLI
 
