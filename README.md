@@ -19,6 +19,8 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 ## Videos
 * **First trials:** [https://youtu.be/qn05-901b3Y](https://youtu.be/qn05-901b3Y)
 * **Web interface through wifi:** [https://youtube.com/shorts/XqAgwizNodE](https://youtube.com/shorts/XqAgwizNodE)
+* **MQTT use with IoTMQTTPanel and OVMS Connect:** [https://youtu.be/g8Yh6OgjL-Q?si=QtElrzG9FnF5YEUm](https://youtu.be/g8Yh6OgjL-Q?si=QtElrzG9FnF5YEUm)
+* **Glove box removal (LHD ZE1 Leaf):** [https://youtu.be/kyx2A4U-M1M?si=YGewj1TeBEfrpOKV](https://youtu.be/kyx2A4U-M1M?si=YGewj1TeBEfrpOKV)
 
 ## Hardware Requirements
 1. **Lilygo T-2CAN** (ESP32 with built-in CAN transceiver).
