@@ -19,6 +19,8 @@ inline constexpr CANMessage<4> hvac_on_data      = {0x56E, {0x4E, 0x08, 0x00, 0x
 inline constexpr CANMessage<4> start_charge_data = {0x56E, {0x66, 0x08, 0x00, 0x00}}; // Charging ON
 inline constexpr CANMessage<4> interrupt_data    = {0x56E, {0x96, 0x00, 0x00, 0x00}}; // Interrupt action
 inline constexpr CANMessage<4> hvac_off_data     = {0x56E, {0x56, 0x08, 0x00, 0x00}}; // HVAC OFF
+inline constexpr CANMessage<4> unlock_doors_data = {0x56E, {0x11, 0x00, 0x00, 0x00}}; // Unlock doors
+inline constexpr CANMessage<4> lock_doors_data   = {0x56E, {0x60, 0x80, 0x00, 0x00}}; // Lock doors
 
 // Readout callbacks (to be called when a message is received, implemented at application side):
 void handleRawSOC(float soc);
@@ -33,6 +35,8 @@ void refreshSequence();
 void hvacOnSequence();
 void hvacOffSequence();
 void chargeOnSequence();
+void unlockDoorsSequence();
+void lockDoorsSequence();
 
 
 #endif

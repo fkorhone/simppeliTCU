@@ -144,6 +144,24 @@ void handleChargeOn() {
   server.sendHeader("Location", "/"); server.send(303);
 }
 
+void handleUnlock() {
+  Serial.println("### Unlock Doors! ###");
+
+  wakeup();
+  unlockDoorsSequence();
+
+  server.sendHeader("Location", "/"); server.send(303);
+}
+
+void handleLock() {
+  Serial.println("### Lock Doors! ###");
+
+  wakeup();
+  lockDoorsSequence();
+
+  server.sendHeader("Location", "/"); server.send(303);
+}
+
 void handleMqttChargeOn() {
   Serial.println("### Charge ON! (MQTT) ###");
   
@@ -242,6 +260,8 @@ void setup() {
       server.on("/hvac_on", handleHvacOn);
       server.on("/hvac_off", handleHvacOff);
       server.on("/charge_on", handleChargeOn);
+      server.on("/unlock", handleUnlock);
+      server.on("/lock", handleLock);
       server.begin();
   }
 }
