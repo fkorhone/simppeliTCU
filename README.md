@@ -12,6 +12,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 🔋 **Remote Charging:** Override the charge timer to start charging.
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
+* 📡 **MQTT Support:** Integrate with home automation or mobile apps over encrypted transport. Note: unless proper certificate validation is implemented, the MQTT server is not authenticated. See the [MQTT Setup Guide](docs/mqtt.md).
 
 ![Screenshot of the Web UI from mobile phone browser](docs/screenshot.jpg)
 
