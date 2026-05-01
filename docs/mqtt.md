@@ -26,6 +26,8 @@ Follow your chosen provider's documentation to create an account, obtain your br
 
 You can use the **IoT MQTT Panel** Android app to control your vehicle and view telemetry. We have provided a ready-to-use button layout and dashboard configuration.
 
+Check out the demonstration video: **[MQTT use with IoTMQTTPanel and OVMS Connect](https://youtu.be/g8Yh6OgjL-Q?si=QtElrzG9FnF5YEUm)**
+
 ### Importing the Dashboard
 
 1. Locate the `IoTMQTTPanel-simppeliTCU.json` file in the `docs/` folder of this repository.

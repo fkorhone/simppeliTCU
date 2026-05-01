@@ -27,7 +27,7 @@
 
    2.2. Remove the negative terminal.
 
-3. **Remove Glovebox.**
+3. **Remove Glovebox:** (See [video reference for LHD ZE1 Leaf](https://youtu.be/kyx2A4U-M1M?si=YGewj1TeBEfrpOKV))
 
 4. **Remove TCU and detach its 40-pin connector.**
 
