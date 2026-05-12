@@ -14,6 +14,7 @@ void mqttUpdateCabinTemp(float temp);
 void mqttUpdateCharging(bool isCharging, ChargerState state);
 void mqttUpdateHVAC(bool isOn);
 void mqttPublishStatus(const char* msg);
+void mqttPublishHassDiscovery();
 
 // Optional callbacks implemented in simppeliTCU.ino
 extern void handleMqttHvacOn();
