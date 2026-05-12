@@ -96,8 +96,15 @@ void initConfiguration() {
 }
 
 void factoryReset() {
-    if (nvsReady) {
-        preferences.clear();
+    if (!nvsReady) {
+        Serial.println("Error: Factory reset failed because NVS is not initialized.");
+        return;
+    }
+
+    if (preferences.clear()) {
+        Serial.println("Factory reset completed successfully.");
+    } else {
+        Serial.println("Error: Factory reset failed while clearing NVS.");
     }
 }
 
