@@ -14,6 +14,7 @@ enum class ConfigStatus {
 };
 
 void initConfiguration();
+void factoryReset();
 
 const char* getWifiSSID();
 ConfigStatus setWifiSSID(const char* value);
