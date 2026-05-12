@@ -5,6 +5,7 @@
 #include <WiFiClient.h>
 #include "configuration.h"
 #include "stringBuffer.h"
+#include "hassDiscovery.h"
 
 WiFiClient espClient; // For non-TLS
 WiFiClientSecure espClientSecure; // For TLS
@@ -20,26 +21,6 @@ struct OvmsCommands {
   const char* unlock = "unlock";
 };
 static const OvmsCommands ovmsCmds;
-
-struct OvmsMetrics {
-  const char* soc = "metric/v/b/soc";
-  const char* cabinTemp = "metric/v/e/cabintemp";
-  const char* chargingState = "metric/v/c/state";
-  const char* chargingActive = "metric/v/c/charging";
-  const char* hvacActive = "metric/v/e/hvac";
-  const char* doorFL = "metric/v/d/fl";
-  const char* doorFR = "metric/v/d/fr";
-  const char* doorRL = "metric/v/d/rl";
-  const char* doorRR = "metric/v/d/rr";
-  const char* doorTrunk = "metric/v/d/trunk";
-  const char* locked = "metric/v/e/locked";
-  const char* hvacSetpoint = "metric/v/e/cabinsetpoint";
-  const char* fanSpeed = "metric/v/e/cabinfan";
-  const char* heating = "metric/v/e/heating";
-  const char* cooling = "metric/v/e/cooling";
-  const char* ventilationMode = "metric/v/e/cabinvent";
-};
-static const OvmsMetrics ovmsMetrics;
 
 static float lastSOC = -1.0;
 static bool socDirty = false;
@@ -77,7 +58,7 @@ static bool ventilationModeDirty = false;
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
 
-static StringBuffer<64> mqttPrefix;
+static StringBuffer<128> mqttPrefix;
 static StringBuffer<128> currentResponseTopic;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
@@ -85,6 +66,9 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   msg.copyFromData(payload, length);
   msg.trim();
   msg.toLowerCase();
+
+  StringBuffer<128> topicStr;
+  topicStr.copyFrom(topic);
 
   Serial.print("MQTT Command received on topic: ");
   Serial.println(topic);
@@ -94,24 +78,25 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   StringBuffer<80> clientPrefix;
   clientPrefix.format("%sclient/", mqttPrefix.c_str());
   
-  StringBuffer<128> topicStr;
-  topicStr.copyFrom(topic);
-  
   // OVMS app sends commands to client/<clientid>/command/<commandid>
   if (topicStr.startsWith(clientPrefix.c_str())) {
-    const char* clientInfo = topicStr.c_str() + clientPrefix.length();
+    const char* clientInfo = topicStr.c_str() + clientPrefix.length(); // e.g. "someclient/command/someid"
     const char* cmdMarker = strstr(clientInfo, "/command/");
     
     if (cmdMarker != NULL) {
       size_t clientIdLen = cmdMarker - clientInfo;
       StringBuffer<64> clientId;
-      clientId.copyFromData((const byte*)clientInfo, clientIdLen);
+      // Only copy if there's something to copy to avoid issues with topics like "client//command"
+      if (clientIdLen > 0) {
+        clientId.copyFromData((const byte*)clientInfo, clientIdLen);
+      }
       
       const char* commandId = cmdMarker + 9;
       
       // Prepare the response topic to reply to this specific command
-      currentResponseTopic.format("%sclient/%s/response/%s", mqttPrefix.c_str(), clientId.c_str(), commandId);
-      
+      if (!clientId.isEmpty()) {
+        currentResponseTopic.format("%sclient/%s/response/%s", mqttPrefix.c_str(), clientId.c_str(), commandId);
+      }
       // The app sends "lock <pin>" or "unlock <pin>"
       // We need to check for the command prefix and ignore the pin.
       if (msg.startsWith(ovmsCmds.lock)) {
@@ -171,15 +156,19 @@ boolean reconnectMQTT() {
     cmdTopic.format("%sclient/+/command/+", mqttPrefix.c_str());
     mqttClient.subscribe(cmdTopic.c_str());
     
-    // Force sync latest known metrics on reconnect
+    if (getHassDiscoveryEnabled()) {
+      mqttPublishHassDiscovery(mqttClient, mqttPrefix);
+    }
+
+    // Force sync latest known metrics on reconnect by marking them as dirty
     if (lastSOC >= 0) { socDirty = true; mqttUpdateSOC(lastSOC); }
     if (lastCabinTemp > -30) { cabinTempDirty = true; mqttUpdateCabinTemp(lastCabinTemp); }
     if (lastChargingStateSet) { chargingDirty = true; mqttUpdateCharging(lastIsCharging, lastChargerState); }
     if (lastHvacStateSet) { hvacDirty = true; mqttUpdateHVAC(lastIsHvacOn); }
     if (lastSetpoint >= 0) { setpointDirty = true; mqttUpdateHVACSetpoint(lastSetpoint); }
     if (lastFanSpeed >= 0) { fanSpeedDirty = true; mqttUpdateFanSpeed(lastFanSpeed); }
-    heatingDirty = true; coolingDirty = true; mqttUpdateHeatingMode(lastHeating, lastCooling);
-    ventilationModeDirty = true; mqttUpdateVentilationMode(lastVentilationMode);
+    if (lastHvacStateSet) { heatingDirty = true; coolingDirty = true; mqttUpdateHeatingMode(lastHeating, lastCooling); }
+    if (lastHvacStateSet) { ventilationModeDirty = true; mqttUpdateVentilationMode(lastVentilationMode); }
     if (lastDoorsStateSet) { doorsDirty = true; mqttUpdateDoors(lastDoorFL, lastDoorFR, lastDoorRL, lastDoorRR, lastDoorTrunk); }
     if (lastLockStateSet) { lockDirty = true; mqttUpdateLock(lastLockState); }
     
@@ -199,7 +188,7 @@ void setupMQTT() {
   mqttClient.setServer(getMqttServer(), getMqttPort());
   
   // OVMS messages have longer topics, so enlarging buffer is recommended
-  mqttClient.setBufferSize(512);
+  mqttClient.setBufferSize(1024);
   mqttClient.setCallback(mqttCallback);
 }
 

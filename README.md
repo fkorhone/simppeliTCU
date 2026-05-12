@@ -13,6 +13,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 🔐 **Door Locking:** Lock and unlock doors remotely (disabled by default, enable via configuration).
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
+* 🏠 **Home Assistant Integration:** Automatic discovery of metrics and controls via MQTT.
 * 📡 **MQTT Support:** Integrate with home automation or mobile apps over encrypted transport. Note: unless proper certificate validation is implemented, the MQTT server is not authenticated. See the [MQTT Setup Guide](docs/mqtt.md).
 
 ## Operation
@@ -67,7 +68,9 @@ reboot
 * `ap_ssid`, `ap_password` (For creating a local Wi-Fi Access Point / AP mode)
 * `hostName`
 * `mqtt_server`, `mqtt_port`, `mqtt_user`, `mqtt_password`, `vehicle_id`
+* `mqtt_tls` (Enable/disable TLS for MQTT connection; default: `true`)
 * `locking_enabled` (Enable door lock/unlock functionality; default: `false`)
+* `hass_discovery` (Enable/disable Home Assistant discovery messages; default: `true`)
 
 **Wi-Fi Modes:**
 * **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.
