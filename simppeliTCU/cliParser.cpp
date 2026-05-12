@@ -26,6 +26,7 @@ void executeCommand(char* cmd) {
         Serial.printf("  vehicle_id: %s\n", getVehicleId());
         Serial.printf("  locking_enabled: %s\n", getLockingEnabled() ? "true" : "false");
         Serial.printf("  mqtt_tls: %s\n", getMqttTls() ? "true" : "false");
+        Serial.printf("  hass_discovery: %s\n", getHassDiscoveryEnabled() ? "true" : "false");
         if (!showSecrets) {
             Serial.println("  (use 'list --secrets' to display secret values)");
         }
@@ -45,6 +46,7 @@ void executeCommand(char* cmd) {
             else if (strcmp(key, "vehicle_id") == 0) Serial.println(getVehicleId());
             else if (strcmp(key, "locking_enabled") == 0) Serial.println(getLockingEnabled() ? "true" : "false");
             else if (strcmp(key, "mqtt_tls") == 0) Serial.println(getMqttTls() ? "true" : "false");
+            else if (strcmp(key, "hass_discovery") == 0) Serial.println(getHassDiscoveryEnabled() ? "true" : "false");
             else Serial.println("Unknown parameter.");
         } else {
             Serial.println("Usage: get <key>");
@@ -90,6 +92,16 @@ void executeCommand(char* cmd) {
                     status = setMqttTls(true);
                 } else if (strcmp(val, "false") == 0 || strcmp(val, "0") == 0) {
                     status = setMqttTls(false);
+                } else {
+                    Serial.println("Error: Value must be 'true', 'false', '1', or '0'.");
+                    return;
+                }
+            }
+            else if (strcmp(key, "hass_discovery") == 0) {
+                if (strcmp(val, "true") == 0 || strcmp(val, "1") == 0) {
+                    status = setHassDiscoveryEnabled(true);
+                } else if (strcmp(val, "false") == 0 || strcmp(val, "0") == 0) {
+                    status = setHassDiscoveryEnabled(false);
                 } else {
                     Serial.println("Error: Value must be 'true', 'false', '1', or '0'.");
                     return;

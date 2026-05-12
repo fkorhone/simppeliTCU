@@ -53,4 +53,7 @@ ConfigStatus setLockingEnabled(bool value);
 bool getMqttTls();
 ConfigStatus setMqttTls(bool value);
 
+bool getHassDiscoveryEnabled();
+ConfigStatus setHassDiscoveryEnabled(bool value);
+
 #endif

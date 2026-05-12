@@ -18,7 +18,7 @@ If you don't already host your own MQTT broker, there are several cloud provider
 Follow your chosen provider's documentation to create an account, obtain your broker URL, and set up your username and password.
 
 > [!WARNING]
-> The firmware currently uses TLS for MQTT transport, but by default it does **not** verify the broker's server certificate (`espClient.setInsecure()` is used). This means the connection is encrypted, but it does not authenticate the server, so it is still vulnerable to man-in-the-middle attacks.
+> By default, the firmware uses an encrypted TLS connection for MQTT but does **not** verify the broker's server certificate (`espClient.setInsecure()` is used). This means the connection is encrypted, but it does not authenticate the server, so it is still vulnerable to man-in-the-middle attacks. You can disable TLS for use on a trusted local network by setting `mqtt_tls false` via the serial console (this will typically use port `1883` instead of `8883`).
 >
 > For this reason, only use this default setup with a broker you trust, ideally on a trusted local network or through a trusted VPN. For stronger security, update the firmware to validate the broker certificate using a CA certificate or certificate pinning instead of using `setInsecure()`.
 
@@ -70,7 +70,17 @@ Once saved and connected, you should be able to see valid data on your dashboard
 
 ---
 
-## 4. MQTT API Reference
+## 4. Home Assistant Integration
+
+simppeliTCU supports the Home Assistant MQTT discovery protocol.
+
+When the `hass_discovery` setting is enabled (which it is by default), the device will automatically publish configuration messages to your MQTT broker. If you have the MQTT integration configured in Home Assistant, a new device for your vehicle will appear automatically with all the available sensors (SOC, temperature, etc.) and controls (HVAC, charging, locking).
+
+You can disable this feature by running `set hass_discovery false` via the serial console.
+
+---
+
+## 5. MQTT API Reference
 
 simppeliTCU aims to follow OVMS V.3 topic structure where possible.
 A small subset of topics has been implemented.
