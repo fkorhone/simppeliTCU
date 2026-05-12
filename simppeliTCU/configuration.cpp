@@ -95,6 +95,12 @@ void initConfiguration() {
     conf_vehicle_id.load();
 }
 
+void factoryReset() {
+    if (nvsReady) {
+        preferences.clear();
+    }
+}
+
 const char* getWifiSSID() { return conf_ssid.get(); }
 ConfigStatus setWifiSSID(const char* value) { return conf_ssid.set(value); }
 

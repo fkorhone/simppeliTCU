@@ -100,6 +100,12 @@ void executeCommand(char* cmd) {
         delay(100);
         ESP.restart();
     } 
+    else if (strcmp(command, "factory-reset") == 0) {
+        Serial.println("Performing factory reset...");
+        factoryReset();
+        delay(100);
+        ESP.restart();
+    }
     else {
         Serial.println("Unknown command.");
     }
