@@ -11,21 +11,11 @@ struct CANMessage {
 };
 
 // Can implementation interface (definitions platform specific):
-void waitCAN(int delayMs);
-
 void sendCAN(uint32_t id, const uint8_t* data, uint8_t len);
 
-template<size_t N>
+template <size_t N>
 void sendCAN(const CANMessage<N> &message) {
   sendCAN(message.identifier, message.data, N);
-}
-
-template<size_t N>
-void sendCAN(const CANMessage<N> &message, int repeat, int delayMs) {
-  for (int i = 0; i < repeat; i++) {
-    sendCAN(message.identifier, message.data, N);
-    waitCAN(delayMs);
-  }
 }
 
 template<size_t N>

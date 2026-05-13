@@ -8,14 +8,6 @@
 
 unsigned long logStartTime = 0;
 
-void waitCAN(int delayMs) {
-    unsigned long startTime = millis();
-    while (millis() - startTime < delayMs) {
-      readAndHandleCANMessage();
-    }
-    delay(1);
-}
-
 void print_can_message(twai_message_t &message) {
       unsigned long message_time = millis() - logStartTime;
       Serial.print(message_time/1000.0, 3);

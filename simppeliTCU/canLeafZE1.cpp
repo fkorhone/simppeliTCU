@@ -49,35 +49,158 @@ void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len) {
     }
 }
 
-// Control Sequences
-void wake() {
-  sendCAN(wakeup_data);
-  waitCAN(15);
+// Sequence State Machine
+extern bool carIsAwake;
+CanSequence activeSequence = CanSequence::NONE;
+
+enum class SeqPhase {
+    IDLE,
+    WAKING,
+    WAKE_WAIT,
+    RUN_STEP
+};
+
+static SeqPhase currentPhase = SeqPhase::IDLE;
+static int wakeAttempts = 0;
+static int stepIndex = 0;
+static int repeatCount = 0;
+static unsigned long nextCANEventTime = 0;
+
+struct SequenceStep {
+    uint32_t id;
+    const uint8_t* data;
+    uint8_t len;
+    int repeats;
+    int intervalMs;
+    int delayAfterMs;
+};
+
+#define MSG_STEP(msg, reps, interv) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0 }
+#define MSG_DLY_STEP(msg, reps, interv, delay) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, delay }
+
+static const SequenceStep seq_refresh[] = {
+    MSG_DLY_STEP(hvac_init, 20, 100, 1000),
+    MSG_STEP(idle_data, 20, 100)
+};
+
+static const SequenceStep seq_hvac_on[] = {
+    MSG_STEP(hvac_init, 20, 100),
+    MSG_STEP(hvac_on_data, 20, 100),
+    MSG_STEP(idle_data, 20, 100)
+};
+
+static const SequenceStep seq_hvac_off[] = {
+    MSG_STEP(hvac_init, 10, 100),
+    MSG_STEP(interrupt_data, 9, 100),
+    MSG_STEP(hvac_off_data, 8, 100),
+    MSG_STEP(hvac_init, 4, 100),
+    MSG_STEP(idle_data, 8, 100)
+};
+
+static const SequenceStep seq_charge_on[] = {
+    MSG_STEP(start_charge_data, 20, 100),
+    MSG_STEP(idle_data, 8, 100)
+};
+
+struct SequenceDef {
+    CanSequence seq;
+    const SequenceStep* steps;
+    int length;
+};
+
+static const SequenceDef sequence_map[] = {
+    { CanSequence::REFRESH, seq_refresh, sizeof(seq_refresh)/sizeof(seq_refresh[0]) },
+    { CanSequence::HVAC_ON, seq_hvac_on, sizeof(seq_hvac_on)/sizeof(seq_hvac_on[0]) },
+    { CanSequence::HVAC_OFF, seq_hvac_off, sizeof(seq_hvac_off)/sizeof(seq_hvac_off[0]) },
+    { CanSequence::CHARGE_ON, seq_charge_on, sizeof(seq_charge_on)/sizeof(seq_charge_on[0]) }
+};
+
+void startSequence(CanSequence seq, unsigned long currentTimeMs) {
+    if (seq == CanSequence::NONE) return;
+    if (activeSequence != CanSequence::NONE) return; // Prevent overwriting an active sequence
+    resetCanLogTimestamps();
+    
+    activeSequence = seq;
+    currentPhase = SeqPhase::WAKING;
+    wakeAttempts = 0;
+    stepIndex = 0;
+    repeatCount = 0;
+    carIsAwake = false;
+    nextCANEventTime = currentTimeMs;
 }
 
-void refreshSequence() {
-  sendCAN(hvac_init, 20, 100);
-  waitCAN(1000);
-  sendCAN(idle_data, 20, 100);
+CanSeqResult manageCANSequence(unsigned long currentTimeMs) {
+    if (activeSequence == CanSequence::NONE) return CanSeqResult::IDLE;
+    if ((long)(currentTimeMs - nextCANEventTime) < 0) return CanSeqResult::PROCESSING;
+
+    switch (currentPhase) {
+        case SeqPhase::WAKING:
+            if (carIsAwake || wakeAttempts >= 130) {
+                CanSeqResult res;
+                if (carIsAwake) res = CanSeqResult::WAKE_SUCCESS;
+                else res = CanSeqResult::WAKE_TIMEOUT;
+                currentPhase = SeqPhase::WAKE_WAIT;
+                nextCANEventTime = currentTimeMs + 50; 
+                return res;
+            } else {
+                sendCAN(wakeup_data);
+                wakeAttempts++;
+                nextCANEventTime = currentTimeMs + 15;
+            }
+            break;
+            
+        case SeqPhase::WAKE_WAIT:
+            currentPhase = SeqPhase::RUN_STEP;
+            stepIndex = 0;
+            repeatCount = 0;
+            nextCANEventTime = currentTimeMs;
+            break;
+            
+        case SeqPhase::RUN_STEP: {
+            bool done = false;
+            const SequenceStep* currentSeqArray = nullptr;
+            int currentSeqLen = 0;
+
+            for (const auto& def : sequence_map) {
+                if (def.seq == activeSequence) {
+                    currentSeqArray = def.steps;
+                    currentSeqLen = def.length;
+                    break;
+                }
+            }
+
+            if (!currentSeqArray) {
+                done = true;
+            }
+
+            if (!done && stepIndex < currentSeqLen && currentSeqArray != nullptr) {
+                const SequenceStep& step = currentSeqArray[stepIndex];
+                
+                if (step.id != 0 && step.data != nullptr) {
+                    sendCAN(step.id, step.data, step.len);
+                }
+                
+                if (++repeatCount >= step.repeats) {
+                    stepIndex++;
+                    repeatCount = 0;
+                    const uint32_t nextDelayMs =
+                        (step.delayAfterMs > step.intervalMs) ? step.delayAfterMs : step.intervalMs;
+                    nextCANEventTime = currentTimeMs + nextDelayMs;
+                } else {
+                    nextCANEventTime = currentTimeMs + step.intervalMs;
+                }
+            } else {
+                done = true;
+            }
+
+            if (done) {
+                activeSequence = CanSequence::NONE;
+                currentPhase = SeqPhase::IDLE;
+                return CanSeqResult::SEQUENCE_FINISHED;
+            }
+            break;
+        }
+    }
+    return CanSeqResult::PROCESSING;
 }
 
-void hvacOnSequence() {
-  sendCAN(hvac_init, 20, 100);
-  sendCAN(hvac_on_data, 20, 100);
-  sendCAN(idle_data, 20, 100);
-  // After this the bus goes quiet, but the HVAC is on. 
-}
-
-void hvacOffSequence() {
-  sendCAN(hvac_init, 10, 100); 
-  sendCAN(interrupt_data, 9, 100);
-  sendCAN(hvac_off_data, 8, 100);
-  sendCAN(hvac_init, 4, 100);
-  sendCAN(idle_data, 8, 100);
-  // After this the bus goes quiet, and the HVAC is off.
-}
-
-void chargeOnSequence() {
-  sendCAN(start_charge_data, 20, 100);
-  sendCAN(idle_data, 8, 100);
-}
