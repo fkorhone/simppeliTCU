@@ -155,14 +155,37 @@ void handleMqttChargeOn() {
 void manageWiFi() {
   if(!wifiEnabled) return;
   bool staEnabled = strlen(getWifiSSID()) > 0;
+  static bool wifiAvailable = false;
 
   if (!staEnabled) {
-    // AP-only mode, no need to manage STA connection
+    // AP-only mode, no STA connection to manage
+    if (!wifiAvailable) {
+      Serial.println("\nAP-only mode active!");
+      
+      if (!MDNS.begin(getHostName())) {
+        Serial.println("Error starting mDNS service!");
+      } else {
+        Serial.println("mDNS service started.");
+        MDNS.addService("http", "tcp", 80);
+      }
+      if (!NBNS.begin(getHostName())) {
+        Serial.println("Error starting NBNS service!");
+      } else {
+        Serial.println("NBNS service started.");
+      }
+
+      Serial.print("You can find the UI in the browser at: http://");
+      Serial.print(getHostName());
+      Serial.print(".local or http://");
+      Serial.print(getHostName());
+      Serial.println(" or by AP IP address (usually 192.168.4.1):");
+      Serial.println(WiFi.softAPIP());
+      wifiAvailable = true;
+    }
     return;
   }
 
   static unsigned long previousAttemptTime = 0;
-  static bool wifiAvailable = false;
   const unsigned long retryInterval = 10000;
   unsigned long currentTime = millis();
 
@@ -214,7 +237,12 @@ void setup() {
   
   if (staEnabled && apEnabled) {
       WiFi.mode(WIFI_AP_STA);
-      WiFi.softAP(getApSSID(), getApPassword());
+      if (strlen(getApPassword()) > 0 && strlen(getApPassword()) < 8) {
+          Serial.println("Warning: AP password must be at least 8 chars. Starting AP without password.");
+          WiFi.softAP(getApSSID());
+      } else {
+          WiFi.softAP(getApSSID(), getApPassword());
+      }
       WiFi.setAutoReconnect(true);
       WiFi.begin(getWifiSSID(), getWifiPassword());
       WiFi.setSleep(false);
@@ -227,7 +255,13 @@ void setup() {
       wifiEnabled = true;
   } else if (apEnabled) {
       WiFi.mode(WIFI_AP);
-      WiFi.softAP(getApSSID(), getApPassword());
+      if (strlen(getApPassword()) > 0 && strlen(getApPassword()) < 8) {
+          Serial.println("Warning: AP password must be at least 8 chars. Starting AP without password.");
+          WiFi.softAP(getApSSID());
+      } else {
+          WiFi.softAP(getApSSID(), getApPassword());
+      }
+      WiFi.setSleep(false);
       wifiEnabled = true;
   }
   else {
