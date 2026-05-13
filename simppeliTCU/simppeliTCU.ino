@@ -176,9 +176,7 @@ void manageWiFi() {
     }
 
     if (currentTime - previousAttemptTime >= retryInterval) {
-      Serial.println("WiFi connection missing, trying to connect...");
-      WiFi.disconnect();
-      WiFi.begin(getWifiSSID(), getWifiPassword());
+      Serial.println("WiFi connection missing, waiting for auto-reconnect...");
       previousAttemptTime = currentTime;
     }
   }
@@ -217,11 +215,13 @@ void setup() {
   if (staEnabled && apEnabled) {
       WiFi.mode(WIFI_AP_STA);
       WiFi.softAP(getApSSID(), getApPassword());
+      WiFi.setAutoReconnect(true);
       WiFi.begin(getWifiSSID(), getWifiPassword());
       WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (staEnabled) {
       WiFi.mode(WIFI_STA);
+      WiFi.setAutoReconnect(true);
       WiFi.begin(getWifiSSID(), getWifiPassword());
       WiFi.setSleep(false);
       wifiEnabled = true;
