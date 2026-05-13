@@ -80,6 +80,8 @@ void executeCommand(char* cmd) {
                 Serial.println("Value updated.");
             } else if (status == ConfigStatus::ERROR_LENGTH) {
                 Serial.println("Error: Value exceeds maximum allowed length.");
+            } else if (status == ConfigStatus::ERROR_PASSWORD_LENGTH) {
+                Serial.println("Error: AP Password must be either empty or at least 8 characters long.");
             } else if (status == ConfigStatus::ERROR_HOSTNAME_LENGTH) {
                 Serial.println("Error: Hostname must be 1-15 characters long.");
             } else if (status == ConfigStatus::ERROR_HOSTNAME_HYPHEN) {
