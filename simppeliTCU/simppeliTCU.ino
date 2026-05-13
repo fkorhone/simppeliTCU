@@ -234,14 +234,21 @@ void setup() {
 
   bool staEnabled = strlen(getWifiSSID()) > 0;
   bool apEnabled = strlen(getApSSID()) > 0;
+
+  if (apEnabled) {
+      size_t apPassLen = strlen(getApPassword());
+      if (apPassLen > 0 && apPassLen < 8) {
+          Serial.println("Error: AP password is too short (must be >= 8 chars). AP mode will be disabled.");
+          apEnabled = false;
+      }
+  }
   
   if (staEnabled && apEnabled) {
       WiFi.mode(WIFI_AP_STA);
-      if (strlen(getApPassword()) > 0 && strlen(getApPassword()) < 8) {
-          Serial.println("Warning: AP password must be at least 8 chars. Starting AP without password.");
-          WiFi.softAP(getApSSID());
-      } else {
+      if (strlen(getApPassword()) > 0) {
           WiFi.softAP(getApSSID(), getApPassword());
+      } else {
+          WiFi.softAP(getApSSID());
       }
       WiFi.setAutoReconnect(true);
       WiFi.begin(getWifiSSID(), getWifiPassword());
@@ -255,11 +262,10 @@ void setup() {
       wifiEnabled = true;
   } else if (apEnabled) {
       WiFi.mode(WIFI_AP);
-      if (strlen(getApPassword()) > 0 && strlen(getApPassword()) < 8) {
-          Serial.println("Warning: AP password must be at least 8 chars. Starting AP without password.");
-          WiFi.softAP(getApSSID());
-      } else {
+      if (strlen(getApPassword()) > 0) {
           WiFi.softAP(getApSSID(), getApPassword());
+      } else {
+          WiFi.softAP(getApSSID());
       }
       WiFi.setSleep(false);
       wifiEnabled = true;

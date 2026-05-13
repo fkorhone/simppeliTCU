@@ -118,7 +118,13 @@ const char* getApSSID() { return conf_ap_ssid.get(); }
 ConfigStatus setApSSID(const char* value) { return conf_ap_ssid.set(value); }
 
 const char* getApPassword() { return conf_ap_password.get(); }
-ConfigStatus setApPassword(const char* value) { return conf_ap_password.set(value); }
+ConfigStatus setApPassword(const char* value) { 
+    size_t len = strlen(value);
+    if (len > 0 && len < 8) {
+        return ConfigStatus::ERROR_PASSWORD_LENGTH;
+    }
+    return conf_ap_password.set(value); 
+}
 
 const char* getHostName() { return conf_hostName.get(); }
 ConfigStatus setHostName(const char* value) {
