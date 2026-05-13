@@ -218,10 +218,12 @@ void setup() {
       WiFi.mode(WIFI_AP_STA);
       WiFi.softAP(getApSSID(), getApPassword());
       WiFi.begin(getWifiSSID(), getWifiPassword());
+      WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (staEnabled) {
       WiFi.mode(WIFI_STA);
       WiFi.begin(getWifiSSID(), getWifiPassword());
+      WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (apEnabled) {
       WiFi.mode(WIFI_AP);
