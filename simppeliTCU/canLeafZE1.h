@@ -27,12 +27,20 @@ void handleCarAwake();
 void handleChargerStatus(bool isCharging, ChargerState state);
 void handleHVACStatus(bool isOn);
 
-// Control Sequences
-void wake();
-void refreshSequence();
-void hvacOnSequence();
-void hvacOffSequence();
-void chargeOnSequence();
+// Sequence State Machine
+enum class CanSequence {
+    NONE,
+    REFRESH,
+    HVAC_ON,
+    HVAC_OFF,
+    CHARGE_ON
+};
 
+enum class CanSeqResult { IDLE, PROCESSING, WAKE_SUCCESS, WAKE_TIMEOUT, SEQUENCE_FINISHED };
+
+extern CanSequence activeSequence;
+
+void startSequence(CanSequence seq, unsigned long currentTimeMs);
+CanSeqResult manageCANSequence(unsigned long currentTimeMs);
 
 #endif

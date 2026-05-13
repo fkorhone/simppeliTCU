@@ -6,12 +6,18 @@
 #include "vehicleTypes.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
+  server.sendContent(F("<html><head><meta name='viewport' content='width=device-width, initial-scale=1'>\n"));
+  
+  if (sequenceActive) {
+    server.sendContent(F("<meta http-equiv='refresh' content='2'>\n"));
+  }
+
   server.sendContent(F(
-    "<html><head><meta name='viewport' content='width=device-width, initial-scale=1'><style>\n"
+    "<style>\n"
     "body { font-family: Arial; text-align: center; margin-top: 20px; }\n"
     ".btn { padding: 15px 30px; font-size: 18px; margin: 10px; border-radius: 8px; text-decoration: none; color: white; display: inline-block; width: 80%; max-width: 300px;}\n"
     ".btn-refresh { background-color: #2196F3; }\n"
@@ -21,9 +27,13 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
     ".data-box { background-color: #f1f1f1; padding: 15px; margin: 15px auto; width: 80%; max-width: 300px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }\n"
     "</style></head><body>\n"
     "<h1>Leaf Remote Control</h1>\n"
-    "<div class='data-box'>\n"
-    "<h3>Car Status</h3>\n"
   ));
+  
+  if (sequenceActive) {
+    server.sendContent(F("<h3 style='color: orange;'>Processing command...</h3>\n"));
+  }
+
+  server.sendContent(F("<div class='data-box'>\n<h3>Car Status</h3>\n"));
   
   if (currentSOC >= 0) {
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Battery:</b> "));

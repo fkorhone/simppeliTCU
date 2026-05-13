@@ -31,7 +31,8 @@ void resetData() {
 }
 
 void handleRoot() {
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn);
+  bool sequenceActive = (activeSequence != CanSequence::NONE);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive);
 }
 
 void handleCarAwake() {
@@ -60,96 +61,68 @@ void handleRawSOC(float soc) {
   mqttUpdateSOC(soc);
 }
 
-void wakeup() {
-  Serial.print("### Wakeup! ###");
-  Serial.println();
-  resetCanLogTimestamps();
-  Serial.print("# type(<,>,!) time(s) identifier data...");
-  Serial.println();
-  carIsAwake = false;
-  for(int i=0; i<130; i++) {
-    wake();
-    if (carIsAwake) {
-      Serial.println("### Car is awake! ###");
-      break;
-    }
-  }
-  waitCAN(50);
+void logSequenceStart() {
+  Serial.println("### Starting Sequence ###");
+  Serial.println("# type(<,>,!) time(s) identifier data...");
 }
 
 // Update data (Wake up)
 void handleRefresh() {
   Serial.println("### Refresh! ###");
+  logSequenceStart();
   resetData();
-  
-  wakeup();
-  refreshSequence();
-
+  startSequence(CanSequence::REFRESH, millis());
   server.sendHeader("Location", "/");
   server.send(303);
 }
 
 void handleMqttRefresh() {
   Serial.println("### Refresh! (MQTT) ###");
+  logSequenceStart();
   resetData();
-  
-  wakeup();
-  refreshSequence();
+  startSequence(CanSequence::REFRESH, millis());
 }
 
 void handleHvacOn() {
   Serial.println("### HVAC ON! ###");
-  isHvacOn = true;
-
-  wakeup();
-  hvacOnSequence();
-  
-  server.sendHeader("Location", "/"); server.send(303);
+  logSequenceStart();
+  startSequence(CanSequence::HVAC_ON, millis());
+  server.sendHeader("Location", "/"); 
+  server.send(303);
 }
 
 void handleMqttHvacOn() {
   Serial.println("### HVAC ON! (MQTT) ###");
-  isHvacOn = true;
-
-  wakeup();
-  hvacOnSequence();
-  mqttPublishStatus("HVAC started!");
+  logSequenceStart();
+  startSequence(CanSequence::HVAC_ON, millis());
 }
 
 void handleHvacOff() {
   Serial.println("### HVAC OFF! ###");
-  isHvacOn = false;
-
-  wakeup();
-  hvacOffSequence();
-  
-  server.sendHeader("Location", "/"); server.send(303);
+  logSequenceStart();
+  startSequence(CanSequence::HVAC_OFF, millis());
+  server.sendHeader("Location", "/"); 
+  server.send(303);
 }
 
 void handleMqttHvacOff() {
   Serial.println("### HVAC OFF! (MQTT) ###");
-  isHvacOn = false;
-
-  wakeup();
-  hvacOffSequence();
-  mqttPublishStatus("HVAC stopped.");
+  logSequenceStart();
+  startSequence(CanSequence::HVAC_OFF, millis());
 }
 
 void handleChargeOn() {
   Serial.println("### Charge ON! ###");
-  
-  wakeup();
-  chargeOnSequence();
-  
-  server.sendHeader("Location", "/"); server.send(303);
+  logSequenceStart();
+  startSequence(CanSequence::CHARGE_ON, millis());
+  server.sendHeader("Location", "/"); 
+  server.send(303);
 }
 
 void handleMqttChargeOn() {
   Serial.println("### Charge ON! (MQTT) ###");
-  
-  wakeup();
-  chargeOnSequence();
-  mqttPublishStatus("Charging forced on!");
+  logSequenceStart();
+  startSequence(CanSequence::CHARGE_ON, millis());
 }
 
 void manageWiFi() {
@@ -292,6 +265,14 @@ void loop() {
   server.handleClient();
   manageMQTT();
   readAndHandleCANMessage();
+  CanSeqResult seqRes = manageCANSequence(millis());
+  if (seqRes == CanSeqResult::WAKE_SUCCESS) {
+      Serial.println("### Car is awake! ###");
+  } else if (seqRes == CanSeqResult::WAKE_TIMEOUT) {
+      Serial.println("### Car wake timeout! ###");
+  } else if (seqRes == CanSeqResult::SEQUENCE_FINISHED) {
+      Serial.println("### Sequence Complete ###");
+  }
   manageWiFi();
   processSerialInput();
 }
