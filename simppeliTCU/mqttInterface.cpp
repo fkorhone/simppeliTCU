@@ -149,7 +149,7 @@ void manageMQTT() {
 
   if (WiFi.status() == WL_CONNECTED) {
     if (!mqttClient.connected()) {
-      if (millis() - lastMqttReconnectAttempt > 5000) {
+      if (millis() - lastMqttReconnectAttempt > 30000) {
         lastMqttReconnectAttempt = millis();
         if (reconnectMQTT()) {
           lastMqttReconnectAttempt = 0;
