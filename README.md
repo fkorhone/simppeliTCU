@@ -14,6 +14,9 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 * 📡 **MQTT Support:** Integrate with home automation or mobile apps over encrypted transport. Note: unless proper certificate validation is implemented, the MQTT server is not authenticated. See the [MQTT Setup Guide](docs/mqtt.md).
 
+## Operation
+* ⚙️ **Non-blocking operation:** The device processes CAN commands asynchronously. If a new command is issued while one is already in progress, it will be safely ignored.
+
 ![Screenshot of the Web UI from mobile phone browser](docs/screenshot.jpg)
 
 ## Videos
@@ -45,6 +48,7 @@ Available commands:
 * `get <key>` - Prints the current value of the specified key.
 * `set <key> <value>` - Updates the specified key with a new value (saved persistently).
 * `reboot` - Restarts the device to apply the changes immediately.
+* `factory-reset` - Clears all configuration settings and restarts the device.
 
 **Example configuration session:**
 ```text
