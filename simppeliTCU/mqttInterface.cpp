@@ -96,6 +96,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
+void mqttPublishHassDiscovery();
+
 boolean reconnectMQTT() {
   StringBuffer<32> clientId;
   clientId.format("simppeliTCU-%04X", (unsigned int)random(0xffff));
@@ -121,6 +123,8 @@ boolean reconnectMQTT() {
     cmdTopic.format("%sclient/+/command/+", mqttPrefix.c_str());
     mqttClient.subscribe(cmdTopic.c_str());
     
+    mqttPublishHassDiscovery();
+
     // Send latest metrics on reconnect
     if (lastSOC >= 0) mqttUpdateSOC(lastSOC);
     if (lastCabinTemp > -30) mqttUpdateCabinTemp(lastCabinTemp);
@@ -243,4 +247,102 @@ void mqttPublishStatus(const char* msg) {
       currentResponseTopic.clear(); 
     }
   }
+}
+
+void mqttPublishHassConfig(const char* component, const char* entityId, const char* props[][2], size_t propCount) {
+  if (!mqttClient.connected()) return;
+  const char* vid = getVehicleId();
+  StringBuffer<128> topic;
+  topic.format("homeassistant/%s/simppeliTCU_%s/%s/config", component, vid, entityId);
+
+  StringBuffer<512> payload;
+  payload.copyFrom("{");
+  const char* baseTopic = mqttPrefix.c_str();
+
+  for (size_t i = 0; i < propCount; i++) {
+    const char* key = props[i][0];
+    const char* val = props[i][1];
+
+    payload.append("\"");
+    payload.append(key);
+    payload.append("\":\"");
+
+    if (strcmp(key, "state_topic") == 0 || strcmp(key, "command_topic") == 0) {
+      payload.append(baseTopic);
+    }
+    payload.append(val);
+    payload.append("\",");
+  }
+
+  StringBuffer<128> device;
+  device.format("\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\"}}", vid, vid);
+  payload.append(device.c_str());
+
+  mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
+}
+
+void mqttPublishHassDiscovery() {
+  if (!mqttClient.connected()) return;
+
+  const char* socProps[][2] = {
+    {"name", "SOC"},
+    {"device_class", "battery"},
+    {"unit_of_measurement", "%"},
+    {"state_topic", ovmsMetrics.soc}
+  };
+  mqttPublishHassConfig("sensor", "soc", socProps, 4);
+
+  const char* tempProps[][2] = {
+    {"name", "Cabin Temperature"},
+    {"device_class", "temperature"},
+    {"unit_of_measurement", "°C"},
+    {"state_topic", ovmsMetrics.cabinTemp}
+  };
+  mqttPublishHassConfig("sensor", "cabintemp", tempProps, 4);
+
+  const char* chargeProps[][2] = {
+    {"name", "Charging Active"},
+    {"device_class", "battery_charging"},
+    {"state_topic", ovmsMetrics.chargingActive},
+    {"payload_on", "yes"},
+    {"payload_off", "no"}
+  };
+  mqttPublishHassConfig("binary_sensor", "charging", chargeProps, 5);
+
+  const char* hvacProps[][2] = {
+    {"name", "HVAC Active"},
+    {"device_class", "running"},
+    {"state_topic", ovmsMetrics.hvacActive},
+    {"payload_on", "yes"},
+    {"payload_off", "no"}
+  };
+  mqttPublishHassConfig("binary_sensor", "hvac", hvacProps, 5);
+
+  const char* hvacSwProps[][2] = {
+    {"name", "HVAC Control"},
+    {"state_topic", ovmsMetrics.hvacActive},
+    {"command_topic", "client/hass/command/0"},
+    {"payload_on", "climatecontrol on"},
+    {"payload_off", "climatecontrol off"},
+    {"state_on", "yes"},
+    {"state_off", "no"}
+  };
+  mqttPublishHassConfig("switch", "hvac_switch", hvacSwProps, 7);
+
+  const char* chargeSwProps[][2] = {
+    {"name", "Charge Control"},
+    {"state_topic", ovmsMetrics.chargingActive},
+    {"command_topic", "client/hass/command/1"},
+    {"payload_on", "charge start"},
+    {"state_on", "yes"},
+    {"state_off", "no"}
+  };
+  mqttPublishHassConfig("switch", "charge_switch", chargeSwProps, 6);
+
+  const char* refreshProps[][2] = {
+    {"name", "Refresh Data"},
+    {"command_topic", "client/hass/command/2"},
+    {"payload_press", "server v3 update modified"}
+  };
+  mqttPublishHassConfig("button", "refresh", refreshProps, 3);
 }
