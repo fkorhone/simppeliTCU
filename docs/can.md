@@ -13,6 +13,7 @@ This project utilizes the `IT-CAN` bus (often referred to as CAR-CAN by the comm
 
 ## Known Issues
 * **CAN communication errors:** When the original TCU is disconnected from the CAN bus, other modules raise a set of CAN-related communication errors. The current implementation does not mimic the correct responses to keep other modules happy. However, no dashboard warning lights have illuminated, and no other issues have been noticed while driving.
+* **Concurrent commands ignored:** If a new command (via Web or MQTT) is issued while another sequence (like waking up the car) is already in progress, the new command will be ignored to prevent interrupting the active sequence.
 
 ## Known Limitations / Research
 * **Sleep (charging):** `A6 00 00 00` Captured what appears to be variant of 0x86, not sure if this was error related (charging did not start this time) or always used at end of every charge start sequence.
