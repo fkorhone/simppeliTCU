@@ -67,3 +67,44 @@ The panels in the app rely on a base topic prefix to communicate with the specif
 *(Update the Dashboard prefix topic)*
 
 Once saved and connected, you should be able to see valid data on your dashboard and control the vehicle state!
+
+---
+
+## 4. MQTT API Reference
+
+simppeliTCU aims to follow OVMS V.3 topic structure where possible.
+A small subset of topics has been implemented.
+
+### Topic Structure
+All topics use the base prefix `ovms/<user>/<vehicle>/`
+
+Where:
+- `<user>` = MQTT username configured in simppeliTCU
+- `<vehicle>` = Vehicle ID configured in simppeliTCU
+
+### Published Topics (simppeliTCU → Broker)
+
+| Topic | Retained | Description |
+|-------|----------|-------------|
+| `ovms/<user>/<vehicle>/metric/v/b/soc` | Yes | State of Charge percentage as decimal string (e.g., `75.5`) |
+| `ovms/<user>/<vehicle>/metric/v/e/cabintemp` | Yes | Cabin temperature in °C as decimal string (e.g., `22.5`) |
+| `ovms/<user>/<vehicle>/metric/v/c/charging` | Yes | Charging status: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/c/state` | Yes | Charging state: `charging`, `done`, `stopped`, `wait`, or empty |
+| `ovms/<user>/<vehicle>/metric/v/e/hvac` | Yes | HVAC status: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/s/v3/connected` | Yes | Connection status (LWT): `yes` or `no` |
+| `ovms/<user>/<vehicle>/client/<clientid>/response/<commandid>` | No | Response to specific commands. |
+
+### Subscribed Topics (simppeliTCU ← Broker)
+
+| Topic | Description |
+|-------|-------------|
+| `ovms/<user>/<vehicle>/client/<clientid>/command/<commandid>` | Commands from OVMS app. `<clientid>` and `<commandid>` can be any identifier. |
+
+#### Supported Commands
+
+| Command | Action |
+|---------|--------|
+| `climatecontrol on` | Triggers `handleMqttHvacOn()` |
+| `climatecontrol off` | Triggers `handleMqttHvacOff()` |
+| `charge start` | Triggers `handleMqttChargeOn()` |
+| `server v3 update modified` | Triggers `handleMqttRefresh()`, returns current SOC and cabin temp |
