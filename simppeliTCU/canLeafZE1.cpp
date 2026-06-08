@@ -1,51 +1,84 @@
 #include "canLeafZE1.h"
 
+// Message parser dispatch
+struct MessageParser {
+    uint32_t id;
+    uint8_t expected_len;
+    void (*handler)(const uint8_t* data, uint8_t len);
+};
+
+// Helper macro to create parser entries from CANMessage objects
+#define CAN_PARSER(msg, handler) { (msg).identifier, decltype(msg)::data_size, handler }
+
+// Message-specific handlers
+void handleSOCMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    float soc = extractScaledValue(data, soc_field, soc_scaling);
+    handleRawSOC(soc);
+}
+
+void handleTempMessage(const uint8_t* data, uint8_t len) {
+    float temp = extractScaledValue(data, cabin_temp_field, cabin_temp_scaling);
+    handleCabinTemp(temp);
+}
+
+void handleCarAwakeMessage(const uint8_t* data, uint8_t len) {
+    handleCarAwake();
+}
+
+void handleChargerMessage(const uint8_t* data, uint8_t len) {
+    uint8_t cStatus = static_cast<uint8_t>(extractBits(data, cStatus_field));
+    bool qc_state = extractBool(data, qc_state_field);
+    bool vg_state = (extractBits(data, vg_state_field) == 0x09);
+    float chargeVoltage = extractScaledValue(data, chargeVolt_field, voltage_scaling);
+
+    bool isCharging = false;
+    ChargerState state = ChargerState::IDLE;
+
+    switch (cStatus) {
+        case 0x01:
+            if (qc_state && !vg_state) { state = ChargerState::CHARGING; isCharging = true; }
+            break;
+        case 0x04:
+            if (chargeVoltage > 0) { state = ChargerState::CHARGING; isCharging = true; }
+            else { state = ChargerState::INTERRUPTED; }
+            break;
+        case 0x02:
+            state = ChargerState::FINISHED;
+            break;
+        case 0x0c:
+            state = ChargerState::WAITING;
+            break;
+        default:
+            break;
+    }
+
+    handleChargerStatus(isCharging, state);
+}
+
+void handleHVACMessage(const uint8_t* data, uint8_t len) {
+    bool isOn = extractBool(data, hvac_bit0_field) ||
+                extractBool(data, hvac_bit4_field) ||
+                extractBool(data, hvac_bit5_field);
+    handleHVACStatus(isOn);
+}
+
+// Message parser dispatch table
+static const MessageParser parsers[] = {
+    CAN_PARSER(raw_soc_readout, handleSOCMessage),
+    CAN_PARSER(cabin_temp_readout, handleTempMessage),
+    CAN_PARSER(car_awake_readout, handleCarAwakeMessage),
+    CAN_PARSER(charger_status_readout, handleChargerMessage),
+    CAN_PARSER(hvac_status_readout, handleHVACMessage),
+};
+
 // Can message reception handler, to be called when a CAN message is received
 void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len) {
-    if (receivedMessageIs(identifier, len, raw_soc_readout)) {
-      uint16_t soc_raw = (data[0] << 2) | (data[1] >> 6);
-      handleRawSOC(soc_raw / 10.0);
-    }
-    else if (receivedMessageIs(identifier, len, cabin_temp_readout)) {
-      handleCabinTemp((data[0] / 2.0) - 40.0);
-    }
-    else if (receivedMessageIs(identifier, len, car_awake_readout)) {
-      handleCarAwake();
-    }
-    else if (receivedMessageIs(identifier, len, charger_status_readout)) {
-      uint8_t cStatus = (data[5] >> 1) & 0x3f;
-      bool qc_state = (data[4] & 0x40) == 0x40;
-      bool vg_state = (data[0] >> 4) == 0x09;
-      float chargeVoltage = ((data[3] >> 3) & 0x03) * 110.0f;
-      
-      bool isCharging = false;
-      ChargerState state = ChargerState::IDLE;
-
-      if (cStatus == 0x01) {
-        if (qc_state && !vg_state) {
-          state = ChargerState::CHARGING;
-          isCharging = true;
-        } else {
-          state = ChargerState::IDLE;
+    for (const auto& p : parsers) {
+        if (p.id == identifier && len >= p.expected_len) {
+            p.handler(data, len);
+            return;
         }
-      } else if (cStatus == 0x04) {
-        if (chargeVoltage > 0) {
-          state = ChargerState::CHARGING;
-          isCharging = true;
-        } else {
-          state = ChargerState::INTERRUPTED;
-        }
-      } else if (cStatus == 0x02) {
-        state = ChargerState::FINISHED;
-      } else if (cStatus == 0x0c) {
-        state = ChargerState::WAITING;
-      }
-      
-      handleChargerStatus(isCharging, state);
-    }
-    else if (receivedMessageIs(identifier, len, hvac_status_readout)) {
-      bool isOn = (data[1] & 0x01) || (data[1] & 0x30);
-      handleHVACStatus(isOn);
     }
 }
 
