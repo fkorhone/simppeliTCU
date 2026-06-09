@@ -33,3 +33,33 @@ If you prefer using the command line, you can build and flash the firmware using
    ```bash
    arduino-cli upload -p <PORT> --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc simppeliTCU
    ```
+
+## Running Unit Tests
+
+### Prerequisites
+
+- CMake 3.14+
+- MinGW or Visual Studio (Windows)
+- Git (for FetchContent to download Google Test)
+
+### Commands
+
+```bash
+# Navigate to test directory
+cd test
+
+# Create and enter build directory
+mkdir build
+cd build
+
+# Configure with MinGW
+cmake -G "MinGW Makefiles" ..
+
+# Build the tests
+cmake --build .
+
+# Run all tests
+ctest
+```
+
+
