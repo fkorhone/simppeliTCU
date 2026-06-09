@@ -1,0 +1,27 @@
+# Build directories
+simppeliTCU/build/
+test/build/
+
+# IDE specific
+.idea/
+.vs/
+
+# Compiled objects
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.a
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+
+# Google Test downloaded by FetchContent
+googletest-src/
+googletest-build/
+
+# Coverage reports
+coverage.html
+coverage.xml

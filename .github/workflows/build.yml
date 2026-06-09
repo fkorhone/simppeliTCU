@@ -5,7 +5,65 @@ on:
     branches: [ "**" ]
 
 jobs:
-  build:
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ git gcovr
+
+    - name: Configure and build tests with coverage
+      working-directory: test
+      run: |
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_FLAGS="--coverage -O0" \
+          ..
+        cmake --build .
+
+    - name: Run tests
+      working-directory: test/build
+      run: ctest --output-on-failure
+
+    - name: Generate coverage report
+      working-directory: test/build
+      run: |
+        gcovr --root ../.. --xml --output coverage.xml \
+          --object-directory . \
+          --exclude "_deps/" \
+          --exclude "CMakeFiles/" \
+          --exclude "googletest/" \
+          --exclude "test/"
+        gcovr --root ../.. --html --output coverage.html \
+          --object-directory . \
+          --exclude "_deps/" \
+          --exclude "CMakeFiles/" \
+          --exclude "googletest/" \
+          --exclude "test/"
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: test/build/coverage.*
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: test/build/coverage.xml
+        flags: unittests
+        name: unit-tests-coverage
+
+  build-firmware:
+    name: Build Firmware
+    needs: unit-tests
     runs-on: ubuntu-latest
 
     steps:
@@ -28,4 +86,3 @@ jobs:
       with:
         name: simppeliTCU-firmware
         path: simppeliTCU/build/
-    
