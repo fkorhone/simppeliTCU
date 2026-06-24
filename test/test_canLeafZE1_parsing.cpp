@@ -15,6 +15,10 @@ extern bool lastDoor_rl;
 extern bool lastDoor_rr;
 extern bool lastDoor_trunk;
 extern bool lastLockStatus;
+extern float lastHVACSetpoint_value;
+extern float lastFanSpeed_value;
+extern bool lastHeating_value;
+extern bool lastCooling_value;
 
 // Accessor functions for the test
 namespace {
@@ -31,6 +35,10 @@ namespace {
         lastDoor_rr = false;
         lastDoor_trunk = false;
         lastLockStatus = false;
+        lastHVACSetpoint_value = 0.0f;
+        lastFanSpeed_value = 0.0f;
+        lastHeating_value = false;
+        lastCooling_value = false;
     }
 }
 
@@ -138,7 +146,7 @@ TEST(CanLeafZE1Parsing, HVACStatus_Parsing) {
     EXPECT_TRUE(lastHVAC_value);
     
     resetMocks();
-    uint8_t hvacData3[] = {0x00, 0x00};
+    uint8_t hvacData3[] = {0x00, 0x08};
     handleReceivedMessage(0x54B, hvacData3, sizeof(hvacData3));
     EXPECT_FALSE(lastHVAC_value);
     
@@ -146,6 +154,49 @@ TEST(CanLeafZE1Parsing, HVACStatus_Parsing) {
     uint8_t hvacData4[] = {0x00, 0x31};
     handleReceivedMessage(0x54B, hvacData4, sizeof(hvacData4));
     EXPECT_TRUE(lastHVAC_value);
+}
+
+// Test HVAC Setpoint parsing
+TEST(CanLeafZE1Parsing, HVACSetpoint_Parsing) {
+    resetMocks();
+    
+    // Setpoint is byte 4, divided by 2
+    uint8_t hvacData1[] = {0x00, 0x00, 0x00, 0x00, 40, 0x00, 0x00, 0x00}; // 20.0 C
+    handleReceivedMessage(0x54A, hvacData1, sizeof(hvacData1));
+    EXPECT_NEAR(lastHVACSetpoint_value, 20.0f, 0.01f);
+    
+    resetMocks();
+    uint8_t hvacData2[] = {0x00, 0x00, 0x00, 0x00, 33, 0x00, 0x00, 0x00}; // 16.5 C
+    handleReceivedMessage(0x54A, hvacData2, sizeof(hvacData2));
+    EXPECT_NEAR(lastHVACSetpoint_value, 16.5f, 0.01f);
+}
+
+// Test HVAC Fan Speed and Heating/Cooling Mode parsing
+TEST(CanLeafZE1Parsing, HVACAdvancedMetrics_Parsing) {
+    resetMocks();
+    
+    // Heating ON (bit 0), Fan Speed 7 (bits 5:3 = 111 -> 0x38)
+    uint8_t hvacData1[] = {0x00, 0x01, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00};
+    handleReceivedMessage(0x54B, hvacData1, sizeof(hvacData1));
+    EXPECT_TRUE(lastHeating_value);
+    EXPECT_FALSE(lastCooling_value);
+    EXPECT_NEAR(lastFanSpeed_value, 100.0f, 0.01f);
+    
+    resetMocks();
+    // Cooling ON (bit 4 -> 0x10), Heating OFF, Fan Speed 3 (bits 5:3 = 011 -> 0x18)
+    uint8_t hvacData2[] = {0x00, 0x10, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00};
+    handleReceivedMessage(0x54B, hvacData2, sizeof(hvacData2));
+    EXPECT_FALSE(lastHeating_value);
+    EXPECT_TRUE(lastCooling_value);
+    EXPECT_NEAR(lastFanSpeed_value, 42.857f, 0.01f);
+    
+    resetMocks();
+    // Heating ON and Cooling ON (0x11), Fan Speed 0 (0x00)
+    uint8_t hvacData3[] = {0x00, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    handleReceivedMessage(0x54B, hvacData3, sizeof(hvacData3));
+    EXPECT_TRUE(lastHeating_value);
+    EXPECT_TRUE(lastCooling_value);
+    EXPECT_NEAR(lastFanSpeed_value, 0.0f, 0.01f);
 }
 
 // Test Doors and Locks parsing

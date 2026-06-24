@@ -1,4 +1,5 @@
 #include "canLeafZE1.h"
+#include <cstring>
 
 // Message parser dispatch
 struct MessageParser {
@@ -56,12 +57,45 @@ void handleChargerMessage(const uint8_t* data, uint8_t len) {
     handleChargerStatus(isCharging, state);
 }
 
-void handleHVACMessage(const uint8_t* data, uint8_t len) {
-    bool isOn = extractBool(data, hvac_bit0_field) ||
-                extractBool(data, hvac_bit4_field) ||
-                extractBool(data, hvac_bit5_field);
-    handleHVACStatus(isOn);
+void handleHVACSetpointMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    float setpoint = extractScaledValue(data, hvac_setpoint_field, setpoint_scaling);
+    handleHVACSetpoint(setpoint);
 }
+
+VentilationMode decodeVentilationMode(uint8_t byte2) {
+    // OVMS implementation: byte 2 of 0x54B message contains ventilation mode
+    switch (byte2) {
+        case 0x80: return VentilationMode::OFF;
+        case 0x88: return VentilationMode::FACE;
+        case 0x90: return VentilationMode::FACE_FEET;
+        case 0x98: return VentilationMode::FEET;
+        case 0xA0: return VentilationMode::WINDSCREEN_FEET;
+        case 0xA8: return VentilationMode::WINDSCREEN;
+        default: return VentilationMode::UNKNOWN;
+    }
+}
+
+void handleHVACMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    // Extract new metrics
+    bool heating = extractBool(data, hvac_bit0_field);
+    bool cooling = extractBool(data, hvac_bit4_field) || extractBool(data, hvac_bit5_field);
+    float fanSpeed = extractScaledValue(data, fan_speed_field, fan_speed_scaling);
+    
+    // Extract ventilation mode from byte 2
+    VentilationMode ventMode = decodeVentilationMode(data[2]);
+    
+    // HVAC enabled logic from OVMS
+    bool isOn = (data[1] != 0x08 && data[1] != 0x04);
+    
+    handleHVACStatus(isOn);
+    handleFanSpeed(fanSpeed);
+    handleHeatingMode(heating, cooling);
+    handleVentilationMode(ventMode);
+}
+
+
 
 void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
     bool trunk = extractBool(data, door_trunk_field);
@@ -82,6 +116,7 @@ static const MessageParser parsers[] = {
     CAN_PARSER(car_awake_readout, handleCarAwakeMessage),
     CAN_PARSER(charger_status_readout, handleChargerMessage),
     CAN_PARSER(hvac_status_readout, handleHVACMessage),
+    CAN_PARSER(hvac_setpoint_readout, handleHVACSetpointMessage),
     CAN_PARSER(doors_and_locks_readout, handleDoorsAndLocksMessage),
 };
 
@@ -119,10 +154,24 @@ struct SequenceStep {
     int repeats;
     int intervalMs;
     int delayAfterMs;
+    SequencePayloadModifier modifier;
 };
 
-#define MSG_STEP(msg, reps, interv) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0 }
-#define MSG_DLY_STEP(msg, reps, interv, delay) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, delay }
+#define MSG_STEP(msg, reps, interv) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0, nullptr }
+#define MSG_DLY_STEP(msg, reps, interv, delay) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, delay, nullptr }
+#define MSG_MOD_STEP(msg, reps, interv, mod_fn) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0, mod_fn }
+
+static uint8_t internal_hvac_setpoint_byte = 0;
+
+void setHVACTargetTemperature(float setpoint) {
+    internal_hvac_setpoint_byte = setpoint > 0.0f ? static_cast<uint8_t>(setpoint * 2.0f) : 0;
+}
+
+static void hvacPayloadModifier(uint8_t* data, uint8_t len) {
+    if (len >= 3) {
+        data[2] = internal_hvac_setpoint_byte;
+    }
+}
 
 static const SequenceStep seq_refresh[] = {
     MSG_DLY_STEP(hvac_init, 20, 100, 1000),
@@ -131,8 +180,9 @@ static const SequenceStep seq_refresh[] = {
 
 static const SequenceStep seq_hvac_on[] = {
     MSG_STEP(hvac_init, 20, 100),
-    MSG_STEP(hvac_on_data, 20, 100),
-    MSG_STEP(idle_data, 20, 100)
+    MSG_MOD_STEP(hvac_on_data, 25, 100, hvacPayloadModifier),
+    MSG_MOD_STEP(hvac_on_idle, 40, 100, hvacPayloadModifier),
+    MSG_MOD_STEP(idle_data, 50, 100, hvacPayloadModifier)
 };
 
 static const SequenceStep seq_hvac_off[] = {
@@ -235,7 +285,13 @@ CanSeqResult manageCANSequence(unsigned long currentTimeMs) {
                 const SequenceStep& step = currentSeqArray[stepIndex];
                 
                 if (step.id != 0 && step.data != nullptr) {
-                    sendCAN(step.id, step.data, step.len);
+                    uint8_t buffer[8];
+                    uint8_t safeLen = step.len > sizeof(buffer) ? sizeof(buffer) : step.len;
+                    memcpy(buffer, step.data, safeLen);
+                    if (step.modifier) {
+                        step.modifier(buffer, safeLen);
+                    }
+                    sendCAN(step.id, buffer, safeLen);
                 }
                 
                 if (++repeatCount >= step.repeats) {

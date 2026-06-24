@@ -88,9 +88,14 @@ Where:
 |-------|----------|-------------|
 | `ovms/<user>/<vehicle>/metric/v/b/soc` | Yes | State of Charge percentage as decimal string (e.g., `75.5`) |
 | `ovms/<user>/<vehicle>/metric/v/e/cabintemp` | Yes | Cabin temperature in °C as decimal string (e.g., `22.5`) |
+| `ovms/<user>/<vehicle>/metric/v/e/cabinsetpoint`| Yes | Requested HVAC target temperature in °C (e.g., `20.5`) |
+| `ovms/<user>/<vehicle>/metric/v/e/cabinvent` | Yes | Ventilation mode: `off`, `face`, `face|feet`, `feet`, `windscreen|feet`, `windscreen`, or empty |
+| `ovms/<user>/<vehicle>/metric/v/e/cabinfan` | Yes | Cabin fan speed percentage |
 | `ovms/<user>/<vehicle>/metric/v/c/charging` | Yes | Charging status: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/c/state` | Yes | Charging state: `charging`, `done`, `stopped`, `wait`, or empty |
 | `ovms/<user>/<vehicle>/metric/v/e/hvac` | Yes | HVAC status: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/e/heating` | Yes | Heating active: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/e/cooling` | Yes | Cooling/AC active: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/fl` | Yes | Front left door open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/fr` | Yes | Front right door open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/rl` | Yes | Rear left door open: `yes` or `no` |
@@ -110,7 +115,7 @@ Where:
 
 | Command | Action |
 |---------|--------|
-| `climatecontrol on` | Triggers `handleMqttHvacOn()` |
+| `climatecontrol on [temp]` | Triggers `handleMqttHvacOn()` (Target temperature is optional) |
 | `climatecontrol off` | Triggers `handleMqttHvacOff()` |
 | `charge start` | Triggers `handleMqttChargeOn()` |
 | `lock <pin>` | Triggers `handleMqttLock()` (PIN is optional and ignored) |

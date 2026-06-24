@@ -10,4 +10,15 @@ enum class ChargerState {
     WAITING 
 };
 
+// HVAC Ventilation modes (from OVMS implementation)
+enum class VentilationMode {
+    OFF,
+    FACE,
+    FACE_FEET,
+    FEET,
+    WINDSCREEN_FEET,
+    WINDSCREEN,
+    UNKNOWN
+};
+
 #endif

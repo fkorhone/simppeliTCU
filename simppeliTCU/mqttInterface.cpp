@@ -31,6 +31,11 @@ struct OvmsMetrics {
   const char* doorRR = "metric/v/d/rr";
   const char* doorTrunk = "metric/v/d/trunk";
   const char* locked = "metric/v/e/locked";
+  const char* hvacSetpoint = "metric/v/e/cabinsetpoint";
+  const char* fanSpeed = "metric/v/e/cabinfan";
+  const char* heating = "metric/v/e/heating";
+  const char* cooling = "metric/v/e/cooling";
+  const char* ventilationMode = "metric/v/e/cabinvent";
 };
 static const OvmsMetrics ovmsMetrics;
 
@@ -55,6 +60,17 @@ static bool doorsDirty = false;
 static bool lastLockStateSet = false;
 static bool lastLockState = false;
 static bool lockDirty = false;
+
+static float lastSetpoint = -1.0;
+static bool setpointDirty = false;
+static float lastFanSpeed = -1.0;
+static bool fanSpeedDirty = false;
+static bool lastHeating = false;
+static bool heatingDirty = false;
+static bool lastCooling = false;
+static bool coolingDirty = false;
+static VentilationMode lastVentilationMode = VentilationMode::UNKNOWN;
+static bool ventilationModeDirty = false;
 
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
@@ -100,8 +116,12 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         handleMqttLock();
       } else if (msg.startsWith(ovmsCmds.unlock)) {
         handleMqttUnlock();
-      } else if (msg.equals(ovmsCmds.hvacOn)) {
-        handleMqttHvacOn();
+      } else if (msg.startsWith(ovmsCmds.hvacOn)) {
+        float setpoint = 0.0f;
+        if (msg.length() > strlen(ovmsCmds.hvacOn)) {
+            setpoint = atof(msg.c_str() + strlen(ovmsCmds.hvacOn));
+        }
+        handleMqttHvacOn(setpoint);
       } else if (msg.equals(ovmsCmds.hvacOff)) {
         handleMqttHvacOff();
       }
@@ -154,6 +174,10 @@ boolean reconnectMQTT() {
     if (lastCabinTemp > -30) { cabinTempDirty = true; mqttUpdateCabinTemp(lastCabinTemp); }
     if (lastChargingStateSet) { chargingDirty = true; mqttUpdateCharging(lastIsCharging, lastChargerState); }
     if (lastHvacStateSet) { hvacDirty = true; mqttUpdateHVAC(lastIsHvacOn); }
+    if (lastSetpoint >= 0) { setpointDirty = true; mqttUpdateHVACSetpoint(lastSetpoint); }
+    if (lastFanSpeed >= 0) { fanSpeedDirty = true; mqttUpdateFanSpeed(lastFanSpeed); }
+    heatingDirty = true; coolingDirty = true; mqttUpdateHeatingMode(lastHeating, lastCooling);
+    ventilationModeDirty = true; mqttUpdateVentilationMode(lastVentilationMode);
     if (lastDoorsStateSet) { doorsDirty = true; mqttUpdateDoors(lastDoorFL, lastDoorFR, lastDoorRL, lastDoorRR, lastDoorTrunk); }
     if (lastLockStateSet) { lockDirty = true; mqttUpdateLock(lastLockState); }
     
@@ -261,6 +285,45 @@ void mqttUpdateHVAC(bool isOn) {
   lastHvacStateSet = true;
   lastIsHvacOn = isOn;
   hvacDirty = !mqttPublishMetricStr(ovmsMetrics.hvacActive, isOn ? "yes" : "no");
+}
+
+void mqttUpdateHVACSetpoint(float setpoint) {
+  if (lastSetpoint == setpoint && !setpointDirty) return;
+  lastSetpoint = setpoint;
+  setpointDirty = !mqttPublishMetric(ovmsMetrics.hvacSetpoint, setpoint);
+}
+
+void mqttUpdateFanSpeed(float speed) {
+  if (lastFanSpeed == speed && !fanSpeedDirty) return;
+  lastFanSpeed = speed;
+  fanSpeedDirty = !mqttPublishMetric(ovmsMetrics.fanSpeed, speed);
+}
+
+void mqttUpdateHeatingMode(bool heating, bool cooling) {
+  if (lastHeating == heating && !heatingDirty && lastCooling == cooling && !coolingDirty) return;
+  lastHeating = heating;
+  lastCooling = cooling;
+  heatingDirty = !mqttPublishMetricStr(ovmsMetrics.heating, heating ? "yes" : "no");
+  coolingDirty = !mqttPublishMetricStr(ovmsMetrics.cooling, cooling ? "yes" : "no");
+}
+
+const char* ventilationModeToString(VentilationMode mode) {
+  switch (mode) {
+    case VentilationMode::OFF: return "off";
+    case VentilationMode::FACE: return "face";
+    case VentilationMode::FACE_FEET: return "face|feet";
+    case VentilationMode::FEET: return "feet";
+    case VentilationMode::WINDSCREEN_FEET: return "windscreen|feet";
+    case VentilationMode::WINDSCREEN: return "windscreen";
+    case VentilationMode::UNKNOWN:
+    default: return "";
+  }
+}
+
+void mqttUpdateVentilationMode(VentilationMode mode) {
+  if (lastVentilationMode == mode && !ventilationModeDirty) return;
+  lastVentilationMode = mode;
+  ventilationModeDirty = !mqttPublishMetricStr(ovmsMetrics.ventilationMode, ventilationModeToString(mode));
 }
 
 void mqttUpdateSOC(float soc) {
