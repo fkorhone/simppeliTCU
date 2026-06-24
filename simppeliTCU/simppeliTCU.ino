@@ -22,6 +22,11 @@ bool isChargingNow = false;
 ChargerState currentChargerState = ChargerState::IDLE;
 bool isHvacOn = false;
 int8_t lockState = -1;
+float currentSetpoint = -1.0;
+float currentFanSpeed = -1.0;
+bool isHeatingEnabled = false;
+bool isCoolingEnabled = false;
+VentilationMode currentVentilationMode = VentilationMode::UNKNOWN;
 
 void resetData() {
     currentSOC = -1.0;
@@ -30,11 +35,16 @@ void resetData() {
     currentChargerState = ChargerState::IDLE;
     isHvacOn = false;
     lockState = -1;
+    currentSetpoint = -1.0;
+    currentFanSpeed = -1.0;
+    isHeatingEnabled = false;
+    isCoolingEnabled = false;
+    currentVentilationMode = VentilationMode::UNKNOWN;
 }
 
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode);
 }
 
 void handleCarAwake() {
@@ -58,6 +68,35 @@ void handleCabinTemp(float temp) {
   mqttUpdateCabinTemp(temp);
 }
 
+void handleHVACSetpoint(float setpoint) {
+  // The car reports 0 for setpoint during remote climate. Ignore it if we already have a valid setpoint.
+  if ((isHvacOn || activeSequence == CanSequence::HVAC_ON) && setpoint == 0.0f && currentSetpoint > 0.0f) {
+      return;
+  }
+  currentSetpoint = setpoint;
+  mqttUpdateHVACSetpoint(setpoint);
+}
+
+void handleFanSpeed(float speed) {
+  // The car reports 0 for fan speed during remote climate even though it is blowing.
+  if ((isHvacOn || activeSequence == CanSequence::HVAC_ON) && speed == 0.0f && currentFanSpeed > 0.0f) {
+      return;
+  }
+  currentFanSpeed = speed;
+  mqttUpdateFanSpeed(speed);
+}
+
+void handleHeatingMode(bool heating, bool cooling) {
+  isHeatingEnabled = heating;
+  isCoolingEnabled = cooling;
+  mqttUpdateHeatingMode(heating, cooling);
+}
+
+void handleVentilationMode(VentilationMode mode) {
+  currentVentilationMode = mode;
+  mqttUpdateVentilationMode(mode);
+}
+
 void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk) {
   mqttUpdateDoors(fl, fr, rl, rr, trunk);
 }
@@ -76,6 +115,7 @@ void logSequenceStart() {
   Serial.println("### Starting Sequence ###");
   Serial.println("# type(<,>,!) time(s) identifier data...");
 }
+
 
 // Update data (Wake up)
 void handleRefresh() {
@@ -96,15 +136,30 @@ void handleMqttRefresh() {
 
 void handleHvacOn() {
   Serial.println("### HVAC ON! ###");
+  float setpoint = 0.0f;
+  if (server.hasArg("setpoint")) {
+    setpoint = server.arg("setpoint").toFloat();
+  }
+  Serial.print("Setpoint: ");
+  Serial.println(setpoint);
   logSequenceStart();
+  setHVACTargetTemperature(setpoint);
+  if (setpoint > 0.0f) {
+      handleHVACSetpoint(setpoint); // Pre-fill the UI/MQTT
+  }
   startSequence(CanSequence::HVAC_ON, millis());
   server.sendHeader("Location", "/"); 
   server.send(303);
 }
 
-void handleMqttHvacOn() {
-  Serial.println("### HVAC ON! (MQTT) ###");
+void handleMqttHvacOn(float setpoint) {
+  Serial.print("### HVAC ON! (MQTT) Setpoint: ");
+  Serial.println(setpoint);
   logSequenceStart();
+  setHVACTargetTemperature(setpoint);
+  if (setpoint > 0.0f) {
+      handleHVACSetpoint(setpoint); // Pre-fill the UI/MQTT with the requested setpoint
+  }
   startSequence(CanSequence::HVAC_ON, millis());
 }
 

@@ -13,12 +13,16 @@ void mqttUpdateSOC(float soc);
 void mqttUpdateCabinTemp(float temp);
 void mqttUpdateCharging(bool isCharging, ChargerState state);
 void mqttUpdateHVAC(bool isOn);
+void mqttUpdateHVACSetpoint(float setpoint);
+void mqttUpdateFanSpeed(float speed);
+void mqttUpdateHeatingMode(bool heating, bool cooling);
+void mqttUpdateVentilationMode(VentilationMode mode);
 void mqttUpdateDoors(bool fl, bool fr, bool rl, bool rr, bool trunk);
 void mqttUpdateLock(bool locked);
 void mqttPublishStatus(const char* msg);
 
 // Optional callbacks implemented in simppeliTCU.ino
-extern void handleMqttHvacOn();
+extern void handleMqttHvacOn(float setpoint);
 extern void handleMqttHvacOff();
 extern void handleMqttChargeOn();
 extern void handleMqttRefresh();

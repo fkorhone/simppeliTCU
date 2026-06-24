@@ -16,6 +16,11 @@ bool lastDoor_rl = false;
 bool lastDoor_rr = false;
 bool lastDoor_trunk = false;
 bool lastLockStatus = false;
+float lastHVACSetpoint_value = 0.0f;
+float lastFanSpeed_value = 0.0f;
+bool lastHeating_value = false;
+bool lastCooling_value = false;
+VentilationMode lastVentilationMode_value = VentilationMode::UNKNOWN;
 
 void handleRawSOC(float soc) {
     lastSOC_value = soc;
@@ -48,6 +53,23 @@ void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk) {
 
 void handleLockStatus(bool locked) {
     lastLockStatus = locked;
+}
+
+void handleHVACSetpoint(float setpoint) {
+    lastHVACSetpoint_value = setpoint;
+}
+
+void handleFanSpeed(float speed) {
+    lastFanSpeed_value = speed;
+}
+
+void handleHeatingMode(bool heating, bool cooling) {
+    lastHeating_value = heating;
+    lastCooling_value = cooling;
+}
+
+void handleVentilationMode(VentilationMode mode) {
+    lastVentilationMode_value = mode;
 }
 
 void sendCAN(uint32_t id, const uint8_t* data, uint8_t len) {

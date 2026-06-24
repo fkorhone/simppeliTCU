@@ -6,7 +6,7 @@
 #include "vehicleTypes.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -80,14 +80,50 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   // Status indicators
   if (isHvacOn) {
     server.sendContent(F("<h3 style='color: #ff5722;'>HVAC ON</h3>\n"));
+    if (isHeatingEnabled) server.sendContent(F("<p style='margin: 0; font-weight: bold;'>Heating Mode</p>\n"));
+    if (isCoolingEnabled) server.sendContent(F("<p style='margin: 0; font-weight: bold;'>Cooling Mode</p>\n"));
+    if (currentSetpoint >= 0) {
+      server.sendContent(F("<p style='margin: 0;'>Setpoint: "));
+      server.sendContent(String(currentSetpoint, 1));
+      server.sendContent(F(" &deg;C</p>\n"));
+    }
+    if (currentFanSpeed >= 0) {
+      server.sendContent(F("<p style='margin: 0;'>Fan Speed: "));
+      server.sendContent(String(currentFanSpeed, 0));
+      server.sendContent(F("%</p>\n"));
+    }
+    // Ventilation mode display
+    server.sendContent(F("<p style='margin: 0;'><b>Ventilation:</b> "));
+    switch (ventilationMode) {
+      case VentilationMode::OFF: server.sendContent(F("Off")); break;
+      case VentilationMode::FACE: server.sendContent(F("Face")); break;
+      case VentilationMode::FACE_FEET: server.sendContent(F("Face & Feet")); break;
+      case VentilationMode::FEET: server.sendContent(F("Feet")); break;
+      case VentilationMode::WINDSCREEN_FEET: server.sendContent(F("Windscreen & Feet")); break;
+      case VentilationMode::WINDSCREEN: server.sendContent(F("Windscreen")); break;
+      case VentilationMode::UNKNOWN:
+      default: server.sendContent(F("Unknown")); break;
+    }
+    server.sendContent(F("</p>\n"));
+    server.sendContent(F("<br>\n"));
   }
   if (isCharging) {
     server.sendContent(F("<h3 style='color: #4CAF50;'>CHARGING ON</h3>\n"));
   }
   
   // Buttons
+  float defaultSetpoint = currentSetpoint > 0.0f ? currentSetpoint : 20.0f;
+  
   server.sendContent(F(
-    "<a href='/hvac_on' class='btn btn-hvac-on'>Start HVAC</a><br>\n"
+    "<form action='/hvac_on' method='GET' style='margin: 10px;'>\n"
+    "<label for='setpoint' style='font-size: 18px; font-weight: bold;'>Target Temp &deg;C: </label>\n"
+    "<input type='number' step='0.5' name='setpoint' id='setpoint' value='"
+  ));
+  server.sendContent(String(defaultSetpoint, 1));
+  server.sendContent(F(
+    "' style='font-size: 18px; padding: 5px; width: 80px; text-align: center;'><br>\n"
+    "<button type='submit' class='btn btn-hvac-on' style='border: none; cursor: pointer; margin-top: 15px;'>Start HVAC</button>\n"
+    "</form>\n"
     "<a href='/hvac_off' class='btn btn-hvac-off'>Stop HVAC</a><br><br>\n"
     "<a href='/charge_on' class='btn btn-charge-on'>Start Charging</a><br><br>\n"
   ));
