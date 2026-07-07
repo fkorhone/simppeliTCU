@@ -2,11 +2,13 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
+#include <WiFiClient.h>
 #include "configuration.h"
 #include "stringBuffer.h"
 
-WiFiClientSecure espClient;
-PubSubClient mqttClient(espClient);
+WiFiClient espClient; // For non-TLS
+WiFiClientSecure espClientSecure; // For TLS
+PubSubClient mqttClient;
 unsigned long lastMqttReconnectAttempt = 0;
 
 struct OvmsCommands {
@@ -159,7 +161,7 @@ boolean reconnectMQTT() {
   }
 
   if (connected) {
-    Serial.println("SECURE MQTT Connected!");
+    Serial.println("MQTT Connected!");
     
     // Mark as connected in Retained message (for OVMS app to see vehicle is online)
     mqttClient.publish(willTopic.c_str(), (const uint8_t*)"yes", 3, true);
@@ -188,7 +190,12 @@ boolean reconnectMQTT() {
 
 void setupMQTT() {
   mqttPrefix.format("ovms/%s/%s/", getMqttUser(), getVehicleId());
-  espClient.setInsecure(); // Skip certificate validation for simplicity
+  if (getMqttTls()) {
+    espClientSecure.setInsecure(); // Skip certificate validation for simplicity
+    mqttClient.setClient(espClientSecure);
+  } else {
+    mqttClient.setClient(espClient);
+  }
   mqttClient.setServer(getMqttServer(), getMqttPort());
   
   // OVMS messages have longer topics, so enlarging buffer is recommended

@@ -105,6 +105,7 @@ static ConfigString<64> conf_mqtt_user("mqtt_user", "");
 static ConfigString<64> conf_mqtt_password("mqtt_password", "");
 static ConfigString<64> conf_vehicle_id("vehicle_id", "");
 static ConfigBool       conf_locking_enabled("locking_enabled", false);
+static ConfigBool       conf_mqtt_tls("mqtt_tls", true);
 
 void initConfiguration() {
     nvsReady = preferences.begin("config", false);
@@ -123,6 +124,7 @@ void initConfiguration() {
     conf_mqtt_password.load();
     conf_vehicle_id.load();
     conf_locking_enabled.load();
+    conf_mqtt_tls.load();
 }
 
 void factoryReset() {
@@ -190,3 +192,6 @@ ConfigStatus setVehicleId(const char* value) { return conf_vehicle_id.set(value)
 
 bool getLockingEnabled() { return conf_locking_enabled.get(); }
 ConfigStatus setLockingEnabled(bool value) { return conf_locking_enabled.set(value); }
+
+bool getMqttTls() { return conf_mqtt_tls.get(); }
+ConfigStatus setMqttTls(bool value) { return conf_mqtt_tls.set(value); }

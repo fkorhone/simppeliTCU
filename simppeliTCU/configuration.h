@@ -50,4 +50,7 @@ ConfigStatus setVehicleId(const char* value);
 bool getLockingEnabled();
 ConfigStatus setLockingEnabled(bool value);
 
+bool getMqttTls();
+ConfigStatus setMqttTls(bool value);
+
 #endif
