@@ -1,11 +1,11 @@
-#ifndef CAN_LEAF_ZE1_H
-#define CAN_LEAF_ZE1_H
+#ifndef CAN_LEAF_H
+#define CAN_LEAF_H
 
 #include "canInterface.h"
 #include "vehicleTypes.h"
 
 // Leaf readout messages
-inline constexpr CANMessage<2> raw_soc_readout = {0x55B};
+inline constexpr CANMessage<8> ze1_dashboard_soc_readout = {0x59E}; // ZE1 dashboard SOC
 inline constexpr CANMessage<1> cabin_temp_readout = {0x54F};
 inline constexpr CANMessage<0> car_awake_readout = {0x601};
 inline constexpr CANMessage<6> charger_status_readout = {0x390};
@@ -26,7 +26,7 @@ inline constexpr CANMessage<4> unlock_doors_data = {0x56E, {0x11, 0x00, 0x00, 0x
 inline constexpr CANMessage<4> lock_doors_data   = {0x56E, {0x60, 0x80, 0x00, 0x00}}; // Lock doors
 
 // ===== CAN Field Definitions (bit 0 = MSB of byte 0) =====
-inline constexpr CANField soc_field = { 0, 10 };    
+inline constexpr CANField soc_field = { 56, 8 };    
 inline constexpr CANField cabin_temp_field = { 0, 8 }; 
 inline constexpr CANField cStatus_field   = { 41, 6 }; 
 inline constexpr CANField qc_state_field  = { 33, 1 }; 
@@ -46,14 +46,15 @@ inline constexpr CANField door_fl_field    = { 4, 1 };
 inline constexpr CANField locked_field     = { 19, 1 };
 
 // Scaling definitions
-inline constexpr FieldScaling soc_scaling        = {false, 0.1f,   0.0f};
-inline constexpr FieldScaling cabin_temp_scaling = {false, 0.5f,  -40.0f};
+inline constexpr FieldScaling soc_scaling        = {false, 0.5f,   0.0f};
+inline constexpr FieldScaling ze1_cabin_temp_scaling = {false, 0.5f,  -40.0f};
+inline constexpr uint8_t ze1_cabin_temp_sentinel = 0x50; // 80
 inline constexpr FieldScaling voltage_scaling    = {false, 110.0f, 0.0f};
 inline constexpr FieldScaling setpoint_scaling   = {false, 0.5f,   0.0f};
 inline constexpr FieldScaling fan_speed_scaling  = {false, 100.0f/7, 0.0f};
 
 // Readout callbacks (to be called when a message is received, implemented at application side):
-void handleRawSOC(float soc);
+void handleDashboardSOC(float soc);
 void handleCabinTemp(float temp);
 void handleCarAwake();
 void handleChargerStatus(bool isCharging, ChargerState state);
@@ -89,5 +90,8 @@ void setHVACTargetTemperature(float setpoint);
 
 void startSequence(CanSequence seq, unsigned long currentTimeMs);
 CanSeqResult manageCANSequence(unsigned long currentTimeMs);
+
+// Vehicle detection state reset (for testing)
+void resetVehicleDetection();
 
 #endif

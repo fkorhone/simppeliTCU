@@ -4,7 +4,7 @@
 #include <NetBIOS.h>
 #include "configuration.h"
 #include "cliParser.h"
-#include "canLeafZE1.h"
+#include "canLeaf.h"
 #include "ui.h"
 #include "mqttInterface.h"
 
@@ -106,7 +106,7 @@ void handleLockStatus(bool locked) {
   mqttUpdateLock(locked);
 }
 
-void handleRawSOC(float soc) {
+void handleDashboardSOC(float soc) {
   currentSOC = soc;
   mqttUpdateSOC(soc);
 }

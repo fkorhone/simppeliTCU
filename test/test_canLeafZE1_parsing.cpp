@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../simppeliTCU/canLeafZE1.h"
+#include "../simppeliTCU/canLeaf.h"
 #include "../simppeliTCU/vehicleTypes.h"
 
 // Mock callback functions to capture parsed values - these are defined in test_canInterface_stubs.cpp
@@ -42,51 +42,77 @@ namespace {
     }
 }
 
-// Test SOC parsing
-TEST(CanLeafZE1Parsing, SOC_Parsing) {
+// Test ZE1 parsing first (since is_ze1 defaults to true)
+TEST(CanLeafZE1Parsing, ZE1_Parsing) {
+    resetVehicleDetection();
     resetMocks();
     
-    uint8_t socData[] = {0x21, 0x98};
-    handleReceivedMessage(0x55B, socData, sizeof(socData));
-    EXPECT_NEAR(lastSOC_value, 13.4f, 0.01f);
+    // ZE1 SOC (confirms is_ze1 = true)
+    uint8_t ze1SocData[8] = {0};
+    ze1SocData[7] = 27; // 27 * 0.5 = 13.5%
+    handleReceivedMessage(0x59E, ze1SocData, sizeof(ze1SocData));
+    EXPECT_NEAR(lastSOC_value, 13.5f, 0.01f);
     
     resetMocks();
-    uint8_t socData2[] = {0x14, 0x00};
-    handleReceivedMessage(0x55B, socData2, sizeof(socData2));
+    ze1SocData[7] = 16; // 16 * 0.5 = 8.0%
+    handleReceivedMessage(0x59E, ze1SocData, sizeof(ze1SocData));
     EXPECT_NEAR(lastSOC_value, 8.0f, 0.01f);
     
+    // ZE1 Temp: raw * 0.5 - 40
     resetMocks();
-    uint8_t socData3[] = {0x27, 0x00};
-    handleReceivedMessage(0x55B, socData3, sizeof(socData3));
-    EXPECT_NEAR(lastSOC_value, 15.6f, 0.01f);
-}
-
-// Test cabin temperature parsing
-TEST(CanLeafZE1Parsing, CabinTemp_Parsing) {
-    resetMocks();
-    
-    uint8_t tempData1[] = {0x78};
-    handleReceivedMessage(0x54F, tempData1, sizeof(tempData1));
+    uint8_t ze1TempData1[] = {0x78}; // 120 * 0.5 - 40 = 20.0f
+    handleReceivedMessage(0x54F, ze1TempData1, sizeof(ze1TempData1));
     EXPECT_NEAR(lastTemp_value, 20.0f, 0.01f);
     
+    // ZE1 Temp Sentinel
     resetMocks();
-    uint8_t tempData2[] = {0x50};
-    handleReceivedMessage(0x54F, tempData2, sizeof(tempData2));
-    EXPECT_NEAR(lastTemp_value, 0.0f, 0.01f);
+    uint8_t ze1TempSentinel[] = {0x50}; // Sentinel (was previously 0.0f)
+    handleReceivedMessage(0x54F, ze1TempSentinel, sizeof(ze1TempSentinel));
+    EXPECT_EQ(lastTemp_value, -100.0f); // Unchanged
     
     resetMocks();
-    uint8_t tempData3[] = {0x3C};
-    handleReceivedMessage(0x54F, tempData3, sizeof(tempData3));
+    uint8_t ze1TempData3[] = {0x3C}; // 60 * 0.5 - 40 = -10.0f
+    handleReceivedMessage(0x54F, ze1TempData3, sizeof(ze1TempData3));
     EXPECT_NEAR(lastTemp_value, -10.0f, 0.01f);
     
     resetMocks();
-    uint8_t tempData4[] = {0xA0};
-    handleReceivedMessage(0x54F, tempData4, sizeof(tempData4));
+    uint8_t ze1TempData4[] = {0xA0}; // 160 * 0.5 - 40 = 40.0f
+    handleReceivedMessage(0x54F, ze1TempData4, sizeof(ze1TempData4));
     EXPECT_NEAR(lastTemp_value, 40.0f, 0.01f);
+}
+
+// Test AZE0 parsing (this will set is_ze1 to false)
+TEST(CanLeafZE1Parsing, AZE0_Parsing) {
+    resetVehicleDetection();
+    resetMocks();
+    
+    // AZE0 SOC
+    uint8_t aze0SocData[8] = {0};
+    aze0SocData[4] = 13; // 13% -> Triggers is_ze1 = false
+    handleReceivedMessage(0x1DB, aze0SocData, sizeof(aze0SocData));
+    EXPECT_NEAR(lastSOC_value, 13.0f, 0.01f);
+
+    resetMocks();
+    aze0SocData[4] = 85; // 85%
+    handleReceivedMessage(0x1DB, aze0SocData, sizeof(aze0SocData));
+    EXPECT_NEAR(lastSOC_value, 85.0f, 0.01f);
+
+    // AZE0 Temp: (raw - 32) * 5/9
+    resetMocks();
+    uint8_t aze0TempData[] = {68}; // (68 - 32) * 5/9 = 20.0f
+    handleReceivedMessage(0x54F, aze0TempData, sizeof(aze0TempData));
+    EXPECT_NEAR(lastTemp_value, 20.0f, 0.01f);
+
+    // AZE0 Temp Sentinel
+    resetMocks();
+    uint8_t aze0TempSentinel[] = {20}; // Sentinel
+    handleReceivedMessage(0x54F, aze0TempSentinel, sizeof(aze0TempSentinel));
+    EXPECT_EQ(lastTemp_value, -100.0f); // Unchanged
 }
 
 // Test car awake parsing
 TEST(CanLeafZE1Parsing, CarAwake_Parsing) {
+    resetVehicleDetection();
     resetMocks();
     EXPECT_FALSE(carIsAwake);
     
