@@ -26,10 +26,10 @@ target_include_directories(test_stubs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(can_leaf_ze1_parsing_tests
     test_canLeafZE1_parsing.cpp
-    ../simppeliTCU/canLeafZE1.cpp
+    ../simppeliTCU/canLeaf.cpp
     ../simppeliTCU/vehicleTypes.h
     ../simppeliTCU/canInterface.h
-    ../simppeliTCU/canLeafZE1.h
+    ../simppeliTCU/canLeaf.h
 )
 
 target_include_directories(can_leaf_ze1_parsing_tests PRIVATE 

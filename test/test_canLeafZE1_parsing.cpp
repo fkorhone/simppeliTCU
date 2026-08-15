@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../simppeliTCU/canLeafZE1.h"
+#include "../simppeliTCU/canLeaf.h"
 #include "../simppeliTCU/vehicleTypes.h"
 
 // Mock callback functions to capture parsed values - these are defined in test_canInterface_stubs.cpp
@@ -42,23 +42,38 @@ namespace {
     }
 }
 
-// Test SOC parsing
-TEST(CanLeafZE1Parsing, SOC_Parsing) {
+// Test ZE1 parsing first (since is_ze1 defaults to true)
+TEST(CanLeafZE1Parsing, ZE1_Parsing) {
+    resetVehicleDetection();
     resetMocks();
     
-    uint8_t socData[] = {0x21, 0x98};
-    handleReceivedMessage(0x55B, socData, sizeof(socData));
-    EXPECT_NEAR(lastSOC_value, 13.4f, 0.01f);
+    // ZE1 SOC
+    uint8_t ze1SocData[8] = {0};
+    ze1SocData[7] = 27; // 27 * 0.5 = 13.5%
+    handleReceivedMessage(0x59E, ze1SocData, sizeof(ze1SocData));
+    EXPECT_NEAR(lastSOC_value, 13.5f, 0.01f);
     
     resetMocks();
-    uint8_t socData2[] = {0x14, 0x00};
-    handleReceivedMessage(0x55B, socData2, sizeof(socData2));
+    ze1SocData[7] = 16; // 16 * 0.5 = 8.0%
+    handleReceivedMessage(0x59E, ze1SocData, sizeof(ze1SocData));
     EXPECT_NEAR(lastSOC_value, 8.0f, 0.01f);
-    
+}
+
+// Test AZE0 parsing (this will set is_ze1 to false)
+TEST(CanLeafZE1Parsing, AZE0_Parsing) {
+    resetVehicleDetection();
     resetMocks();
-    uint8_t socData3[] = {0x27, 0x00};
-    handleReceivedMessage(0x55B, socData3, sizeof(socData3));
-    EXPECT_NEAR(lastSOC_value, 15.6f, 0.01f);
+    
+    // AZE0 SOC
+    uint8_t aze0SocData[8] = {0};
+    aze0SocData[4] = 13; // 13%
+    handleReceivedMessage(0x1DB, aze0SocData, sizeof(aze0SocData));
+    EXPECT_NEAR(lastSOC_value, 13.0f, 0.01f);
+
+    resetMocks();
+    aze0SocData[4] = 85; // 85%
+    handleReceivedMessage(0x1DB, aze0SocData, sizeof(aze0SocData));
+    EXPECT_NEAR(lastSOC_value, 85.0f, 0.01f);
 }
 
 // Test cabin temperature parsing
@@ -87,6 +102,7 @@ TEST(CanLeafZE1Parsing, CabinTemp_Parsing) {
 
 // Test car awake parsing
 TEST(CanLeafZE1Parsing, CarAwake_Parsing) {
+    resetVehicleDetection();
     resetMocks();
     EXPECT_FALSE(carIsAwake);
     

@@ -1,4 +1,5 @@
-#include "canLeafZE1.h"
+#include "canLeaf.h"
+#include "canLeafAZE0.h"
 #include <cstring>
 
 // Message parser dispatch
@@ -11,11 +12,29 @@ struct MessageParser {
 // Helper macro to create parser entries from CANMessage objects
 #define CAN_PARSER(msg, handler) { (msg).identifier, decltype(msg)::data_size, handler }
 
+static bool is_ze1 = true; // Default to ZE1 since it is the officially supported model
+
+// Vehicle detection state reset (for testing)
+void resetVehicleDetection() {
+    is_ze1 = true;
+}
+
 // Message-specific handlers
-void handleSOCMessage(const uint8_t* data, uint8_t len) {
+void handleZE1SOCMessage(const uint8_t* data, uint8_t len) {
     (void)len;
+    is_ze1 = true; // Confirmed ZE1
     float soc = extractScaledValue(data, soc_field, soc_scaling);
-    handleRawSOC(soc);
+    handleDashboardSOC(soc);
+}
+
+void handleAZE0SOCMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    uint64_t raw = extractBits(data, aze0_soc_field);
+    if (raw != aze0_dashboard_soc_sentinel) {
+        is_ze1 = false; // Confirmed AZE0!
+        float soc = extractScaledValue(data, aze0_soc_field, aze0_soc_scaling);
+        handleDashboardSOC(soc);
+    }
 }
 
 void handleTempMessage(const uint8_t* data, uint8_t len) {
@@ -111,7 +130,8 @@ void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
 
 // Message parser dispatch table
 static const MessageParser parsers[] = {
-    CAN_PARSER(raw_soc_readout, handleSOCMessage),
+    CAN_PARSER(ze1_dashboard_soc_readout, handleZE1SOCMessage),
+    CAN_PARSER(aze0_dashboard_soc_readout, handleAZE0SOCMessage),
     CAN_PARSER(cabin_temp_readout, handleTempMessage),
     CAN_PARSER(car_awake_readout, handleCarAwakeMessage),
     CAN_PARSER(charger_status_readout, handleChargerMessage),

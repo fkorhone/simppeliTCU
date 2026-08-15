@@ -22,7 +22,7 @@ bool lastHeating_value = false;
 bool lastCooling_value = false;
 VentilationMode lastVentilationMode_value = VentilationMode::UNKNOWN;
 
-void handleRawSOC(float soc) {
+void handleDashboardSOC(float soc) {
     lastSOC_value = soc;
 }
 
