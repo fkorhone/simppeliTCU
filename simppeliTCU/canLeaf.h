@@ -47,8 +47,8 @@ inline constexpr CANField locked_field     = { 19, 1 };
 
 // Scaling definitions
 inline constexpr FieldScaling soc_scaling        = {false, 0.5f,   0.0f};
-inline constexpr FieldScaling soc_scaling        = {false, 0.1f,   0.0f};
-inline constexpr FieldScaling cabin_temp_scaling = {false, 0.5f,  -40.0f};
+inline constexpr FieldScaling ze1_cabin_temp_scaling = {false, 0.5f,  -40.0f};
+inline constexpr uint8_t ze1_cabin_temp_sentinel = 0x50; // 80
 inline constexpr FieldScaling voltage_scaling    = {false, 110.0f, 0.0f};
 inline constexpr FieldScaling setpoint_scaling   = {false, 0.5f,   0.0f};
 inline constexpr FieldScaling fan_speed_scaling  = {false, 100.0f/7, 0.0f};

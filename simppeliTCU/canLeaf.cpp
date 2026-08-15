@@ -38,7 +38,14 @@ void handleAZE0SOCMessage(const uint8_t* data, uint8_t len) {
 }
 
 void handleTempMessage(const uint8_t* data, uint8_t len) {
-    float temp = extractScaledValue(data, cabin_temp_field, cabin_temp_scaling);
+    float temp;
+    if (is_ze1) {
+        if (data[0] == ze1_cabin_temp_sentinel) return;
+        temp = extractScaledValue(data, cabin_temp_field, ze1_cabin_temp_scaling);
+    } else {
+        if (data[0] == aze0_cabin_temp_sentinel) return;
+        temp = extractScaledValue(data, cabin_temp_field, aze0_cabin_temp_scaling);
+    }
     handleCabinTemp(temp);
 }
 
