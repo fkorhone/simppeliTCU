@@ -22,6 +22,7 @@ If you prefer using the command line, you can build and flash the firmware using
    arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
    arduino-cli core install esp32:esp32 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
    arduino-cli lib install PubSubClient
+    arduino-cli lib install autowp-mcp2515
    ```
 
 2. **Compile the sketch** (ensuring USB CDC On Boot is enabled):

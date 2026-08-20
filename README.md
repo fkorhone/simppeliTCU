@@ -88,6 +88,16 @@ For instructions on downloading and flashing pre-compiled release binaries (usin
 ## The CAN communication
 Please see the [CAN Communication Details](docs/can.md) document for information regarding CAN bus messages, commands, known issues, and limitations related to the IT-CAN integration.
 
+### Dual CAN bus support (LilyGO T-2Can)
+The firmware supports two CAN interfaces:
+
+1. **Primary CAN (TWAI):** The ESP32's built-in CAN controller (Port B: TX 7, RX 6).
+2. **Second CAN (MCP2515):** An external MCP2515 CAN controller connected over SPI, available on the LilyGO T-2Can board.
+
+All outgoing CAN messages are sent on **both** buses, and incoming messages received on **either** bus are processed identically. This allows the device to be connected to two separate CAN buses at the same time. e.g. IT CAN and AV CAN.
+
+The second CAN interface is enabled by default and requires the `autowp-mcp2515` library (see the [Compiling and Uploading Guide](docs/compiling.md)). It can be disabled by setting `USE_SECOND_CAN` to `0` in `simppeliTCU/featureFlags.h` or by overriding it with the compiler flag `-DUSE_SECOND_CAN=0`. Pin assignments for both CAN interfaces (TWAI and MCP2515) are configured centrally in `simppeliTCU/hardware.h`.
+
 ## License & Disclaimer (MIT License)
 This project is licensed under the MIT License. 
 
