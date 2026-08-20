@@ -384,6 +384,7 @@ void loop() {
   manageMQTT();
   readAndHandleCANMessage();
   CanSeqResult seqRes = manageCANSequence(millis());
+  manageTCUDTCPrevention(millis());
   if (seqRes == CanSeqResult::WAKE_SUCCESS) {
       Serial.println("### Car is awake! ###");
   } else if (seqRes == CanSeqResult::WAKE_TIMEOUT) {

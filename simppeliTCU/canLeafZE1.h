@@ -89,5 +89,6 @@ void setHVACTargetTemperature(float setpoint);
 
 void startSequence(CanSequence seq, unsigned long currentTimeMs);
 CanSeqResult manageCANSequence(unsigned long currentTimeMs);
+void manageTCUDTCPrevention(unsigned long currentTimeMs);
 
 #endif

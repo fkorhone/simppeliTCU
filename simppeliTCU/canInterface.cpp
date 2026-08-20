@@ -23,8 +23,13 @@ void print_can_message(twai_message_t &message) {
       Serial.println();
 }
 
+unsigned long last56EMessageSentMillis = 0;
+
 // Helper function to send CAN message
 void sendCAN(uint32_t id,const uint8_t* data, uint8_t len) {
+  if (id == 0x56E) {
+      last56EMessageSentMillis = millis();
+  }
   twai_message_t message;
   message.identifier = id;
   message.extd = 0;
@@ -61,9 +66,14 @@ void setupCAN() {
   }
 }
 
+unsigned long lastCanMessageMillis = 0;
+
 void readAndHandleCANMessage() {
   twai_message_t message;
   if (twai_receive(&message, 0) == ESP_OK) { // 0 = do not wait, read only if data is available
+    if (message.identifier != 0x56E) {
+        lastCanMessageMillis = millis();
+    }
     handleReceivedMessage(message.identifier, message.data, message.data_length_code);
     Serial.print("< ");
     print_can_message(message);

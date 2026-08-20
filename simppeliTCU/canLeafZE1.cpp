@@ -317,3 +317,34 @@ CanSeqResult manageCANSequence(unsigned long currentTimeMs) {
     }
     return CanSeqResult::PROCESSING;
 }
+
+void manageTCUDTCPrevention(unsigned long currentTimeMs) {
+    static bool wasCanActive = false;
+    static unsigned long offStartTime = 0;
+
+    // Consider CAN bus active if we received a message (other than our own 0x56E) in the last 2 seconds
+    bool canActive = (currentTimeMs - lastCanMessageMillis < 2000); 
+
+    if (canActive) {
+        if (!wasCanActive) {
+            wasCanActive = true;
+        }
+        // If no 0x56E message has been sent in the last 120ms, act as a watchdog and send heartbeat
+        if (currentTimeMs - last56EMessageSentMillis >= 120) {
+            sendCAN(hvac_init);
+        }
+    } else {
+        if (wasCanActive) {
+            offStartTime = currentTimeMs;
+            wasCanActive = false;
+        }
+        
+        // "When vehicle is turning OFF, last few seconds of CAN bus activity"
+        // If the CAN bus just went inactive, send 0x86 a few times to emulate turning OFF
+        if (offStartTime != 0 && (currentTimeMs - offStartTime < 2000)) {
+            if (currentTimeMs - last56EMessageSentMillis >= 120) {
+                sendCAN(idle_data);
+            }
+        }
+    }
+}
