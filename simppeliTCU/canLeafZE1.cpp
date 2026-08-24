@@ -319,32 +319,18 @@ CanSeqResult manageCANSequence(unsigned long currentTimeMs) {
 }
 
 void manageTCUDTCPrevention(unsigned long currentTimeMs) {
-    static bool wasCanActive = false;
-    static unsigned long offStartTime = 0;
-
-    // Consider CAN bus active if we received a message (other than our own 0x56E) in the last 2 seconds
-    bool canActive = (currentTimeMs - lastCanMessageMillis < 2000); 
+    // Consider CAN bus active if we actually received a message (other than our own 0x56E) in the last 2 seconds
+    bool canActive = (lastCanMessageMillis != 0) && (currentTimeMs - lastCanMessageMillis < 2000);
 
     if (canActive) {
-        if (!wasCanActive) {
-            wasCanActive = true;
-        }
-        // If no 0x56E message has been sent in the last 120ms, act as a watchdog and send heartbeat
+        // If no 0x56E message has been sent in the last 120ms, act as a watchdog and send heartbeat.
+        // We use idle_data (0x86) instead of hvac_init (0x46) so we don't accidentally keep the climate
+        // control electronics awake or disrupt sequences.
         if (currentTimeMs - last56EMessageSentMillis >= 120) {
-            sendCAN(hvac_init);
-        }
-    } else {
-        if (wasCanActive) {
-            offStartTime = currentTimeMs;
-            wasCanActive = false;
-        }
-        
-        // "When vehicle is turning OFF, last few seconds of CAN bus activity"
-        // If the CAN bus just went inactive, send 0x86 a few times to emulate turning OFF
-        if (offStartTime != 0 && (currentTimeMs - offStartTime < 2000)) {
-            if (currentTimeMs - last56EMessageSentMillis >= 120) {
-                sendCAN(idle_data);
-            }
+            sendCAN(idle_data);
         }
     }
+    // We intentionally do NOT send anything when canActive is false.
+    // Sending messages after the bus goes quiet will wake the car's ECUs back up,
+    // creating an infinite loop that drains the 12V battery!
 }
