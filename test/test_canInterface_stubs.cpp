@@ -4,6 +4,8 @@
 #include "../simppeliTCU/vehicleTypes.h"
 
 bool carIsAwake = false;
+unsigned long lastCanMessageMillis = 0;
+unsigned long last56EMessageSentMillis = 0;
 
 float lastSOC_value = -1.0f;
 float lastTemp_value = -100.0f;

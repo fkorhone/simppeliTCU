@@ -71,6 +71,9 @@ void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len);
 void setupCAN();
 void readAndHandleCANMessage();
 
+extern unsigned long lastCanMessageMillis;
+extern unsigned long last56EMessageSentMillis;
+
 void resetCanLogTimestamps();
 
 #endif
