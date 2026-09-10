@@ -33,6 +33,13 @@ If you prefer using the command line, you can build and flash the firmware using
    ```
    *(If compiled in Arduino IDE or without `GIT_HASH_RAW`, the version string in `simppeliTCU/version.h` defaults to showing `(local)` as the commit hash.)*
 
+   **Building for Waveshare ESP32-S3-RS485-CAN:** `LilyGo T-2CAN` (`LILYGO_T2CAN`) is selected by default in [`simppeliTCU/hardware.h`](../simppeliTCU/hardware.h). To compile for the Waveshare board, pass `-DBOARD=WAVESHARE_ESP32_S3_RS485_CAN` via compiler flags (or change `#define BOARD` in `simppeliTCU/hardware.h` when using Arduino IDE):
+   ```bash
+   arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc \
+     --build-property "compiler.cpp.extra_flags=-DBOARD=WAVESHARE_ESP32_S3_RS485_CAN -DGIT_HASH_RAW=$(git rev-parse --short HEAD)" \
+     simppeliTCU
+   ```
+
 3. **Upload to the board** (replace `<PORT>` with your COM port, e.g., `COM3` or `/dev/cu.usbserial...`):
    ```bash
    arduino-cli upload -p <PORT> --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc simppeliTCU
