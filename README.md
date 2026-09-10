@@ -31,18 +31,18 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * **Nag Screen Auto-Dismiss** [https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV](https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV)
 
 ## Hardware Requirements
-1. **Lilygo T-2CAN** (ESP32 with built-in CAN transceiver).
-2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended: a flush-mount 12V USB car socket).
-3. Connectors/pins to mate with the original TCU harness.
+1. **Lilygo T-2CAN** (ESP32-S3 with built-in CAN transceivers) — *or alternative **Waveshare ESP32-S3-RS485-CAN** (single CAN, built-in 7–36V DC regulator)*.
+2. **Automotive 12V to 5V Step-Down Converter** (Highly recommended for Lilygo T-2CAN: a flush-mount 12V USB car socket) + **2A inline fuse**.
+3. Connectors/pins to mate with the original TCU harness (e.g., 16-pin Sumitomo NH `.025"` adapter set).
 
 **See the [Installation Guide](docs/INSTALLATION.md) for full step-by-step instructions, wiring diagrams, and required tools.**
 
 ### ⚠️ CRITICAL WIRING WARNING
 **DO NOT connect the car's 12V line directly to the Lilygo board!** Automotive 12V systems experience massive voltage spikes (transients) that will most likely damage the ESP32. 
-* Unplug the IT-CAN wires from original TCU.
-* Route the 12V from the TCU harness through an automotive-grade 12V-to-5V USB adapter (with an inline fuse).
-* Power the Lilygo using a standard USB cable from the adapter.
-* Connect `CAN-H` and `CAN-L` to the Lilygo's TWAI pins (Port B: TX 7, RX 6 in this code).
+* Unpin the `IT-CAN` wires (`#6` and `#7`) from the original TCU connector (keep `+12V` and `GND` connected/looped to the original TCU if you want the cabin hands-free microphone to keep working).
+* Route the 12V from the TCU harness through a **2A inline fuse** and an automotive-grade 12V-to-5V USB adapter (or to the `DC 7–36V` terminal on the Waveshare board).
+* Power the Lilygo using a standard USB cable from the 5V adapter.
+* Connect `CAN-H`, `CAN-L`, and `SGNDB` (signal ground) to the Lilygo's TWAI screw terminals (**Port B**: TX 7, RX 6 in this code).
 
 ## Configuration
 
