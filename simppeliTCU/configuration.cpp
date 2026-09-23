@@ -96,6 +96,8 @@ public:
 // Define config objects
 static ConfigString<64> conf_ssid("ssid", "");
 static ConfigString<64> conf_password("password", "");
+static ConfigString<64> conf_fallback_ssid("fallback_ssid", "");
+static ConfigString<64> conf_fallback_password("fallback_password", "");
 static ConfigString<64> conf_ap_ssid("ap_ssid", "");
 static ConfigString<64> conf_ap_password("ap_password", "");
 static ConfigString<64> conf_hostName("hostName", "leaf");
@@ -118,6 +120,8 @@ void initConfiguration() {
 
     conf_ssid.load();
     conf_password.load();
+    conf_fallback_ssid.load();
+    conf_fallback_password.load();
     conf_ap_ssid.load();
     conf_ap_password.load();
     conf_hostName.load();
@@ -151,6 +155,12 @@ ConfigStatus setWifiSSID(const char* value) { return conf_ssid.set(value); }
 
 const char* getWifiPassword() { return conf_password.get(); }
 ConfigStatus setWifiPassword(const char* value) { return conf_password.set(value); }
+
+const char* getFallbackSSID() { return conf_fallback_ssid.get(); }
+ConfigStatus setFallbackSSID(const char* value) { return conf_fallback_ssid.set(value); }
+
+const char* getFallbackPassword() { return conf_fallback_password.get(); }
+ConfigStatus setFallbackPassword(const char* value) { return conf_fallback_password.set(value); }
 
 const char* getApSSID() { return conf_ap_ssid.get(); }
 ConfigStatus setApSSID(const char* value) { return conf_ap_ssid.set(value); }

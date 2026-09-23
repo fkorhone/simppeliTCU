@@ -15,6 +15,13 @@ WebServer server(80);
 // State variables
 bool wifiEnabled = false;
 bool carIsAwake = false;
+static bool usingFallback = false;
+static bool wasStaConnected = false;
+static unsigned long wifiAttemptStart = 0;
+static unsigned long lastPrimaryScan = 0;
+static unsigned long primarySeenSince = 0;
+static bool primarySeen = false;
+static bool primaryScanRunning = false;
 
 // Values read from car
 float currentSOC = -1.0;
@@ -271,9 +278,21 @@ void handleMqttChargeOn() {
   startSequence(CanSequence::CHARGE_ON, millis());
 }
 
+void connectWiFi(bool fallback) {
+  usingFallback = fallback;
+  wasStaConnected = false;
+  wifiAttemptStart = millis();
+  Serial.printf("[WiFi] Connecting to %s: %s\n", fallback ? "fallback" : "primary",
+                fallback ? getFallbackSSID() : getWifiSSID());
+  if (WiFi.status() == WL_CONNECTED) WiFi.disconnect(false, false);
+  WiFi.begin(fallback ? getFallbackSSID() : getWifiSSID(),
+             fallback ? getFallbackPassword() : getWifiPassword());
+}
+
 void manageWiFi() {
   if(!wifiEnabled) return;
   bool staEnabled = strlen(getWifiSSID()) > 0;
+  bool fallbackEnabled = staEnabled && strlen(getFallbackSSID()) > 0;
   static bool wifiAvailable = false;
 
   if (!staEnabled) {
@@ -307,6 +326,65 @@ void manageWiFi() {
   static unsigned long previousAttemptTime = 0;
   const unsigned long retryInterval = 10000;
   unsigned long currentTime = millis();
+
+  if (fallbackEnabled) {
+    if (WiFi.status() == WL_CONNECTED &&
+        (wasStaConnected || WiFi.SSID() == (usingFallback ? getFallbackSSID() : getWifiSSID()))) {
+      if (!wasStaConnected) {
+        Serial.printf("[WiFi] Connected to %s\n", usingFallback ? "fallback" : "primary");
+        Serial.print("[WiFi] IP: ");
+        Serial.println(WiFi.localIP());
+        wasStaConnected = true;
+        lastPrimaryScan = currentTime - 30000;
+      }
+
+      if (usingFallback) {
+        if (primaryScanRunning) {
+          int networks = WiFi.scanComplete();
+          if (networks >= 0) {
+            bool foundPrimary = false;
+            for (int i = 0; i < networks; ++i) {
+              if (WiFi.SSID(i) == getWifiSSID()) {
+                foundPrimary = true;
+                break;
+              }
+            }
+            WiFi.scanDelete();
+            primaryScanRunning = false;
+            if (foundPrimary) {
+              if (primarySeen && currentTime - primarySeenSince >= 5000) {
+                Serial.println("[WiFi] Primary network available again");
+                Serial.println("[WiFi] Switching to primary");
+                primarySeen = false;
+                connectWiFi(false);
+              } else if (!primarySeen) {
+                primarySeen = true;
+                primarySeenSince = currentTime;
+              }
+            } else {
+              primarySeen = false;
+            }
+          } else if (networks != WIFI_SCAN_RUNNING) {
+            primaryScanRunning = false;
+            primarySeen = false;
+          }
+        } else if (currentTime - lastPrimaryScan >= (primarySeen ? 5000UL : 30000UL)) {
+          WiFi.scanNetworks(true);
+          primaryScanRunning = true;
+          lastPrimaryScan = currentTime;
+        }
+      }
+    } else if (wasStaConnected) {
+      wasStaConnected = false;
+      primaryScanRunning = false;
+      primarySeen = false;
+      // Give primary a fresh connection attempt before falling back.
+      connectWiFi(false);
+    } else if (currentTime - wifiAttemptStart >= retryInterval) {
+      Serial.printf("[WiFi] %s connection failed\n", usingFallback ? "Fallback" : "Primary");
+      connectWiFi(!usingFallback);
+    }
+  }
 
   if (WiFi.status() != WL_CONNECTED)
   {
@@ -371,14 +449,14 @@ void setup() {
       } else {
           WiFi.softAP(getApSSID());
       }
-      WiFi.setAutoReconnect(true);
-      WiFi.begin(getWifiSSID(), getWifiPassword());
+      WiFi.setAutoReconnect(strlen(getFallbackSSID()) == 0);
+      connectWiFi(false);
       WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (staEnabled) {
       WiFi.mode(WIFI_STA);
-      WiFi.setAutoReconnect(true);
-      WiFi.begin(getWifiSSID(), getWifiPassword());
+      WiFi.setAutoReconnect(strlen(getFallbackSSID()) == 0);
+      connectWiFi(false);
       WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (apEnabled) {
