@@ -64,7 +64,9 @@ jobs:
   build-firmware:
     name: Build Firmware
     needs: unit-tests
-    runs-on: ubuntu-latest
+    # arduino/compile-sketches@v1 pins Python 3.12.4, which has no build for
+    # ubuntu-26.04 (current ubuntu-latest). Use ubuntu-24.04 where it exists.
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout repository
