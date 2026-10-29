@@ -107,6 +107,7 @@ static ConfigString<64> conf_vehicle_id("vehicle_id", "");
 static ConfigBool       conf_locking_enabled("locking_enabled", false);
 static ConfigBool       conf_mqtt_tls("mqtt_tls", true);
 static ConfigBool       conf_hass_discovery("hass_discovery", true);
+static ConfigBool       conf_nag_dismiss("nag_dismiss", true);
 
 void initConfiguration() {
     nvsReady = preferences.begin("config", false);
@@ -127,6 +128,7 @@ void initConfiguration() {
     conf_locking_enabled.load();
     conf_mqtt_tls.load();
     conf_hass_discovery.load();
+    conf_nag_dismiss.load();
 }
 
 void factoryReset() {
@@ -200,3 +202,6 @@ ConfigStatus setMqttTls(bool value) { return conf_mqtt_tls.set(value); }
 
 bool getHassDiscoveryEnabled() { return conf_hass_discovery.get(); }
 ConfigStatus setHassDiscoveryEnabled(bool value) { return conf_hass_discovery.set(value); }
+
+bool getNagDismissEnabled() { return conf_nag_dismiss.get(); }
+ConfigStatus setNagDismissEnabled(bool value) { return conf_nag_dismiss.set(value); }

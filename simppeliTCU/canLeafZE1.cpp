@@ -109,6 +109,48 @@ void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
     handleLockStatus(locked);
 }
 
+static uint8_t internal_nag_seq_nibble = 1;
+static bool nag_popup_handled = false;
+
+void handleSteeringWheelButtonMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    // Track rolling sequence counter (1..7) from incoming 0x683 data frames (ignore 0xE0 ACK and 0xF0 keep-alive)
+    if (data[0] < 0x30) {
+        uint8_t seq = static_cast<uint8_t>(extractBits(data, av_seq_nibble_field));
+        if (seq == 0) {
+            internal_nag_seq_nibble = 1;
+            nag_popup_handled = false;
+        } else if (seq <= 7) {
+            internal_nag_seq_nibble = seq;
+        }
+    }
+}
+
+void handleAVDisplayStatusMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    if (data[0] < 0x30 && extractBits(data, av_seq_nibble_field) == 0) {
+        nag_popup_handled = false;
+        return;
+    }
+    if (data[0] == 0x10 && data[2] == 0x40 && data[3] == 0x20 && data[4] == 0x0D) {
+        if (!nag_popup_handled) {
+            nag_popup_handled = true;
+            handleNagScreenPopup();
+        }
+    }
+}
+
+void handleAVPopupStatusMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    if (data[0] == 0x10 && data[1] == 0x18 && data[3] == 0x20 &&
+        data[4] == 0x0D && data[5] == 0x87 && data[6] == 0x81) {
+        if (!nag_popup_handled) {
+            nag_popup_handled = true;
+            handleNagScreenPopup();
+        }
+    }
+}
+
 // Message parser dispatch table
 static const MessageParser parsers[] = {
     CAN_PARSER(raw_soc_readout, handleSOCMessage),
@@ -118,6 +160,9 @@ static const MessageParser parsers[] = {
     CAN_PARSER(hvac_status_readout, handleHVACMessage),
     CAN_PARSER(hvac_setpoint_readout, handleHVACSetpointMessage),
     CAN_PARSER(doors_and_locks_readout, handleDoorsAndLocksMessage),
+    CAN_PARSER(steering_wheel_button_readout, handleSteeringWheelButtonMessage),
+    CAN_PARSER(av_display_status_readout, handleAVDisplayStatusMessage),
+    CAN_PARSER(av_popup_status_readout, handleAVPopupStatusMessage),
 };
 
 // Can message reception handler, to be called when a CAN message is received
@@ -160,6 +205,7 @@ struct SequenceStep {
 #define MSG_STEP(msg, reps, interv) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0, nullptr }
 #define MSG_DLY_STEP(msg, reps, interv, delay) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, delay, nullptr }
 #define MSG_MOD_STEP(msg, reps, interv, mod_fn) { msg.identifier, msg.data, sizeof(msg.data), reps, interv, 0, mod_fn }
+#define WAIT_STEP(delay) { 0, nullptr, 0, 1, delay, 0, nullptr }
 
 static uint8_t internal_hvac_setpoint_byte = 0;
 
@@ -170,6 +216,13 @@ void setHVACTargetTemperature(float setpoint) {
 static void hvacPayloadModifier(uint8_t* data, uint8_t len) {
     if (len >= 3) {
         data[2] = internal_hvac_setpoint_byte;
+    }
+}
+
+static void nagSeqPayloadModifier(uint8_t* data, uint8_t len) {
+    if (len >= 2) {
+        internal_nag_seq_nibble = (internal_nag_seq_nibble % 7) + 1;
+        data[1] = static_cast<uint8_t>(internal_nag_seq_nibble << 4);
     }
 }
 
@@ -208,19 +261,28 @@ static const SequenceStep seq_lock_doors[] = {
     MSG_STEP(idle_data, 8, 100)
 };
 
+static const SequenceStep seq_dismiss_nag[] = {
+    WAIT_STEP(1500),
+    MSG_MOD_STEP(nag_press_data, 1, 100, nagSeqPayloadModifier),
+    MSG_MOD_STEP(nag_press_data, 1, 50, nagSeqPayloadModifier),
+    MSG_MOD_STEP(nag_release_data, 1, 50, nagSeqPayloadModifier)
+};
+
 struct SequenceDef {
     CanSequence seq;
     const SequenceStep* steps;
     int length;
+    bool wakeUpCar;
 };
 
 static const SequenceDef sequence_map[] = {
-    { CanSequence::REFRESH, seq_refresh, sizeof(seq_refresh)/sizeof(seq_refresh[0]) },
-    { CanSequence::HVAC_ON, seq_hvac_on, sizeof(seq_hvac_on)/sizeof(seq_hvac_on[0]) },
-    { CanSequence::HVAC_OFF, seq_hvac_off, sizeof(seq_hvac_off)/sizeof(seq_hvac_off[0]) },
-    { CanSequence::CHARGE_ON, seq_charge_on, sizeof(seq_charge_on)/sizeof(seq_charge_on[0]) },
-    { CanSequence::UNLOCK_DOORS, seq_unlock_doors, sizeof(seq_unlock_doors)/sizeof(seq_unlock_doors[0]) },
-    { CanSequence::LOCK_DOORS, seq_lock_doors, sizeof(seq_lock_doors)/sizeof(seq_lock_doors[0]) }
+    { CanSequence::REFRESH, seq_refresh, sizeof(seq_refresh)/sizeof(seq_refresh[0]), true },
+    { CanSequence::HVAC_ON, seq_hvac_on, sizeof(seq_hvac_on)/sizeof(seq_hvac_on[0]), true },
+    { CanSequence::HVAC_OFF, seq_hvac_off, sizeof(seq_hvac_off)/sizeof(seq_hvac_off[0]), true },
+    { CanSequence::CHARGE_ON, seq_charge_on, sizeof(seq_charge_on)/sizeof(seq_charge_on[0]), true },
+    { CanSequence::UNLOCK_DOORS, seq_unlock_doors, sizeof(seq_unlock_doors)/sizeof(seq_unlock_doors[0]), true },
+    { CanSequence::LOCK_DOORS, seq_lock_doors, sizeof(seq_lock_doors)/sizeof(seq_lock_doors[0]), true },
+    { CanSequence::DISMISS_NAG, seq_dismiss_nag, sizeof(seq_dismiss_nag)/sizeof(seq_dismiss_nag[0]), false }
 };
 
 void startSequence(CanSequence seq, unsigned long currentTimeMs) {
@@ -228,12 +290,22 @@ void startSequence(CanSequence seq, unsigned long currentTimeMs) {
     if (activeSequence != CanSequence::NONE) return; // Prevent overwriting an active sequence
     resetCanLogTimestamps();
     
+    bool wakeUpCar = true;
+    for (const auto& def : sequence_map) {
+        if (def.seq == seq) {
+            wakeUpCar = def.wakeUpCar;
+            break;
+        }
+    }
+
     activeSequence = seq;
-    currentPhase = SeqPhase::WAKING;
+    currentPhase = wakeUpCar ? SeqPhase::WAKING : SeqPhase::RUN_STEP;
     wakeAttempts = 0;
     stepIndex = 0;
     repeatCount = 0;
-    carIsAwake = false;
+    if (wakeUpCar) {
+        carIsAwake = false;
+    }
     nextCANEventTime = currentTimeMs;
 }
 

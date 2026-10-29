@@ -56,4 +56,7 @@ ConfigStatus setMqttTls(bool value);
 bool getHassDiscoveryEnabled();
 ConfigStatus setHassDiscoveryEnabled(bool value);
 
+bool getNagDismissEnabled();
+ConfigStatus setNagDismissEnabled(bool value);
+
 #endif

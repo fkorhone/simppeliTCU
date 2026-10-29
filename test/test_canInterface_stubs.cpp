@@ -1,9 +1,19 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <vector>
 
 #include "../simppeliTCU/vehicleTypes.h"
 
+struct SentCANMessage {
+    uint32_t id;
+    uint8_t len;
+    uint8_t data[8];
+};
+
+std::vector<SentCANMessage> sentCANMessages;
+
 bool carIsAwake = false;
+int nagScreenPopupCount = 0;
 
 float lastSOC_value = -1.0f;
 float lastTemp_value = -100.0f;
@@ -72,8 +82,18 @@ void handleVentilationMode(VentilationMode mode) {
     lastVentilationMode_value = mode;
 }
 
+void handleNagScreenPopup() {
+    nagScreenPopupCount++;
+}
+
 void sendCAN(uint32_t id, const uint8_t* data, uint8_t len) {
-    (void)id; (void)data; (void)len;
+    SentCANMessage msg{};
+    msg.id = id;
+    msg.len = len > 8 ? 8 : len;
+    for (uint8_t i = 0; i < msg.len; i++) {
+        msg.data[i] = data[i];
+    }
+    sentCANMessages.push_back(msg);
 }
 
 void resetCanLogTimestamps() {
