@@ -62,11 +62,21 @@ jobs:
         name: unit-tests-coverage
 
   build-firmware:
-    name: Build Firmware
+    name: Build Firmware (${{ matrix.artifact }})
     needs: unit-tests
     # arduino/compile-sketches@v1 pins Python 3.12.4, which has no build for
     # ubuntu-26.04 (current ubuntu-latest). Use ubuntu-24.04 where it exists.
     runs-on: ubuntu-24.04
+    # One firmware binary per supported board, selected via -DBOARD=<define>
+    # (see simppeliTCU/hardware.h).
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - board-define: LILYGO_T2CAN
+            artifact: simppeliTCU-LilyGo-T2-Can
+          - board-define: WAVESHARE_ESP32_S3_RS485_CAN
+            artifact: simppeliTCU-Waveshare-esp32-rs485-can
 
     steps:
     - name: Checkout repository
@@ -80,12 +90,21 @@ jobs:
           simppeliTCU
         cli-compile-flags: |
           - --export-binaries
+          - --build-property=compiler.cpp.extra_flags=-DBOARD=${{ matrix.board-define }}
         libraries: |
           - name: PubSubClient
           - name: autowp-mcp2515
 
+    - name: Rename firmware binaries
+      shell: bash
+      run: |
+        find simppeliTCU/build -maxdepth 1 -name 'simppeliTCU.ino.*' -type f | while read -r f; do
+          base=$(basename "$f")
+          mv "$f" "$(dirname "$f")/${{ matrix.artifact }}.${base#simppeliTCU.ino.}"
+        done
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: simppeliTCU-firmware
+        name: ${{ matrix.artifact }}
         path: simppeliTCU/build/
