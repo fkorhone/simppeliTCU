@@ -71,6 +71,7 @@ reboot
 * `mqtt_tls` (Enable/disable TLS for MQTT connection; default: `true`)
 * `locking_enabled` (Enable door lock/unlock functionality; default: `false`)
 * `hass_discovery` (Enable/disable Home Assistant discovery messages; default: `true`)
+* `nag_dismiss` (Enable/disable automatic infotainment nag screen dismissal on AV-CAN; default: `true`)
 
 **Wi-Fi Modes:**
 * **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.

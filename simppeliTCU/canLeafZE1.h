@@ -12,6 +12,9 @@ inline constexpr CANMessage<6> charger_status_readout = {0x390};
 inline constexpr CANMessage<2> hvac_status_readout = {0x54B};
 inline constexpr CANMessage<5> hvac_setpoint_readout = {0x54A};
 inline constexpr CANMessage<3> doors_and_locks_readout = {0x60D};
+inline constexpr CANMessage<2> steering_wheel_button_readout = {0x683};
+inline constexpr CANMessage<5> av_display_status_readout = {0x628};
+inline constexpr CANMessage<7> av_popup_status_readout = {0x62C};
 
 // Leaf can messages
 inline constexpr CANMessage<1> wakeup_data       = {0x68C, {0x00}};                  // Wakeup ping
@@ -24,6 +27,8 @@ inline constexpr CANMessage<4> interrupt_data    = {0x56E, {0x96, 0x00, 0x00, 0x
 inline constexpr CANMessage<4> hvac_off_data     = {0x56E, {0x56, 0x08, 0x00, 0x00}}; // HVAC OFF
 inline constexpr CANMessage<4> unlock_doors_data = {0x56E, {0x11, 0x00, 0x00, 0x00}}; // Unlock doors
 inline constexpr CANMessage<4> lock_doors_data   = {0x56E, {0x60, 0x80, 0x00, 0x00}}; // Lock doors
+inline constexpr CANMessage<8> nag_press_data    = {0x683, {0x04, 0x20, 0x20, 0x0D, 0x88, 0xFF, 0xFF, 0xFF}}; // Steering wheel phone button press
+inline constexpr CANMessage<8> nag_release_data  = {0x683, {0x04, 0x40, 0x20, 0x0D, 0x08, 0xFF, 0xFF, 0xFF}}; // Steering wheel phone button release
 
 // ===== CAN Field Definitions (bit 0 = MSB of byte 0) =====
 inline constexpr CANField soc_field = { 0, 10 };    
@@ -44,6 +49,7 @@ inline constexpr CANField door_rr_field    = { 2, 1 };
 inline constexpr CANField door_fr_field    = { 3, 1 };
 inline constexpr CANField door_fl_field    = { 4, 1 };
 inline constexpr CANField locked_field     = { 19, 1 };
+inline constexpr CANField av_seq_nibble_field = { 8, 4 }; // Upper nibble of byte 1 on AV-CAN frames
 
 // Scaling definitions
 inline constexpr FieldScaling soc_scaling        = {false, 0.1f,   0.0f};
@@ -64,6 +70,7 @@ void handleHeatingMode(bool heating, bool cooling);
 void handleVentilationMode(VentilationMode mode);
 void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk);
 void handleLockStatus(bool locked);
+void handleNagScreenPopup();
 
 
 // Sequence State Machine
@@ -74,7 +81,8 @@ enum class CanSequence {
     HVAC_OFF,
     CHARGE_ON,
     UNLOCK_DOORS,
-    LOCK_DOORS
+    LOCK_DOORS,
+    DISMISS_NAG
 };
 
 enum class CanSeqResult { IDLE, PROCESSING, WAKE_SUCCESS, WAKE_TIMEOUT, SEQUENCE_FINISHED };
