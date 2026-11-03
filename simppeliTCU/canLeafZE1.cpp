@@ -28,26 +28,27 @@ void handleCarAwakeMessage(const uint8_t* data, uint8_t len) {
 }
 
 void handleChargerMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
     uint8_t cStatus = static_cast<uint8_t>(extractBits(data, cStatus_field));
     bool qc_state = extractBool(data, qc_state_field);
-    bool vg_state = (extractBits(data, vg_state_field) == 0x09);
+    bool vg_state = (extractBits(data, vg_state_field) == CHARGER_VG_STATE_ACTIVE);
     float chargeVoltage = extractScaledValue(data, chargeVolt_field, voltage_scaling);
 
     bool isCharging = false;
     ChargerState state = ChargerState::IDLE;
 
     switch (cStatus) {
-        case 0x01:
+        case CHARGER_STATUS_QC:
             if (qc_state && !vg_state) { state = ChargerState::CHARGING; isCharging = true; }
             break;
-        case 0x04:
+        case CHARGER_STATUS_AC:
             if (chargeVoltage > 0) { state = ChargerState::CHARGING; isCharging = true; }
             else { state = ChargerState::INTERRUPTED; }
             break;
-        case 0x02:
+        case CHARGER_STATUS_FINISHED:
             state = ChargerState::FINISHED;
             break;
-        case 0x0c:
+        case CHARGER_STATUS_WAITING:
             state = ChargerState::WAITING;
             break;
         default:
@@ -66,13 +67,13 @@ void handleHVACSetpointMessage(const uint8_t* data, uint8_t len) {
 VentilationMode decodeVentilationMode(uint8_t byte2) {
     // OVMS implementation: byte 2 of 0x54B message contains ventilation mode
     switch (byte2) {
-        case 0x80: return VentilationMode::OFF;
-        case 0x88: return VentilationMode::FACE;
-        case 0x90: return VentilationMode::FACE_FEET;
-        case 0x98: return VentilationMode::FEET;
-        case 0xA0: return VentilationMode::WINDSCREEN_FEET;
-        case 0xA8: return VentilationMode::WINDSCREEN;
-        default: return VentilationMode::UNKNOWN;
+        case VENT_MODE_OFF:             return VentilationMode::OFF;
+        case VENT_MODE_FACE:            return VentilationMode::FACE;
+        case VENT_MODE_FACE_FEET:       return VentilationMode::FACE_FEET;
+        case VENT_MODE_FEET:            return VentilationMode::FEET;
+        case VENT_MODE_WINDSCREEN_FEET: return VentilationMode::WINDSCREEN_FEET;
+        case VENT_MODE_WINDSCREEN:      return VentilationMode::WINDSCREEN;
+        default:                        return VentilationMode::UNKNOWN;
     }
 }
 
@@ -83,11 +84,14 @@ void handleHVACMessage(const uint8_t* data, uint8_t len) {
     bool cooling = extractBool(data, hvac_bit4_field) || extractBool(data, hvac_bit5_field);
     float fanSpeed = extractScaledValue(data, fan_speed_field, fan_speed_scaling);
     
-    // Extract ventilation mode from byte 2
-    VentilationMode ventMode = decodeVentilationMode(data[2]);
+    // Extract ventilation mode from byte 2 when present
+    VentilationMode ventMode = (len >= 3)
+        ? decodeVentilationMode(static_cast<uint8_t>(extractBits(data, ventilation_mode_field)))
+        : VentilationMode::UNKNOWN;
     
     // HVAC enabled logic from OVMS
-    bool isOn = (data[1] != 0x08 && data[1] != 0x04);
+    uint8_t hvacState = static_cast<uint8_t>(extractBits(data, hvac_state_field));
+    bool isOn = (hvacState != HVAC_STATE_OFF_2 && hvacState != HVAC_STATE_OFF_1);
     
     handleHVACStatus(isOn);
     handleFanSpeed(fanSpeed);
@@ -95,9 +99,8 @@ void handleHVACMessage(const uint8_t* data, uint8_t len) {
     handleVentilationMode(ventMode);
 }
 
-
-
 void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
     bool trunk = extractBool(data, door_trunk_field);
     bool rr = extractBool(data, door_rr_field);
     bool rl = extractBool(data, door_rl_field);
@@ -221,12 +224,12 @@ struct SequenceStep {
 static uint8_t internal_hvac_setpoint_byte = 0;
 
 void setHVACTargetTemperature(float setpoint) {
-    internal_hvac_setpoint_byte = setpoint > 0.0f ? static_cast<uint8_t>(setpoint * 2.0f) : 0;
+    internal_hvac_setpoint_byte = setpoint > 0.0f ? static_cast<uint8_t>(setpoint * HVAC_CMD_SETPOINT_SCALE) : 0;
 }
 
 static void hvacPayloadModifier(uint8_t* data, uint8_t len) {
-    if (len >= 3) {
-        data[2] = internal_hvac_setpoint_byte;
+    if (len > HVAC_CMD_SETPOINT_BYTE) {
+        data[HVAC_CMD_SETPOINT_BYTE] = internal_hvac_setpoint_byte;
     }
 }
 

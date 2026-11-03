@@ -37,6 +37,7 @@ inline constexpr CANField cStatus_field          = { 41, 6 };
 inline constexpr CANField qc_state_field         = { 33, 1 };
 inline constexpr CANField vg_state_field         = { 0, 4 };
 inline constexpr CANField chargeVolt_field       = { 27, 2 };
+inline constexpr CANField hvac_state_field       = { 8, 8 };  // Byte 1 of 0x54B
 inline constexpr CANField hvac_bit0_field        = { 15, 1 };
 inline constexpr CANField hvac_bit4_field        = { 11, 1 };
 inline constexpr CANField hvac_bit5_field        = { 10, 1 };
@@ -57,6 +58,25 @@ inline constexpr CANField av_ff_seq_byte_field   = { 16, 8 }; // Byte 2 sequence
 inline constexpr CANField av_ff_cmd_field        = { 24, 16 }; // Bytes 3..4 command ID on multi-frame AV-CAN first frames
 
 // ===== Message-Specific Constants =====
+// Charger status (0x390)
+inline constexpr uint8_t CHARGER_VG_STATE_ACTIVE   = 0x09;
+inline constexpr uint8_t CHARGER_STATUS_QC         = 0x01;
+inline constexpr uint8_t CHARGER_STATUS_FINISHED   = 0x02;
+inline constexpr uint8_t CHARGER_STATUS_AC         = 0x04;
+inline constexpr uint8_t CHARGER_STATUS_WAITING    = 0x0C;
+
+// HVAC status (0x54B) and command (0x56E)
+inline constexpr uint8_t HVAC_STATE_OFF_1          = 0x04;
+inline constexpr uint8_t HVAC_STATE_OFF_2          = 0x08;
+inline constexpr uint8_t VENT_MODE_OFF             = 0x80;
+inline constexpr uint8_t VENT_MODE_FACE            = 0x88;
+inline constexpr uint8_t VENT_MODE_FACE_FEET       = 0x90;
+inline constexpr uint8_t VENT_MODE_FEET            = 0x98;
+inline constexpr uint8_t VENT_MODE_WINDSCREEN_FEET = 0xA0;
+inline constexpr uint8_t VENT_MODE_WINDSCREEN      = 0xA8;
+inline constexpr uint8_t HVAC_CMD_SETPOINT_BYTE    = 2;
+inline constexpr float   HVAC_CMD_SETPOINT_SCALE   = 2.0f;
+
 // AV-CAN (0x683 / 0x628 / 0x62C) nag screen dismissal
 inline constexpr uint8_t  AV_FRAME_TYPE_SINGLE     = 0x00;
 inline constexpr uint8_t  AV_FIRST_FRAME_HEADER    = 0x10;
