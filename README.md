@@ -11,6 +11,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 🌡️ **Remote Climate Control:** Start and active abort of the cabin heater/AC.
 * 🔋 **Remote Charging:** Override the charge timer to start charging.
 * 🔐 **Door Locking:** Lock and unlock doors remotely (disabled by default, enable via configuration).
+* 🔕 **Nag Screen Auto-Dismiss:** Automatically dismisses ZE1 infotainment nag/popup screen when connected to AV-CAN bus.
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 * 🏠 **Home Assistant Integration:** Automatic discovery of metrics and controls via MQTT.
@@ -26,6 +27,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * **Web interface through wifi:** [https://youtube.com/shorts/XqAgwizNodE](https://youtube.com/shorts/XqAgwizNodE)
 * **MQTT use with IoTMQTTPanel and OVMS Connect:** [https://youtu.be/g8Yh6OgjL-Q?si=QtElrzG9FnF5YEUm](https://youtu.be/g8Yh6OgjL-Q?si=QtElrzG9FnF5YEUm)
 * **Glove box removal (LHD ZE1 Leaf):** [https://youtu.be/kyx2A4U-M1M?si=YGewj1TeBEfrpOKV](https://youtu.be/kyx2A4U-M1M?si=YGewj1TeBEfrpOKV)
+* **Nag Screen Auto-Dismiss** [https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV](https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV)
 
 ## Hardware Requirements
 1. **Lilygo T-2CAN** (ESP32 with built-in CAN transceiver).
@@ -72,6 +74,7 @@ reboot
 * `mqtt_tls` (Enable/disable TLS for MQTT connection; default: `true`)
 * `locking_enabled` (Enable door lock/unlock functionality; default: `false`)
 * `hass_discovery` (Enable/disable Home Assistant discovery messages; default: `true`)
+* `nag_dismiss` (Enable/disable automatic infotainment nag screen dismissal on AV-CAN; default: `true`)
 
 **Wi-Fi Modes:**
 * **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.
