@@ -112,6 +112,15 @@ void handleRawSOC(float soc) {
   mqttUpdateSOC(soc);
 }
 
+void handleNagScreenPopup() {
+  if (!getNagDismissEnabled() || activeSequence != CanSequence::NONE) {
+    return;
+  }
+  Serial.println("### Dismiss Nag Screen! ###");
+  logSequenceStart();
+  startSequence(CanSequence::DISMISS_NAG, millis());
+}
+
 void logSequenceStart() {
   Serial.println("### Starting Sequence ###");
   Serial.println("# type(<,>,!) time(s) identifier data...");
