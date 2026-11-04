@@ -46,9 +46,10 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 The device configuration (Wi-Fi, MQTT credentials, etc.) is stored in persistent memory. You configure the system through the USB serial connection using a terminal (such as the Arduino IDE Serial Monitor, PuTTY, or similar) set to **115200 baud** with Newline (`\n`) or Carriage Return (`\r`) enabled.
 
 Available commands:
-* `list` - Shows all current configuration properties.
+* `list` - Shows all current configuration properties (including firmware version).
 * `get <key>` - Prints the current value of the specified key.
 * `set <key> <value>` - Updates the specified key with a new value (saved persistently).
+* `version` - Prints the current firmware version and git commit hash.
 * `reboot` - Restarts the device to apply the changes immediately.
 * `factory-reset` - Clears all configuration settings and restarts the device.
 
@@ -83,7 +84,7 @@ For instructions on how to compile and upload the firmware using the Arduino IDE
 
 ## Flashing Pre-compiled Binaries
 
-For instructions on downloading and flashing pre-compiled release binaries (using GUI tools or `esptool`), please refer to the [Pre-compiled Binaries Flashing Guide](docs/flashing.md).
+For instructions on downloading and flashing pre-compiled release binaries (using GUI tools or `esptool`), please refer to the [Pre-compiled Binaries Flashing Guide](docs/flashing.md). See [CHANGELOG.md](CHANGELOG.md) for a history of features and changes in each release.
 
 ## The CAN communication
 Please see the [CAN Communication Details](docs/can.md) document for information regarding CAN bus messages, commands, known issues, and limitations related to the IT-CAN integration.

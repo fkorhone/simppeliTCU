@@ -1,6 +1,10 @@
 # Flashing Pre-compiled Binaries
 
-To get the pre-compiled binaries, go to the **Actions** tab of this GitHub repository, click on the latest successful "Build" run, and download the `simppeliTCU-firmware` zip from the Artifacts section. These pre-compiled binaries already have "USB CDC On Boot" enabled.
+Pre-compiled firmware binaries for each supported board (`LilyGo-T2-Can` and `Waveshare-esp32-rs485-can`) are available in two places:
+1. **GitHub Releases (Recommended):** Go to the **Releases** section of this GitHub repository to download a versioned release (e.g., `v0.1.0`) along with its changelog.
+2. **GitHub Actions Artifacts (Development builds):** For in-progress work, go to the **Actions** tab, click on the latest successful "Build" run, and download the artifact zip for your board.
+
+All pre-compiled binaries already have "USB CDC On Boot" enabled.
 
 ### Option 1: Easy Offline GUI (Windows)
 For the easiest offline flashing experience, use Espressif's official tool:
