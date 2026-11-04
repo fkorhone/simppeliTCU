@@ -404,3 +404,76 @@ TEST(CanLeafZE1Parsing, DismissNag_SequenceExecution) {
     EXPECT_EQ(manageCANSequence(2700), CanSeqResult::SEQUENCE_FINISHED);
     EXPECT_EQ(activeSequence, CanSequence::NONE);
 }
+
+// Test nag screen dismissal deferred while car is in reverse (reverse camera active)
+TEST(CanLeafZE1Parsing, NagScreenPopup_DeferredWhileInReverse) {
+    resetMocks();
+
+    uint8_t clusterBoot0[]  = {0x07, 0x00, 0x00, 0x20, 0x00, 0x01, 0x09, 0x00};
+    uint8_t displayInit[]   = {0x04, 0x00, 0x00, 0x21, 0xD0, 0xFF, 0xFF, 0xFF};
+    uint8_t displaySeq40[]  = {0x10, 0x2A, 0x40, 0x20, 0x0D, 0x00, 0x00, 0x01};
+    uint8_t popup62CInit[]  = {0x03, 0x00, 0x00, 0x21, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint8_t popup62C[]      = {0x10, 0x18, 0x40, 0x20, 0x0D, 0x87, 0x81, 0x85};
+    uint8_t shifterPark[]   = {0x08, 0x00, 0x00};
+    uint8_t shifterTrans[]  = {0x00, 0x00, 0x00};
+    uint8_t shifterRev[]    = {0x10, 0x00, 0x00};
+    uint8_t shifterDrive[]  = {0x20, 0x00, 0x00};
+
+    // Boot init in Park, then immediate shift through transition (0x00) into Reverse (0x10)
+    handleReceivedMessage(0x683, clusterBoot0, sizeof(clusterBoot0));
+    handleReceivedMessage(0x628, displayInit, sizeof(displayInit));
+    handleReceivedMessage(0x421, shifterPark, sizeof(shifterPark));
+    handleReceivedMessage(0x421, shifterTrans, sizeof(shifterTrans));
+    handleReceivedMessage(0x421, shifterRev, sizeof(shifterRev));
+    EXPECT_EQ(nagScreenPopupCount, 0);
+
+    // Both 0x628 (seq 0x40) and 0x62C arrive while reverse camera is active: must defer, not trigger
+    handleReceivedMessage(0x628, displaySeq40, sizeof(displaySeq40));
+    handleReceivedMessage(0x62C, popup62CInit, sizeof(popup62CInit));
+    handleReceivedMessage(0x62C, popup62C, sizeof(popup62C));
+    EXPECT_EQ(nagScreenPopupCount, 0);
+
+    // Passing through gate transition (0x00) out of Reverse must wait for engaged non-reverse gear
+    handleReceivedMessage(0x421, shifterTrans, sizeof(shifterTrans));
+    EXPECT_EQ(nagScreenPopupCount, 0);
+
+    // Engaging Drive (0x20) exits reverse camera and triggers nag screen popup dismissal once
+    handleReceivedMessage(0x421, shifterDrive, sizeof(shifterDrive));
+    EXPECT_EQ(nagScreenPopupCount, 1);
+
+    // Subsequent reverse/drive shifts in the same driving session must not re-trigger
+    handleReceivedMessage(0x421, shifterRev, sizeof(shifterRev));
+    handleReceivedMessage(0x421, shifterDrive, sizeof(shifterDrive));
+    EXPECT_EQ(nagScreenPopupCount, 1);
+}
+
+// Test shifting into reverse while DISMISS_NAG sequence is waiting aborts and re-triggers on exit
+TEST(CanLeafZE1Parsing, NagScreenPopup_ReverseAbortsActiveDismissAndRetriggers) {
+    resetMocks();
+
+    uint8_t clusterBoot0[] = {0x07, 0x00, 0x00, 0x20, 0x00, 0x01, 0x09, 0x00};
+    uint8_t displaySeq40[] = {0x10, 0x2A, 0x40, 0x20, 0x0D, 0x00, 0x00, 0x01};
+    uint8_t shifterRev[]   = {0x10, 0x00, 0x00};
+    uint8_t shifterDrive[] = {0x20, 0x00, 0x00};
+
+    handleReceivedMessage(0x683, clusterBoot0, sizeof(clusterBoot0));
+    handleReceivedMessage(0x628, displaySeq40, sizeof(displaySeq40));
+    EXPECT_EQ(nagScreenPopupCount, 1);
+
+    // Start DISMISS_NAG sequence (in 1500 ms settle wait)
+    startSequence(CanSequence::DISMISS_NAG, 1000);
+    EXPECT_EQ(activeSequence, CanSequence::DISMISS_NAG);
+    EXPECT_EQ(manageCANSequence(1500), CanSeqResult::PROCESSING);
+    EXPECT_TRUE(sentCANMessages.empty());
+
+    // Driver shifts into Reverse during the 1500 ms wait: sequence is aborted and deferred
+    handleReceivedMessage(0x421, shifterRev, sizeof(shifterRev));
+    EXPECT_EQ(activeSequence, CanSequence::NONE);
+    EXPECT_EQ(manageCANSequence(2500), CanSeqResult::IDLE);
+    EXPECT_TRUE(sentCANMessages.empty());
+
+    // Driver shifts out of Reverse into Drive: popup callback fires again
+    handleReceivedMessage(0x421, shifterDrive, sizeof(shifterDrive));
+    EXPECT_EQ(nagScreenPopupCount, 2);
+}
+

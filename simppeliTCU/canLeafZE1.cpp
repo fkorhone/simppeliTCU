@@ -112,12 +112,55 @@ void handleDoorsAndLocksMessage(const uint8_t* data, uint8_t len) {
     handleLockStatus(locked);
 }
 
+enum class SeqPhase {
+    IDLE,
+    WAKING,
+    WAKE_WAIT,
+    RUN_STEP
+};
+
+CanSequence activeSequence = CanSequence::NONE;
+static SeqPhase currentPhase = SeqPhase::IDLE;
+
 static uint8_t internal_av_seq_nibble = AV_SEQ_MIN;
 static bool nag_popup_armed = false;
+static bool nag_popup_pending = false;
+static bool car_in_reverse = false;
 
 static bool isAVBootInitFrame(const uint8_t* data) {
     return extractBits(data, av_frame_type_field) == AV_FRAME_TYPE_SINGLE &&
            extractBits(data, av_seq_nibble_field) == AV_SEQ_BOOT_INIT;
+}
+
+static void triggerNagScreenPopup() {
+    nag_popup_armed = false;
+    if (car_in_reverse) {
+        nag_popup_pending = true;
+        return;
+    }
+    nag_popup_pending = false;
+    handleNagScreenPopup();
+}
+
+void handleShifterMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    uint8_t shifterState = static_cast<uint8_t>(extractBits(data, shifter_state_field));
+    if (shifterState == SHIFTER_STATE_TRANSITION) {
+        return;
+    }
+    if (shifterState == SHIFTER_STATE_REVERSE) {
+        car_in_reverse = true;
+        if (activeSequence == CanSequence::DISMISS_NAG) {
+            activeSequence = CanSequence::NONE;
+            currentPhase = SeqPhase::IDLE;
+            nag_popup_pending = true;
+        }
+    } else if (car_in_reverse) {
+        car_in_reverse = false;
+        if (nag_popup_pending) {
+            triggerNagScreenPopup();
+        }
+    }
 }
 
 void handleSteeringWheelButtonMessage(const uint8_t* data, uint8_t len) {
@@ -130,6 +173,8 @@ void handleSteeringWheelButtonMessage(const uint8_t* data, uint8_t len) {
     if (seq == AV_SEQ_BOOT_INIT) {
         internal_av_seq_nibble = AV_SEQ_MIN;
         nag_popup_armed = true;
+        nag_popup_pending = false;
+        car_in_reverse = false;
     } else if (seq <= AV_SEQ_MAX) {
         internal_av_seq_nibble = seq;
     }
@@ -145,8 +190,7 @@ void handleAVDisplayStatusMessage(const uint8_t* data, uint8_t len) {
         extractBits(data, av_header_byte_field) == AV_FIRST_FRAME_HEADER &&
         extractBits(data, av_ff_seq_byte_field) == AV_DISPLAY_NAG_READY_SEQ &&
         extractBits(data, av_ff_cmd_field) == AV_DISPLAY_STATUS_CMD) {
-        nag_popup_armed = false;
-        handleNagScreenPopup();
+        triggerNagScreenPopup();
     }
 }
 
@@ -160,8 +204,7 @@ void handleAVPopupStatusMessage(const uint8_t* data, uint8_t len) {
         extractBits(data, av_header_byte_field) == AV_FIRST_FRAME_HEADER &&
         extractBits(data, av_ff_len_byte_field) == AV_POPUP_STATUS_LEN &&
         extractBits(data, av_ff_cmd_field) == AV_DISPLAY_STATUS_CMD) {
-        nag_popup_armed = false;
-        handleNagScreenPopup();
+        triggerNagScreenPopup();
     }
 }
 
@@ -174,6 +217,7 @@ static const MessageParser parsers[] = {
     CAN_PARSER(hvac_status_readout, handleHVACMessage),
     CAN_PARSER(hvac_setpoint_readout, handleHVACSetpointMessage),
     CAN_PARSER(doors_and_locks_readout, handleDoorsAndLocksMessage),
+    CAN_PARSER(shifter_status_readout, handleShifterMessage),
     CAN_PARSER(steering_wheel_button_readout, handleSteeringWheelButtonMessage),
     CAN_PARSER(av_display_status_readout, handleAVDisplayStatusMessage),
     CAN_PARSER(av_popup_status_readout, handleAVPopupStatusMessage),
@@ -191,16 +235,6 @@ void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len) {
 
 // Sequence State Machine
 extern bool carIsAwake;
-CanSequence activeSequence = CanSequence::NONE;
-
-enum class SeqPhase {
-    IDLE,
-    WAKING,
-    WAKE_WAIT,
-    RUN_STEP
-};
-
-static SeqPhase currentPhase = SeqPhase::IDLE;
 static int wakeAttempts = 0;
 static int stepIndex = 0;
 static int repeatCount = 0;
