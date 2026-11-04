@@ -328,6 +328,7 @@ void manageWiFi() {
 }
 
 void setup() {
+  Serial.setTxBufferSize(4096);
   Serial.begin(115200);
   Serial.println("\nsimppeliTCU " FW_FULL_VERSION);
   initConfiguration();
