@@ -14,6 +14,8 @@ struct SentCANMessage {
 extern std::vector<SentCANMessage> sentCANMessages;
 extern bool carIsAwake;
 extern int nagScreenPopupCount;
+extern int gpsDataUpdateCount;
+extern LeafGpsData lastGpsData_value;
 extern float lastSOC_value;
 extern float lastTemp_value;
 extern bool lastCharging_value;
@@ -50,6 +52,8 @@ namespace {
         lastHeating_value = false;
         lastCooling_value = false;
         nagScreenPopupCount = 0;
+        gpsDataUpdateCount = 0;
+        lastGpsData_value = {};
         sentCANMessages.clear();
     }
 }
@@ -476,4 +480,84 @@ TEST(CanLeafZE1Parsing, NagScreenPopup_ReverseAbortsActiveDismissAndRetriggers) 
     handleReceivedMessage(0x421, shifterDrive, sizeof(shifterDrive));
     EXPECT_EQ(nagScreenPopupCount, 2);
 }
+
+// Test AV-CAN 0x62C multi-frame GPS data assembly and bitstream coordinate parsing
+TEST(CanLeafZE1Parsing, AVCanGPS_MultiFrameParsing) {
+    resetMocks();
+
+    // Synthetic 0x62C multi-frame GPS message (60° 10' 10.800" N, 24° 57' 8.100" E)
+    uint8_t ff[]  = {0x10, 0x18, 0x10, 0x20, 0x0D, 0x87, 0x81, 0x45};
+    uint8_t cf1[] = {0x21, 0x46, 0x03, 0x07, 0x23, 0xF4, 0x80, 0x00};
+    uint8_t cf2[] = {0x22, 0x00, 0x08, 0x07, 0xEA, 0xAD, 0xC1, 0xB9};
+    uint8_t cf3[] = {0x23, 0x40, 0x00, 0x00, 0x08, 0xFF, 0xFF, 0xFF};
+
+    handleReceivedMessage(0x62C, ff, sizeof(ff));
+    handleReceivedMessage(0x62C, cf1, sizeof(cf1));
+    handleReceivedMessage(0x62C, cf2, sizeof(cf2));
+    EXPECT_EQ(gpsDataUpdateCount, 0);
+
+    handleReceivedMessage(0x62C, cf3, sizeof(cf3));
+    EXPECT_EQ(gpsDataUpdateCount, 1);
+
+    EXPECT_EQ(lastGpsData_value.lat_deg, 60u);
+    EXPECT_EQ(lastGpsData_value.lat_min, 10u);
+    EXPECT_EQ(lastGpsData_value.lat_ms, 10800u);
+    EXPECT_EQ(lastGpsData_value.lon_deg, 24u);
+    EXPECT_EQ(lastGpsData_value.lon_min, 57u);
+    EXPECT_EQ(lastGpsData_value.lon_ms, 8100u);
+    EXPECT_NEAR(lastGpsData_value.latitude, 60.169667, 1e-6);
+    EXPECT_NEAR(lastGpsData_value.longitude, 24.952250, 1e-6);
+}
+
+// Test AV-CAN 0x62C GPS assembly with interleaved control frames and non-GPS multi-frame messages
+TEST(CanLeafZE1Parsing, AVCanGPS_InterleavedAndNonGpsFrames) {
+    resetMocks();
+
+    // Non-GPS multi-frame message on 0x62C (len 0x1F) must be ignored
+    uint8_t otherFf[]  = {0x10, 0x1F, 0x28, 0x46, 0x61, 0x31, 0x30, 0x38};
+    uint8_t otherCf1[] = {0x21, 0x32, 0x30, 0x30, 0x30, 0x30, 0x30, 0x34};
+    uint8_t otherCf2[] = {0x22, 0x32, 0x35, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t otherCf3[] = {0x23, 0x00, 0x00, 0x00, 0x30, 0x30, 0x34, 0x00};
+    handleReceivedMessage(0x62C, otherFf, sizeof(otherFf));
+    handleReceivedMessage(0x62C, otherCf1, sizeof(otherCf1));
+    handleReceivedMessage(0x62C, otherCf2, sizeof(otherCf2));
+    handleReceivedMessage(0x62C, otherCf3, sizeof(otherCf3));
+    EXPECT_EQ(gpsDataUpdateCount, 0);
+
+    // Incomplete GPS message aborted by a single-frame 0x62C message (61° 29' 54.000" N, 23° 45' 36.000" E)
+    uint8_t gpsFf[]  = {0x10, 0x18, 0x60, 0x20, 0x0D, 0x87, 0xA3, 0xBA};
+    uint8_t gpsCf1[] = {0x21, 0x5E, 0x02, 0xE5, 0xB1, 0x94, 0x00, 0x00};
+    uint8_t gpsCf2[] = {0x22, 0x60, 0x98, 0x07, 0xEA, 0xAE, 0x4E, 0x4C};
+    uint8_t gpsCf3[] = {0x23, 0x00, 0x00, 0x35, 0x08, 0xFF, 0xFF, 0xFF};
+    uint8_t singleFrame[] = {0x07, 0x70, 0x46, 0x4D, 0x00, 0x00, 0x00, 0x00};
+
+    handleReceivedMessage(0x62C, gpsFf, sizeof(gpsFf));
+    handleReceivedMessage(0x62C, gpsCf1, sizeof(gpsCf1));
+    handleReceivedMessage(0x62C, singleFrame, sizeof(singleFrame));
+    handleReceivedMessage(0x62C, gpsCf2, sizeof(gpsCf2));
+    handleReceivedMessage(0x62C, gpsCf3, sizeof(gpsCf3));
+    EXPECT_EQ(gpsDataUpdateCount, 0);
+
+    // Valid GPS message with interleaved 0xF0 keep-alive and 0xE0 ACK frames
+    uint8_t keepAlive[] = {0xF0, 0x23, 0x0A, 0x01, 0xFF, 0xFF, 0xFF, 0xFF};
+    uint8_t ackFrame[]  = {0xE0, 0x20, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+    handleReceivedMessage(0x62C, gpsFf, sizeof(gpsFf));
+    handleReceivedMessage(0x62C, keepAlive, sizeof(keepAlive));
+    handleReceivedMessage(0x62C, gpsCf1, sizeof(gpsCf1));
+    handleReceivedMessage(0x62C, gpsCf2, sizeof(gpsCf2));
+    handleReceivedMessage(0x62C, ackFrame, sizeof(ackFrame));
+    handleReceivedMessage(0x62C, gpsCf3, sizeof(gpsCf3));
+    EXPECT_EQ(gpsDataUpdateCount, 1);
+
+    EXPECT_EQ(lastGpsData_value.lat_deg, 61u);
+    EXPECT_EQ(lastGpsData_value.lat_min, 29u);
+    EXPECT_EQ(lastGpsData_value.lat_ms, 54000u);
+    EXPECT_EQ(lastGpsData_value.lon_deg, 23u);
+    EXPECT_EQ(lastGpsData_value.lon_min, 45u);
+    EXPECT_EQ(lastGpsData_value.lon_ms, 36000u);
+    EXPECT_NEAR(lastGpsData_value.latitude, 61.498333, 1e-6);
+    EXPECT_NEAR(lastGpsData_value.longitude, 23.760000, 1e-6);
+}
+
 

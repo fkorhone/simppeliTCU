@@ -14,6 +14,8 @@ std::vector<SentCANMessage> sentCANMessages;
 
 bool carIsAwake = false;
 int nagScreenPopupCount = 0;
+int gpsDataUpdateCount = 0;
+LeafGpsData lastGpsData_value = {};
 
 float lastSOC_value = -1.0f;
 float lastTemp_value = -100.0f;
@@ -84,6 +86,11 @@ void handleVentilationMode(VentilationMode mode) {
 
 void handleNagScreenPopup() {
     nagScreenPopupCount++;
+}
+
+void handleGPSData(const LeafGpsData& gps) {
+    lastGpsData_value = gps;
+    gpsDataUpdateCount++;
 }
 
 void sendCAN(uint32_t id, const uint8_t* data, uint8_t len) {

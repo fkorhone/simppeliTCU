@@ -28,6 +28,7 @@ float currentFanSpeed = -1.0;
 bool isHeatingEnabled = false;
 bool isCoolingEnabled = false;
 VentilationMode currentVentilationMode = VentilationMode::UNKNOWN;
+LeafGpsData currentGpsData = {};
 
 void resetData() {
     currentSOC = -1.0;
@@ -41,6 +42,7 @@ void resetData() {
     isHeatingEnabled = false;
     isCoolingEnabled = false;
     currentVentilationMode = VentilationMode::UNKNOWN;
+    currentGpsData = {};
 }
 
 void handleRoot() {
@@ -119,6 +121,10 @@ void handleNagScreenPopup() {
   Serial.println("### Dismiss Nag Screen! ###");
   logSequenceStart();
   startSequence(CanSequence::DISMISS_NAG, millis());
+}
+
+void handleGPSData(const LeafGpsData& gps) {
+  currentGpsData = gps;
 }
 
 void logSequenceStart() {

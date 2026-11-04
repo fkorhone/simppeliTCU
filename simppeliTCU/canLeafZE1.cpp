@@ -208,6 +208,74 @@ void handleAVPopupStatusMessage(const uint8_t* data, uint8_t len) {
     }
 }
 
+static uint8_t av_gps_payload[AV_GPS_PAYLOAD_LEN] = {0};
+static uint8_t av_gps_expected_cf = 0;
+
+void parse_av_can_gps(const uint8_t payload[AV_GPS_PAYLOAD_LEN], LeafGpsData* gps) {
+    if (!payload || !gps) {
+        return;
+    }
+
+    gps->lat_deg = static_cast<uint8_t>(extractBits(payload, av_gps_lat_deg_field));
+    gps->lat_min = static_cast<uint8_t>(extractBits(payload, av_gps_lat_min_field));
+    gps->lat_ms  = static_cast<uint16_t>(extractBits(payload, av_gps_lat_ms_field));
+
+    gps->lon_deg = static_cast<uint8_t>(extractBits(payload, av_gps_lon_deg_field));
+    gps->lon_min = static_cast<uint8_t>(extractBits(payload, av_gps_lon_min_field));
+    gps->lon_ms  = static_cast<uint16_t>(extractBits(payload, av_gps_lon_ms_field));
+
+    gps->latitude  = static_cast<double>(gps->lat_deg) +
+                     (static_cast<double>(gps->lat_min) / GPS_MINUTES_PER_DEGREE) +
+                     (static_cast<double>(gps->lat_ms) / GPS_MILLIARCSEC_PER_DEGREE);
+    gps->longitude = static_cast<double>(gps->lon_deg) +
+                     (static_cast<double>(gps->lon_min) / GPS_MINUTES_PER_DEGREE) +
+                     (static_cast<double>(gps->lon_ms) / GPS_MILLIARCSEC_PER_DEGREE);
+}
+
+void handleAVGPSMessage(const uint8_t* data, uint8_t len) {
+    uint8_t header = static_cast<uint8_t>(extractBits(data, av_header_byte_field));
+    uint8_t frameType = static_cast<uint8_t>(extractBits(data, av_frame_type_field));
+
+    if (header == AV_FIRST_FRAME_HEADER) {
+        if (len >= AV_GPS_FF_FRAME_LEN &&
+            extractBits(data, av_ff_len_byte_field) == AV_GPS_PAYLOAD_LEN &&
+            extractBits(data, av_ff_msg_type_field) == AV_GPS_MSG_TYPE) {
+            memcpy(av_gps_payload, &data[AV_GPS_FF_DATA_OFFSET], AV_GPS_FF_DATA_LEN);
+            av_gps_expected_cf = AV_GPS_CF1_HEADER;
+        } else {
+            av_gps_expected_cf = 0;
+        }
+        return;
+    }
+
+    if (frameType == AV_FRAME_TYPE_SINGLE) {
+        av_gps_expected_cf = 0;
+        return;
+    }
+
+    if (frameType == AV_FRAME_TYPE_CONSECUTIVE) {
+        if (header != av_gps_expected_cf) {
+            av_gps_expected_cf = 0;
+            return;
+        }
+        if (header == AV_GPS_CF1_HEADER && len >= AV_GPS_CF_FRAME_LEN) {
+            memcpy(&av_gps_payload[AV_GPS_FF_DATA_LEN], &data[AV_GPS_CF_DATA_OFFSET], AV_GPS_CF_DATA_LEN);
+            av_gps_expected_cf = AV_GPS_CF2_HEADER;
+        } else if (header == AV_GPS_CF2_HEADER && len >= AV_GPS_CF_FRAME_LEN) {
+            memcpy(&av_gps_payload[AV_GPS_FF_DATA_LEN + AV_GPS_CF_DATA_LEN], &data[AV_GPS_CF_DATA_OFFSET], AV_GPS_CF_DATA_LEN);
+            av_gps_expected_cf = AV_GPS_CF3_HEADER;
+        } else if (header == AV_GPS_CF3_HEADER && len >= AV_GPS_CF3_MIN_FRAME_LEN) {
+            memcpy(&av_gps_payload[AV_GPS_FF_DATA_LEN + 2 * AV_GPS_CF_DATA_LEN], &data[AV_GPS_CF_DATA_OFFSET], AV_GPS_CF3_DATA_LEN);
+            av_gps_expected_cf = 0;
+            LeafGpsData gps{};
+            parse_av_can_gps(av_gps_payload, &gps);
+            handleGPSData(gps);
+        } else {
+            av_gps_expected_cf = 0;
+        }
+    }
+}
+
 // Message parser dispatch table
 static const MessageParser parsers[] = {
     CAN_PARSER(raw_soc_readout, handleSOCMessage),
@@ -221,6 +289,7 @@ static const MessageParser parsers[] = {
     CAN_PARSER(steering_wheel_button_readout, handleSteeringWheelButtonMessage),
     CAN_PARSER(av_display_status_readout, handleAVDisplayStatusMessage),
     CAN_PARSER(av_popup_status_readout, handleAVPopupStatusMessage),
+    CAN_PARSER(av_gps_readout, handleAVGPSMessage),
 };
 
 // Can message reception handler, to be called when a CAN message is received
@@ -228,7 +297,6 @@ void handleReceivedMessage(uint32_t identifier, uint8_t* data, uint8_t len) {
     for (const auto& p : parsers) {
         if (p.id == identifier && len >= p.expected_len) {
             p.handler(data, len);
-            return;
         }
     }
 }
