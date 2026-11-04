@@ -12,6 +12,7 @@ inline constexpr CANMessage<6> charger_status_readout = {0x390};
 inline constexpr CANMessage<2> hvac_status_readout = {0x54B};
 inline constexpr CANMessage<5> hvac_setpoint_readout = {0x54A};
 inline constexpr CANMessage<3> doors_and_locks_readout = {0x60D};
+inline constexpr CANMessage<1> shifter_status_readout = {0x421};
 inline constexpr CANMessage<2> steering_wheel_button_readout = {0x683};
 inline constexpr CANMessage<5> av_display_status_readout = {0x628};
 inline constexpr CANMessage<5> av_popup_status_readout = {0x62C};
@@ -50,6 +51,7 @@ inline constexpr CANField door_rr_field          = { 2, 1 };
 inline constexpr CANField door_fr_field          = { 3, 1 };
 inline constexpr CANField door_fl_field          = { 4, 1 };
 inline constexpr CANField locked_field           = { 19, 1 };
+inline constexpr CANField shifter_state_field    = { 0, 8 };  // Byte 0 of 0x421
 inline constexpr CANField av_frame_type_field    = { 0, 4 };  // Upper nibble of byte 0 on AV-CAN frames
 inline constexpr CANField av_header_byte_field   = { 0, 8 };  // Byte 0 on AV-CAN frames
 inline constexpr CANField av_seq_nibble_field    = { 8, 4 };  // Upper nibble of byte 1 on single-frame AV-CAN messages
@@ -76,6 +78,10 @@ inline constexpr uint8_t VENT_MODE_WINDSCREEN_FEET = 0xA0;
 inline constexpr uint8_t VENT_MODE_WINDSCREEN      = 0xA8;
 inline constexpr uint8_t HVAC_CMD_SETPOINT_BYTE    = 2;
 inline constexpr float   HVAC_CMD_SETPOINT_SCALE   = 2.0f;
+
+// Shifter status (0x421)
+inline constexpr uint8_t SHIFTER_STATE_TRANSITION   = 0x00;
+inline constexpr uint8_t SHIFTER_STATE_REVERSE      = 0x10;
 
 // AV-CAN (0x683 / 0x628 / 0x62C) nag screen dismissal
 inline constexpr uint8_t  AV_FRAME_TYPE_SINGLE     = 0x00;
