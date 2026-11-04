@@ -16,6 +16,7 @@ inline constexpr CANMessage<1> shifter_status_readout = {0x421};
 inline constexpr CANMessage<2> steering_wheel_button_readout = {0x683};
 inline constexpr CANMessage<5> av_display_status_readout = {0x628};
 inline constexpr CANMessage<5> av_popup_status_readout = {0x62C};
+inline constexpr CANMessage<5> av_gps_readout = {0x62C};
 
 // Leaf can messages
 inline constexpr CANMessage<1> wakeup_data       = {0x68C, {0x00}};                  // Wakeup ping
@@ -58,6 +59,14 @@ inline constexpr CANField av_seq_nibble_field    = { 8, 4 };  // Upper nibble of
 inline constexpr CANField av_ff_len_byte_field   = { 8, 8 };  // Byte 1 payload length on multi-frame AV-CAN first frames
 inline constexpr CANField av_ff_seq_byte_field   = { 16, 8 }; // Byte 2 sequence byte on multi-frame AV-CAN first frames
 inline constexpr CANField av_ff_cmd_field        = { 24, 16 }; // Bytes 3..4 command ID on multi-frame AV-CAN first frames
+inline constexpr CANField av_ff_msg_type_field   = { 24, 8 };  // Byte 3 message type on multi-frame AV-CAN first frames
+inline constexpr CANField av_gps_status_field    = { 16, 11 }; // Bits 16..26 GPS status / satellites / sign bits in 0x62C payload
+inline constexpr CANField av_gps_lat_deg_field   = { 27, 8 };  // Bits 27..34 latitude degrees in 0x62C payload
+inline constexpr CANField av_gps_lat_min_field   = { 35, 8 };  // Bits 35..42 latitude minutes in 0x62C payload
+inline constexpr CANField av_gps_lat_ms_field    = { 43, 16 }; // Bits 43..58 latitude milli-arcseconds in 0x62C payload
+inline constexpr CANField av_gps_lon_deg_field   = { 59, 8 };  // Bits 59..66 longitude degrees in 0x62C payload
+inline constexpr CANField av_gps_lon_min_field   = { 67, 8 };  // Bits 67..74 longitude minutes in 0x62C payload
+inline constexpr CANField av_gps_lon_ms_field    = { 75, 16 }; // Bits 75..90 longitude milli-arcseconds in 0x62C payload
 
 // ===== Message-Specific Constants =====
 // Charger status (0x390)
@@ -95,6 +104,27 @@ inline constexpr uint8_t  AV_DISPLAY_NAG_READY_SEQ = 0x40;
 inline constexpr uint8_t  AV_POPUP_STATUS_LEN      = 0x18;
 inline constexpr uint16_t AV_DISPLAY_STATUS_CMD    = 0x200D;
 
+// AV-CAN (0x62C) GPS multi-frame message
+inline constexpr uint8_t  AV_FRAME_TYPE_CONSECUTIVE  = 0x02;
+inline constexpr uint8_t  AV_GPS_PAYLOAD_LEN         = 24;
+inline constexpr uint8_t  AV_GPS_FF_FRAME_LEN        = 8;
+inline constexpr uint8_t  AV_GPS_FF_DATA_OFFSET      = 2;
+inline constexpr uint8_t  AV_GPS_FF_DATA_LEN         = 6;
+inline constexpr uint8_t  AV_GPS_CF_FRAME_LEN        = 8;
+inline constexpr uint8_t  AV_GPS_CF3_MIN_FRAME_LEN   = 5;
+inline constexpr uint8_t  AV_GPS_CF_DATA_OFFSET      = 1;
+inline constexpr uint8_t  AV_GPS_CF_DATA_LEN         = 7;
+inline constexpr uint8_t  AV_GPS_CF3_DATA_LEN        = 4;
+inline constexpr uint8_t  AV_GPS_CF1_HEADER          = 0x21;
+inline constexpr uint8_t  AV_GPS_CF2_HEADER          = 0x22;
+inline constexpr uint8_t  AV_GPS_CF3_HEADER          = 0x23;
+inline constexpr uint8_t  AV_GPS_MSG_TYPE            = 0x20;
+inline constexpr uint16_t AV_GPS_STATUS_LOCKED       = 0x06C;
+inline constexpr double   GPS_MINUTES_PER_DEGREE     = 60.0;
+inline constexpr double   GPS_MILLIARCSEC_PER_DEGREE = 3600000.0;
+
+void parse_av_can_gps(const uint8_t payload[AV_GPS_PAYLOAD_LEN], LeafGpsData* gps);
+
 // Scaling definitions
 inline constexpr FieldScaling soc_scaling        = {false, 0.1f,   0.0f};
 inline constexpr FieldScaling cabin_temp_scaling = {false, 0.5f,  -40.0f};
@@ -115,6 +145,7 @@ void handleVentilationMode(VentilationMode mode);
 void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk);
 void handleLockStatus(bool locked);
 void handleNagScreenPopup();
+void handleGPSData(const LeafGpsData& gps);
 
 
 // Sequence State Machine
