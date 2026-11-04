@@ -42,12 +42,11 @@ void resetData() {
     isHeatingEnabled = false;
     isCoolingEnabled = false;
     currentVentilationMode = VentilationMode::UNKNOWN;
-    currentGpsData = {};
 }
 
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, currentGpsData);
 }
 
 void handleCarAwake() {
@@ -124,7 +123,9 @@ void handleNagScreenPopup() {
 }
 
 void handleGPSData(const LeafGpsData& gps) {
-  currentGpsData = gps;
+  if (gps.latitude != 0.0 || gps.longitude != 0.0) {
+    currentGpsData = gps;
+  }
 }
 
 void logSequenceStart() {
