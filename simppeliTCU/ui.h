@@ -7,7 +7,7 @@
 #include "version.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode, const LeafGpsData& gpsData) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -71,6 +71,22 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Unlocked</p>\n"));
   } else {
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Waiting...</p>\n"));
+  }
+
+  if (gpsData.latitude != 0.0 || gpsData.longitude != 0.0) {
+    String latStr = String(gpsData.latitude, 6);
+    String lonStr = String(gpsData.longitude, 6);
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Location:</b> <a href='https://maps.google.com/?q="));
+    server.sendContent(latStr);
+    server.sendContent(F(","));
+    server.sendContent(lonStr);
+    server.sendContent(F("' target='_blank' rel='noopener noreferrer'>"));
+    server.sendContent(latStr);
+    server.sendContent(F(", "));
+    server.sendContent(lonStr);
+    server.sendContent(F("</a></p>\n"));
+  } else {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Location:</b> Waiting...</p>\n"));
   }
 
   server.sendContent(F(
