@@ -1,6 +1,7 @@
 #include "cliParser.h"
 #include <Arduino.h>
 #include "configuration.h"
+#include "version.h"
 
 static char inputBuffer[128];
 static int inputIndex = 0;
@@ -14,6 +15,7 @@ void executeCommand(char* cmd) {
         bool showSecrets = (option != NULL && strcmp(option, "--secrets") == 0);
 
         Serial.println("Current Configuration:");
+        Serial.printf("  version: %s\n", FW_FULL_VERSION);
         Serial.printf("  ssid: %s\n", getWifiSSID());
         Serial.printf("  password: %s\n", showSecrets ? getWifiPassword() : "****");
         Serial.printf("  ap_ssid: %s\n", getApSSID());
@@ -34,7 +36,8 @@ void executeCommand(char* cmd) {
     else if (strcmp(command, "get") == 0) {
         char* key = strtok(NULL, " ");
         if (key != NULL) {
-            if (strcmp(key, "ssid") == 0) Serial.println(getWifiSSID());
+            if (strcmp(key, "version") == 0) Serial.println(FW_FULL_VERSION);
+            else if (strcmp(key, "ssid") == 0) Serial.println(getWifiSSID());
             else if (strcmp(key, "password") == 0) Serial.println("****");
             else if (strcmp(key, "ap_ssid") == 0) Serial.println(getApSSID());
             else if (strcmp(key, "ap_password") == 0) Serial.println("****");
@@ -133,6 +136,9 @@ void executeCommand(char* cmd) {
             Serial.println("Usage: set <key> <value>");
         }
     } 
+    else if (strcmp(command, "version") == 0) {
+        Serial.println(FW_FULL_VERSION);
+    }
     else if (strcmp(command, "reboot") == 0) {
         Serial.println("Rebooting...");
         delay(100);

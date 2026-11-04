@@ -1,6 +1,7 @@
 #include "hassDiscovery.h"
 #include "configuration.h"
 #include "stringBuffer.h"
+#include "version.h"
 #include <PubSubClient.h>
 
 // Define the global instance of the metric topics
@@ -40,7 +41,7 @@ void publishHassConfigForMetric(PubSubClient& mqttClient, const StringBuffer<128
 
   // Add common device information
   StringBuffer<256> device;
-  device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\"}}", vid, vid);
+  device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
   payload.append(device.c_str());
 
   mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
@@ -247,7 +248,7 @@ void mqttPublishHassDiscovery(PubSubClient& mqttClient, const StringBuffer<128>&
 
     // Add common device information
     StringBuffer<256> device;
-    device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\"}}", vid, vid);
+    device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
     payload.append(device.c_str());
 
     mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
