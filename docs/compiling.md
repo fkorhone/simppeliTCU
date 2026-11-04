@@ -25,10 +25,13 @@ If you prefer using the command line, you can build and flash the firmware using
     arduino-cli lib install autowp-mcp2515
    ```
 
-2. **Compile the sketch** (ensuring USB CDC On Boot is enabled):
+2. **Compile the sketch** (ensuring USB CDC On Boot is enabled, and optionally embedding the current git commit hash):
    ```bash
-   arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc simppeliTCU
+   arduino-cli compile --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc \
+     --build-property "compiler.cpp.extra_flags=-DGIT_HASH_RAW=$(git rev-parse --short HEAD)" \
+     simppeliTCU
    ```
+   *(If compiled in Arduino IDE or without `GIT_HASH_RAW`, the version string in `simppeliTCU/version.h` defaults to showing `(local)` as the commit hash.)*
 
 3. **Upload to the board** (replace `<PORT>` with your COM port, e.g., `COM3` or `/dev/cu.usbserial...`):
    ```bash
@@ -62,5 +65,20 @@ cmake --build .
 # Run all tests
 ctest
 ```
+
+## Creating a New Release
+
+Releases are created automatically by GitHub Actions when the version is bumped on the `main` branch:
+
+1. Update [`CHANGELOG.md`](../CHANGELOG.md): move or add the changes under a new version heading (e.g., `## [v0.1.1] - YYYY-MM-DD`).
+2. Update [`simppeliTCU/version.h`](../simppeliTCU/version.h): bump `FW_VERSION` to the matching version string (e.g., `#define FW_VERSION "v0.1.1"`).
+3. Commit and push/merge the changes to `main`.
+
+When the workflow runs on `main` and detects that a git tag for `FW_VERSION` does not yet exist, it automatically:
+- Embeds the short git commit hash into the firmware binaries.
+- Creates and pushes the annotated git tag (e.g., `v0.1.1`).
+- Extracts the matching release notes from `CHANGELOG.md`.
+- Publishes a **GitHub Release** with the compiled firmware binaries (`.bin` and `.zip`) for all supported boards.
+
 
 
