@@ -82,6 +82,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Inject git commit hash into version.h
+      shell: bash
+      run: |
+        SHORT_SHA=$(git rev-parse --short=7 HEAD)
+        sed -i "s/#define GIT_HASH \"local\"/#define GIT_HASH \"${SHORT_SHA}\"/" simppeliTCU/version.h
+
     - name: Compile Sketch
       uses: arduino/compile-sketches@v1
       with:
@@ -108,3 +114,91 @@ jobs:
       with:
         name: ${{ matrix.artifact }}
         path: simppeliTCU/build/
+
+  release:
+    name: Create Release
+    needs: [unit-tests, build-firmware]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check version and existing tags
+      id: check_version
+      shell: bash
+      run: |
+        VERSION=$(sed -n 's/^#define FW_VERSION "\(.*\)"/\1/p' simppeliTCU/version.h | tr -d '\r')
+        if [ -z "$VERSION" ]; then
+          echo "Error: Could not read FW_VERSION from simppeliTCU/version.h"
+          exit 1
+        fi
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+        if git rev-parse "$VERSION" >/dev/null 2>&1 || git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+          echo "Tag $VERSION already exists. Skipping release creation."
+          echo "should_release=false" >> "$GITHUB_OUTPUT"
+        else
+          echo "New version $VERSION detected. Preparing release."
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Download firmware artifacts
+      if: steps.check_version.outputs.should_release == 'true'
+      uses: actions/download-artifact@v4
+      with:
+        pattern: simppeliTCU-*
+        path: release-artifacts
+
+    - name: Prepare release assets and changelog
+      if: steps.check_version.outputs.should_release == 'true'
+      shell: bash
+      run: |
+        VERSION="${{ steps.check_version.outputs.version }}"
+        SHORT_SHA=$(git rev-parse --short=7 HEAD)
+        mkdir -p release-assets
+
+        for dir in release-artifacts/simppeliTCU-*; do
+          [ -d "$dir" ] || continue
+          board_name=$(basename "$dir")
+          (cd "$dir" && zip -r "../../release-assets/${board_name}-${VERSION}.zip" .)
+          if [ -f "$dir/${board_name}.bin" ]; then
+            cp "$dir/${board_name}.bin" "release-assets/${board_name}-${VERSION}.bin"
+          fi
+        done
+
+        awk -v ver="$VERSION" '
+          { sub(/\r$/, "") }
+          $0 ~ "^## \\[" ver "\\]" { found=1; next }
+          found && /^## \[/ { exit }
+          found { print }
+        ' CHANGELOG.md > RELEASE_NOTES.md
+
+        if [ ! -s RELEASE_NOTES.md ]; then
+          echo "Release ${VERSION} (${SHORT_SHA})" > RELEASE_NOTES.md
+        fi
+
+    - name: Create and push git tag
+      if: steps.check_version.outputs.should_release == 'true'
+      shell: bash
+      run: |
+        VERSION="${{ steps.check_version.outputs.version }}"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag -a "$VERSION" -m "Release $VERSION"
+        git push origin "$VERSION"
+
+    - name: Publish GitHub Release
+      if: steps.check_version.outputs.should_release == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.check_version.outputs.version }}
+        name: simppeliTCU ${{ steps.check_version.outputs.version }}
+        body_path: RELEASE_NOTES.md
+        files: release-assets/*
+
