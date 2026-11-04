@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <WebServer.h>
 #include "vehicleTypes.h"
+#include "version.h"
 
 // 1. Main page (HTML UI)
 void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode) {
@@ -137,6 +138,7 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   }
 
   server.sendContent(F(
+    "<p style='color: #888; font-size: 12px; margin-top: 30px;'>simppeliTCU " FW_FULL_VERSION "</p>\n"
     "</body></html>\n"
   ));
 

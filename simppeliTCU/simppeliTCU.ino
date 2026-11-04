@@ -7,6 +7,7 @@
 #include "canLeafZE1.h"
 #include "ui.h"
 #include "mqttInterface.h"
+#include "version.h"
 
 WebServer server(80);
 
@@ -319,6 +320,7 @@ void manageWiFi() {
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("\nsimppeliTCU " FW_FULL_VERSION);
   initConfiguration();
 
   bool staEnabled = strlen(getWifiSSID()) > 0;
