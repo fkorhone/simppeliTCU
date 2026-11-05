@@ -110,6 +110,20 @@ static const HassMqttProperty ventilationModeProps[] = {
   {"state_topic", ovmsMetrics.ventilationMode}
 };
 
+// Sensor: Latitude
+static const HassMqttProperty latitudeProps[] = {
+  {"name", "Latitude"},
+  {"unit_of_measurement", "°"},
+  {"state_topic", ovmsMetrics.latitude}
+};
+
+// Sensor: Longitude
+static const HassMqttProperty longitudeProps[] = {
+  {"name", "Longitude"},
+  {"unit_of_measurement", "°"},
+  {"state_topic", ovmsMetrics.longitude}
+};
+
 // Binary Sensor: Lock Status
 static const HassMqttProperty lockProps[] = {
   {"name", "Locked"},
@@ -188,6 +202,8 @@ static const HassMqttMetric hassMetrics[] = {
   {"sensor", "hvac_setpoint", hvacSetpointProps, sizeof(hvacSetpointProps)/sizeof(HassMqttProperty)},
   {"sensor", "fan_speed", fanSpeedProps, sizeof(fanSpeedProps)/sizeof(HassMqttProperty)},
   {"sensor", "ventilation_mode", ventilationModeProps, sizeof(ventilationModeProps)/sizeof(HassMqttProperty)},
+  {"sensor", "latitude", latitudeProps, sizeof(latitudeProps)/sizeof(HassMqttProperty)},
+  {"sensor", "longitude", longitudeProps, sizeof(longitudeProps)/sizeof(HassMqttProperty)},
 
   // Binary Sensors
   {"binary_sensor", "charging", chargeProps, sizeof(chargeProps)/sizeof(HassMqttProperty)},
