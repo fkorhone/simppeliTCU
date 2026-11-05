@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] - 2026-11-05
+
+### Added
+- **Nissan Leaf ZE1 Infotainment Nag Screen Dismissal (`nag_dismiss`)**:
+  - Automatic dismissal of the infotainment startup confirmation ("OK") screen on AV-CAN (configurable via `nag_dismiss` in CLI, disabled by default).
+  - Reverse gear detection on EV-CAN (`0x421`) to defer or pause nag screen dismissal while the reverse camera is active, resuming once a non-reverse gear is engaged.
+
+### Fixed
+- **CAN Bus Throughput & Logging Reliability**:
+  - Prevented CAN reception and loop stalls under high bus load by bounding per-poll frame reads across TWAI and MCP2515 interfaces, increasing the TWAI RX queue length, and using non-blocking buffered Serial TX writes for CAN logs.
+
 ## [v0.1.0] - 2026-11-04
 
 ### Added

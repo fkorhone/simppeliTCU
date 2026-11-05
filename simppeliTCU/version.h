@@ -7,7 +7,7 @@
 // Release version number. Bump this together with CHANGELOG.md on main to
 // automatically create a new git tag and GitHub Release via GitHub Actions.
 #ifndef FW_VERSION
-#define FW_VERSION "v0.1.0"
+#define FW_VERSION "v0.2.0"
 #endif
 
 // Optional unquoted commit hash passed via compiler flag, e.g.:
