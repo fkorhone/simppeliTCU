@@ -112,6 +112,8 @@ Where:
 | `ovms/<user>/<vehicle>/metric/v/d/rr` | Yes | Rear right door open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/trunk` | Yes | Trunk open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/e/locked` | Yes | Vehicle locked: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/p/latitude` | Yes | Current latitude in decimal degrees (e.g., `60.205212`) |
+| `ovms/<user>/<vehicle>/metric/v/p/longitude` | Yes | Current longitude in decimal degrees (e.g., `24.655841`) |
 | `ovms/<user>/<vehicle>/metric/s/v3/connected` | Yes | Connection status (LWT): `yes` or `no` |
 | `ovms/<user>/<vehicle>/client/<clientid>/response/<commandid>` | No | Response to specific commands. |
 

@@ -125,6 +125,7 @@ void handleNagScreenPopup() {
 void handleGPSData(const LeafGpsData& gps) {
   if (gps.latitude != 0.0 || gps.longitude != 0.0) {
     currentGpsData = gps;
+    mqttUpdateGPS(gps.latitude, gps.longitude);
   }
 }
 

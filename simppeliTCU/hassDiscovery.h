@@ -25,6 +25,8 @@ struct OvmsMetrics {
   const char* heating = "metric/v/e/heating";
   const char* cooling = "metric/v/e/cooling";
   const char* ventilationMode = "metric/v/e/cabinvent";
+  const char* latitude = "metric/v/p/latitude";
+  const char* longitude = "metric/v/p/longitude";
 };
 extern const OvmsMetrics ovmsMetrics;
 
