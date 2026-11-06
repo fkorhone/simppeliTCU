@@ -28,6 +28,7 @@ float currentFanSpeed = -1.0;
 bool isHeatingEnabled = false;
 bool isCoolingEnabled = false;
 VentilationMode currentVentilationMode = VentilationMode::UNKNOWN;
+LeafGpsData currentGpsData = {};
 
 void resetData() {
     currentSOC = -1.0;
@@ -45,7 +46,7 @@ void resetData() {
 
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, currentGpsData);
 }
 
 void handleCarAwake() {
@@ -119,6 +120,13 @@ void handleNagScreenPopup() {
   Serial.println("### Dismiss Nag Screen! ###");
   logSequenceStart();
   startSequence(CanSequence::DISMISS_NAG, millis());
+}
+
+void handleGPSData(const LeafGpsData& gps) {
+  if (gps.latitude != 0.0 || gps.longitude != 0.0) {
+    currentGpsData = gps;
+    mqttUpdateGPS(gps.latitude, gps.longitude);
+  }
 }
 
 void logSequenceStart() {

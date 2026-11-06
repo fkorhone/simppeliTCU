@@ -54,6 +54,10 @@ static bool lastCooling = false;
 static bool coolingDirty = false;
 static VentilationMode lastVentilationMode = VentilationMode::UNKNOWN;
 static bool ventilationModeDirty = false;
+static bool lastGpsStateSet = false;
+static double lastLatitude = 0.0;
+static double lastLongitude = 0.0;
+static bool gpsDirty = false;
 
 static bool mqttStatusRequested = false;
 static unsigned long statusRequestTime = 0;
@@ -171,6 +175,7 @@ boolean reconnectMQTT() {
     if (lastHvacStateSet) { ventilationModeDirty = true; mqttUpdateVentilationMode(lastVentilationMode); }
     if (lastDoorsStateSet) { doorsDirty = true; mqttUpdateDoors(lastDoorFL, lastDoorFR, lastDoorRL, lastDoorRR, lastDoorTrunk); }
     if (lastLockStateSet) { lockDirty = true; mqttUpdateLock(lastLockState); }
+    if (lastGpsStateSet) { gpsDirty = true; mqttUpdateGPS(lastLatitude, lastLongitude); }
     
     return true;
   }
@@ -234,7 +239,7 @@ void manageMQTT() {
   }
 }
 
-bool mqttPublishMetric(const char* metric, float value, const char* format = "%.1f") {
+bool mqttPublishMetric(const char* metric, double value, const char* format = "%.1f") {
   if (mqttClient.connected()) {
     StringBuffer<128> topic;
     topic.format("%s%s", mqttPrefix.c_str(), metric);
@@ -381,6 +386,17 @@ void mqttUpdateLock(bool locked) {
   lastLockStateSet = true;
   lastLockState = locked;
   lockDirty = !mqttPublishMetricStr(ovmsMetrics.locked, locked ? "yes" : "no");
+}
+
+void mqttUpdateGPS(double latitude, double longitude) {
+  if (lastGpsStateSet && lastLatitude == latitude && lastLongitude == longitude && !gpsDirty) return;
+  lastGpsStateSet = true;
+  lastLatitude = latitude;
+  lastLongitude = longitude;
+  bool success = true;
+  success &= mqttPublishMetric(ovmsMetrics.latitude, latitude, "%.6f");
+  success &= mqttPublishMetric(ovmsMetrics.longitude, longitude, "%.6f");
+  gpsDirty = !success;
 }
 
 void mqttPublishStatus(const char* msg) {
