@@ -112,10 +112,12 @@ Where:
 | `ovms/<user>/<vehicle>/metric/v/d/rr` | Yes | Rear right door open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/trunk` | Yes | Trunk open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/e/locked` | Yes | Vehicle locked: `yes` or `no` |
-| `ovms/<user>/<vehicle>/metric/v/p/latitude` | Yes | Current latitude in decimal degrees (e.g., `60.205212`) |
-| `ovms/<user>/<vehicle>/metric/v/p/longitude` | Yes | Current longitude in decimal degrees (e.g., `24.655841`) |
+| `ovms/<user>/<vehicle>/metric/v/p/latitude` | Yes | Current latitude in decimal degrees (e.g., `60.205212`). Only published when `tracking` is enabled (disabled by default) |
+| `ovms/<user>/<vehicle>/metric/v/p/longitude` | Yes | Current longitude in decimal degrees (e.g., `24.655841`). Only published when `tracking` is enabled (disabled by default) |
 | `ovms/<user>/<vehicle>/metric/s/v3/connected` | Yes | Connection status (LWT): `yes` or `no` |
 | `ovms/<user>/<vehicle>/client/<clientid>/response/<commandid>` | No | Response to specific commands. |
+
+> **Note:** Location tracking (the `latitude`/`longitude` metrics above, the web UI location display, and the Home Assistant `latitude`/`longitude` discovery entities) is disabled by default and can be turned on with `set tracking true` in the serial CLI. When disabled, no location values are published and the location discovery entities are not announced.
 
 ### Subscribed Topics (simppeliTCU ← Broker)
 

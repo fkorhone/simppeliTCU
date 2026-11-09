@@ -46,7 +46,8 @@ void resetData() {
 
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, currentGpsData);
+  bool trackingEnabled = getTrackingEnabled();
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, trackingEnabled ? currentGpsData : LeafGpsData{}, trackingEnabled);
 }
 
 void handleCarAwake() {
@@ -123,6 +124,9 @@ void handleNagScreenPopup() {
 }
 
 void handleGPSData(const LeafGpsData& gps) {
+  if (!getTrackingEnabled()) {
+    return;
+  }
   if (gps.latitude != 0.0 || gps.longitude != 0.0) {
     currentGpsData = gps;
     mqttUpdateGPS(gps.latitude, gps.longitude);

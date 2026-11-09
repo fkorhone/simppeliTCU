@@ -389,6 +389,7 @@ void mqttUpdateLock(bool locked) {
 }
 
 void mqttUpdateGPS(double latitude, double longitude) {
+  if (!getTrackingEnabled()) return;
   if (lastGpsStateSet && lastLatitude == latitude && lastLongitude == longitude && !gpsDirty) return;
   lastGpsStateSet = true;
   lastLatitude = latitude;

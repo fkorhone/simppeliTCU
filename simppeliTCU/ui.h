@@ -7,7 +7,7 @@
 #include "version.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode, const LeafGpsData& gpsData) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode, const LeafGpsData& gpsData, bool gpsTrackingEnabled) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -73,7 +73,9 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Doors:</b> Waiting...</p>\n"));
   }
 
-  if (gpsData.latitude != 0.0 || gpsData.longitude != 0.0) {
+  if (!gpsTrackingEnabled) {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Location:</b> Disabled (tracking off)</p>\n"));
+  } else if (gpsData.latitude != 0.0 || gpsData.longitude != 0.0) {
     String latStr = String(gpsData.latitude, 6);
     String lonStr = String(gpsData.longitude, 6);
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Location:</b> <a href='https://maps.google.com/?q="));
