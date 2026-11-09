@@ -108,6 +108,7 @@ static ConfigBool       conf_locking_enabled("locking_enabled", false);
 static ConfigBool       conf_mqtt_tls("mqtt_tls", true);
 static ConfigBool       conf_hass_discovery("hass_discovery", true);
 static ConfigBool       conf_nag_dismiss("nag_dismiss", true);
+static ConfigBool       conf_tracking("tracking", false);
 
 void initConfiguration() {
     nvsReady = preferences.begin("config", false);
@@ -129,6 +130,7 @@ void initConfiguration() {
     conf_mqtt_tls.load();
     conf_hass_discovery.load();
     conf_nag_dismiss.load();
+    conf_tracking.load();
 }
 
 void factoryReset() {
@@ -205,3 +207,6 @@ ConfigStatus setHassDiscoveryEnabled(bool value) { return conf_hass_discovery.se
 
 bool getNagDismissEnabled() { return conf_nag_dismiss.get(); }
 ConfigStatus setNagDismissEnabled(bool value) { return conf_nag_dismiss.set(value); }
+
+bool getTrackingEnabled() { return conf_tracking.get(); }
+ConfigStatus setTrackingEnabled(bool value) { return conf_tracking.set(value); }

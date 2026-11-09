@@ -202,8 +202,8 @@ static const HassMqttMetric hassMetrics[] = {
   {"sensor", "hvac_setpoint", hvacSetpointProps, sizeof(hvacSetpointProps)/sizeof(HassMqttProperty)},
   {"sensor", "fan_speed", fanSpeedProps, sizeof(fanSpeedProps)/sizeof(HassMqttProperty)},
   {"sensor", "ventilation_mode", ventilationModeProps, sizeof(ventilationModeProps)/sizeof(HassMqttProperty)},
-  {"sensor", "latitude", latitudeProps, sizeof(latitudeProps)/sizeof(HassMqttProperty)},
-  {"sensor", "longitude", longitudeProps, sizeof(longitudeProps)/sizeof(HassMqttProperty)},
+  {"sensor", "latitude", latitudeProps, sizeof(latitudeProps)/sizeof(HassMqttProperty), true},
+  {"sensor", "longitude", longitudeProps, sizeof(longitudeProps)/sizeof(HassMqttProperty), true},
 
   // Binary Sensors
   {"binary_sensor", "charging", chargeProps, sizeof(chargeProps)/sizeof(HassMqttProperty)},
@@ -249,6 +249,7 @@ void mqttPublishHassDiscovery(PubSubClient& mqttClient, const StringBuffer<128>&
   if (!mqttClient.connected()) return;
 
   for (const auto& metric : hassMetrics) {
+    if (metric.requiresGpsTracking && !getTrackingEnabled()) continue;
     publishHassConfigForMetric(mqttClient, mqttPrefix, metric);
   }
 

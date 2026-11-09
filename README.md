@@ -13,6 +13,7 @@ NOTE: This project is currently an draft implementation generated mainly with AI
 * 🔐 **Door Locking:** Lock and unlock doors remotely (disabled by default, enable via configuration).
 * 🔕 **Nag Screen Auto-Dismiss:** Automatically dismisses ZE1 infotainment nag/popup screen when connected to AV-CAN bus.
 * 📊 **Live Data:** Reads State of Charge (SOC %) and Cabin Temperature from the CAN bus.
+* 📍 **Location Tracking:** GPS coordinates from the AV-CAN bus shown in the web UI with a Google Maps link, published to MQTT and discovered by Home Assistant (can be turned on via the `tracking` configuration, disabled by default).
 * 🌐 **Web UI:** Simple, lightweight mobile-friendly web interface.
 * 🏠 **Home Assistant Integration:** Automatic discovery of metrics and controls via MQTT.
 * 📡 **MQTT Support:** Integrate with home automation or mobile apps over encrypted transport. Note: unless proper certificate validation is implemented, the MQTT server is not authenticated. See the [MQTT Setup Guide](docs/mqtt.md).
@@ -75,6 +76,7 @@ reboot
 * `locking_enabled` (Enable door lock/unlock functionality; default: `false`)
 * `hass_discovery` (Enable/disable Home Assistant discovery messages; default: `true`)
 * `nag_dismiss` (Enable/disable automatic infotainment nag screen dismissal on AV-CAN; default: `true`)
+* `tracking` (Enable/disable GPS location tracking: web UI display, MQTT publishing and Home Assistant discovery entities; default: `false`. Set to `true` to turn location tracking on: `set tracking true`)
 
 **Wi-Fi Modes:**
 * **STA Mode:** Active when `ssid` is configured. The device connects to your home/garage Wi-Fi.

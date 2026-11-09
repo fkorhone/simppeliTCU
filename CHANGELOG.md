@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Configurable GPS Location Tracking (`tracking`)**:
+  - GPS coordinates from the AV-CAN `0x62C` message are shown in the web UI, published on MQTT (`metric/v/p/latitude`, `metric/v/p/longitude`) and announced via Home Assistant discovery.
+  - New `tracking` configuration key (serial CLI, e.g. `set tracking true`) to turn location tracking on. Default: `false` (disabled). When disabled, the web UI shows location as disabled, no GPS metrics are published to MQTT, and no GPS discovery entities are announced.
+
 ## [v0.2.0] - 2026-11-05
 
 ### Added
 - **Nissan Leaf ZE1 Infotainment Nag Screen Dismissal (`nag_dismiss`)**:
-  - Automatic dismissal of the infotainment startup confirmation ("OK") screen on AV-CAN (configurable via `nag_dismiss` in CLI, disabled by default).
+  - Automatic dismissal of the infotainment startup confirmation ("OK") screen on AV-CAN (configurable via `nag_dismiss` in CLI, enabled by default).
   - Reverse gear detection on EV-CAN (`0x421`) to defer or pause nag screen dismissal while the reverse camera is active, resuming once a non-reverse gear is engaged.
 
 ### Fixed

@@ -46,6 +46,7 @@ void executeCommand(char* cmd) {
         Serial.printf("  mqtt_tls: %s\n", getMqttTls() ? "true" : "false");
         Serial.printf("  hass_discovery: %s\n", getHassDiscoveryEnabled() ? "true" : "false");
         Serial.printf("  nag_dismiss: %s\n", getNagDismissEnabled() ? "true" : "false");
+        Serial.printf("  tracking: %s\n", getTrackingEnabled() ? "true" : "false");
         if (!showSecrets) {
             Serial.println("  (use 'list --secrets' to display secret values)");
         }
@@ -68,6 +69,7 @@ void executeCommand(char* cmd) {
             else if (strcmp(key, "mqtt_tls") == 0) Serial.println(getMqttTls() ? "true" : "false");
             else if (strcmp(key, "hass_discovery") == 0) Serial.println(getHassDiscoveryEnabled() ? "true" : "false");
             else if (strcmp(key, "nag_dismiss") == 0) Serial.println(getNagDismissEnabled() ? "true" : "false");
+            else if (strcmp(key, "tracking") == 0) Serial.println(getTrackingEnabled() ? "true" : "false");
             else Serial.println("Unknown parameter.");
         } else {
             Serial.println("Usage: get <key>");
@@ -102,6 +104,7 @@ void executeCommand(char* cmd) {
             else if (strcmp(key, "mqtt_tls") == 0) { if (!applyBoolParam(val, setMqttTls, status)) return; }
             else if (strcmp(key, "hass_discovery") == 0) { if (!applyBoolParam(val, setHassDiscoveryEnabled, status)) return; }
             else if (strcmp(key, "nag_dismiss") == 0) { if (!applyBoolParam(val, setNagDismissEnabled, status)) return; }
+            else if (strcmp(key, "tracking") == 0) { if (!applyBoolParam(val, setTrackingEnabled, status)) return; }
             else {
                 Serial.println("Unknown parameter.");
                 return;

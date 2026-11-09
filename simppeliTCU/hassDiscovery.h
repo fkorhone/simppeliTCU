@@ -42,6 +42,7 @@ struct HassMqttMetric {
   const char* entityId;
   const HassMqttProperty* properties;
   size_t propertyCount;
+  bool requiresGpsTracking = false; // Skip this entity when location tracking is disabled
 };
 
 void mqttPublishHassDiscovery(PubSubClient& mqttClient, const StringBuffer<128>& mqttPrefix);

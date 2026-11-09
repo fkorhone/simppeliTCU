@@ -59,4 +59,7 @@ ConfigStatus setHassDiscoveryEnabled(bool value);
 bool getNagDismissEnabled();
 ConfigStatus setNagDismissEnabled(bool value);
 
+bool getTrackingEnabled();
+ConfigStatus setTrackingEnabled(bool value);
+
 #endif
