@@ -54,6 +54,8 @@ static bool lastCooling = false;
 static bool coolingDirty = false;
 static VentilationMode lastVentilationMode = VentilationMode::UNKNOWN;
 static bool ventilationModeDirty = false;
+static uint32_t lastOdometer = 0; // 0 = not yet received
+static bool odometerDirty = false;
 static bool lastGpsStateSet = false;
 static double lastLatitude = 0.0;
 static double lastLongitude = 0.0;
@@ -180,6 +182,7 @@ boolean reconnectMQTT() {
     if (lastHvacStateSet) { ventilationModeDirty = true; mqttUpdateVentilationMode(lastVentilationMode); }
     if (lastDoorsStateSet) { doorsDirty = true; mqttUpdateDoors(lastDoorFL, lastDoorFR, lastDoorRL, lastDoorRR, lastDoorTrunk); }
     if (lastLockStateSet) { lockDirty = true; mqttUpdateLock(lastLockState); }
+    if (lastOdometer > 0) { odometerDirty = true; mqttUpdateOdometer(lastOdometer); }
     if (lastGpsStateSet) { gpsDirty = true; mqttUpdateGPS(lastLatitude, lastLongitude); }
     
     return true;
@@ -403,6 +406,14 @@ void mqttUpdateGPS(double latitude, double longitude) {
   success &= mqttPublishMetric(ovmsMetrics.latitude, latitude, "%.6f");
   success &= mqttPublishMetric(ovmsMetrics.longitude, longitude, "%.6f");
   gpsDirty = !success;
+}
+
+void mqttUpdateOdometer(uint32_t km) {
+  if (lastOdometer == km && !odometerDirty) return;
+  lastOdometer = km;
+  StringBuffer<16> payload;
+  payload.format("%lu", (unsigned long)km);
+  odometerDirty = !mqttPublishMetricStr(ovmsMetrics.odometer, payload.c_str());
 }
 
 void mqttPublishStatus(const char* msg) {

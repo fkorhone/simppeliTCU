@@ -33,6 +33,11 @@ float lastFanSpeed_value = 0.0f;
 bool lastHeating_value = false;
 bool lastCooling_value = false;
 VentilationMode lastVentilationMode_value = VentilationMode::UNKNOWN;
+uint32_t lastOdometer_value = 0;
+
+void handleOdometer(uint32_t km) {
+    lastOdometer_value = km;
+}
 
 void handleRawSOC(float soc) {
     lastSOC_value = soc;

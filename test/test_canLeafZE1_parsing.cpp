@@ -31,6 +31,7 @@ extern float lastHVACSetpoint_value;
 extern float lastFanSpeed_value;
 extern bool lastHeating_value;
 extern bool lastCooling_value;
+extern uint32_t lastOdometer_value;
 
 // Accessor functions for the test
 namespace {
@@ -51,6 +52,7 @@ namespace {
         lastFanSpeed_value = 0.0f;
         lastHeating_value = false;
         lastCooling_value = false;
+        lastOdometer_value = 0;
         nagScreenPopupCount = 0;
         gpsDataUpdateCount = 0;
         lastGpsData_value = {};
@@ -290,6 +292,26 @@ TEST(CanLeafZE1Parsing, DoorsAndLocks_Parsing) {
     EXPECT_FALSE(lastDoor_fr);
     EXPECT_TRUE(lastDoor_fl);
     EXPECT_TRUE(lastLockStatus);
+}
+
+// Test odometer parsing (bytes 1-3, big-endian, km)
+TEST(CanLeafZE1Parsing, Odometer_Parsing) {
+    resetMocks();
+    uint8_t odoData1[] = {0x00, 0x01, 0xE2, 0x40};
+    handleReceivedMessage(0x5C5, odoData1, sizeof(odoData1));
+    EXPECT_EQ(lastOdometer_value, 123456u);
+
+    resetMocks();
+    // Byte 0 (handbrake etc.) must not affect the value
+    uint8_t odoData2[] = {0x04, 0x00, 0x30, 0x39, 0xFF, 0xFF, 0xFF, 0xFF};
+    handleReceivedMessage(0x5C5, odoData2, sizeof(odoData2));
+    EXPECT_EQ(lastOdometer_value, 12345u);
+
+    resetMocks();
+    // Too short frame is ignored
+    uint8_t odoShort[] = {0x00, 0x01, 0xE2};
+    handleReceivedMessage(0x5C5, odoShort, sizeof(odoShort));
+    EXPECT_EQ(lastOdometer_value, 0u);
 }
 
 // Test that unknown message IDs are ignored

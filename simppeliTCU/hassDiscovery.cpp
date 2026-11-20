@@ -135,6 +135,16 @@ static const HassMqttProperty longitudeProps[] = {
   {"state_topic", ovmsMetrics.longitude}
 };
 
+// Sensor: Odometer
+static const HassMqttProperty odometerProps[] = {
+  {"name", "Odometer"},
+  {"device_class", "distance"},
+  {"unit_of_measurement", "km"},
+  {"state_class", "total_increasing"},
+  {"icon", "mdi:counter"},
+  {"state_topic", ovmsMetrics.odometer}
+};
+
 // Binary Sensor: Lock Status
 static const HassMqttProperty lockProps[] = {
   {"name", "Locked"},
@@ -213,6 +223,7 @@ static const HassMqttMetric hassMetrics[] = {
   {"sensor", "hvac_setpoint", hvacSetpointProps, sizeof(hvacSetpointProps)/sizeof(HassMqttProperty)},
   {"sensor", "fan_speed", fanSpeedProps, sizeof(fanSpeedProps)/sizeof(HassMqttProperty)},
   {"sensor", "ventilation_mode", ventilationModeProps, sizeof(ventilationModeProps)/sizeof(HassMqttProperty)},
+  {"sensor", "odometer", odometerProps, sizeof(odometerProps)/sizeof(HassMqttProperty)},
   {"sensor", "latitude", latitudeProps, sizeof(latitudeProps)/sizeof(HassMqttProperty), true},
   {"sensor", "longitude", longitudeProps, sizeof(longitudeProps)/sizeof(HassMqttProperty), true},
 
