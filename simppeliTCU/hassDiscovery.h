@@ -25,6 +25,7 @@ struct OvmsMetrics {
   const char* heating = "metric/v/e/heating";
   const char* cooling = "metric/v/e/cooling";
   const char* ventilationMode = "metric/v/e/cabinvent";
+  const char* odometer = "metric/v/p/odometer";
   const char* latitude = "metric/v/p/latitude";
   const char* longitude = "metric/v/p/longitude";
   // Server connection status ("yes"/"no"), also used as MQTT Last Will and as

@@ -29,6 +29,7 @@ bool isHeatingEnabled = false;
 bool isCoolingEnabled = false;
 VentilationMode currentVentilationMode = VentilationMode::UNKNOWN;
 LeafGpsData currentGpsData = {};
+int32_t currentOdometer = -1; // km, intentionally not cleared by resetData()
 
 void resetData() {
     currentSOC = -1.0;
@@ -107,6 +108,13 @@ void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk) {
 void handleLockStatus(bool locked) {
   lockState = locked ? 1 : 0;
   mqttUpdateLock(locked);
+}
+
+void handleOdometer(uint32_t km) {
+  // 0 is reported while modules are waking up, 0xFFFFFF marks an invalid value
+  if (km == 0 || km == 0xFFFFFF) return;
+  currentOdometer = static_cast<int32_t>(km);
+  mqttUpdateOdometer(km);
 }
 
 void handleRawSOC(float soc) {

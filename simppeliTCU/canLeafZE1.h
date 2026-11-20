@@ -12,6 +12,7 @@ inline constexpr CANMessage<6> charger_status_readout = {0x390};
 inline constexpr CANMessage<2> hvac_status_readout = {0x54B};
 inline constexpr CANMessage<5> hvac_setpoint_readout = {0x54A};
 inline constexpr CANMessage<3> doors_and_locks_readout = {0x60D};
+inline constexpr CANMessage<4> odometer_readout = {0x5C5};
 inline constexpr CANMessage<1> shifter_status_readout = {0x421};
 inline constexpr CANMessage<2> steering_wheel_button_readout = {0x683};
 inline constexpr CANMessage<5> av_display_status_readout = {0x628};
@@ -52,6 +53,7 @@ inline constexpr CANField door_rr_field          = { 2, 1 };
 inline constexpr CANField door_fr_field          = { 3, 1 };
 inline constexpr CANField door_fl_field          = { 4, 1 };
 inline constexpr CANField locked_field           = { 19, 1 };
+inline constexpr CANField odometer_field         = { 8, 24 };  // Bytes 1..3 of 0x5C5, big-endian, km
 inline constexpr CANField shifter_state_field    = { 0, 8 };  // Byte 0 of 0x421
 inline constexpr CANField av_frame_type_field    = { 0, 4 };  // Upper nibble of byte 0 on AV-CAN frames
 inline constexpr CANField av_header_byte_field   = { 0, 8 };  // Byte 0 on AV-CAN frames
@@ -144,6 +146,7 @@ void handleHeatingMode(bool heating, bool cooling);
 void handleVentilationMode(VentilationMode mode);
 void handleDoorStatus(bool fl, bool fr, bool rl, bool rr, bool trunk);
 void handleLockStatus(bool locked);
+void handleOdometer(uint32_t km);
 void handleNagScreenPopup();
 void handleGPSData(const LeafGpsData& gps);
 

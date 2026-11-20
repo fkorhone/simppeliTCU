@@ -19,6 +19,7 @@ void mqttUpdateHeatingMode(bool heating, bool cooling);
 void mqttUpdateVentilationMode(VentilationMode mode);
 void mqttUpdateDoors(bool fl, bool fr, bool rl, bool rr, bool trunk);
 void mqttUpdateLock(bool locked);
+void mqttUpdateOdometer(uint32_t km);
 void mqttUpdateGPS(double latitude, double longitude);
 void mqttPublishStatus(const char* msg);
 

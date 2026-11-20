@@ -112,6 +112,7 @@ Where:
 | `ovms/<user>/<vehicle>/metric/v/d/rr` | Yes | Rear right door open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/d/trunk` | Yes | Trunk open: `yes` or `no` |
 | `ovms/<user>/<vehicle>/metric/v/e/locked` | Yes | Vehicle locked: `yes` or `no` |
+| `ovms/<user>/<vehicle>/metric/v/p/odometer` | Yes | Odometer in km as integer string (e.g., `45231`) |
 | `ovms/<user>/<vehicle>/metric/v/p/latitude` | Yes | Current latitude in decimal degrees (e.g., `60.205212`). Only published when `tracking` is enabled (disabled by default) |
 | `ovms/<user>/<vehicle>/metric/v/p/longitude` | Yes | Current longitude in decimal degrees (e.g., `24.655841`). Only published when `tracking` is enabled (disabled by default) |
 | `ovms/<user>/<vehicle>/metric/s/v3/connected` | Yes | Connection status (LWT): `yes` or `no` |

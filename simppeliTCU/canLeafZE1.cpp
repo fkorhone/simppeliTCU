@@ -276,6 +276,11 @@ void handleAVGPSMessage(const uint8_t* data, uint8_t len) {
     }
 }
 
+void handleOdometerMessage(const uint8_t* data, uint8_t len) {
+    (void)len;
+    handleOdometer(static_cast<uint32_t>(extractBits(data, odometer_field)));
+}
+
 // Message parser dispatch table
 static const MessageParser parsers[] = {
     CAN_PARSER(raw_soc_readout, handleSOCMessage),
@@ -285,6 +290,7 @@ static const MessageParser parsers[] = {
     CAN_PARSER(hvac_status_readout, handleHVACMessage),
     CAN_PARSER(hvac_setpoint_readout, handleHVACSetpointMessage),
     CAN_PARSER(doors_and_locks_readout, handleDoorsAndLocksMessage),
+    CAN_PARSER(odometer_readout, handleOdometerMessage),
     CAN_PARSER(shifter_status_readout, handleShifterMessage),
     CAN_PARSER(steering_wheel_button_readout, handleSteeringWheelButtonMessage),
     CAN_PARSER(av_display_status_readout, handleAVDisplayStatusMessage),
