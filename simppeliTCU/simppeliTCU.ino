@@ -18,12 +18,15 @@ bool wifiEnabled = false;
 bool carIsAwake = false;
 static bool staEnabled = false;
 static bool fallbackEnabled = false;
+static bool apEnabled = false;
 static StringBuffer<64> activePrimarySSID;
 static StringBuffer<64> activePrimaryPassword;
 static StringBuffer<64> activeFallbackSSID;
 static StringBuffer<64> activeFallbackPassword;
+static StringBuffer<64> activeApSSID;
 static StringBuffer<64> activeHostName;
 static bool wifiServicesRunning = false;
+static bool staServicesActive = false;
 static bool usingFallback = false;
 static bool wasStaConnected = false;
 static unsigned long wifiAttemptStart = 0;
@@ -288,9 +291,13 @@ void handleMqttChargeOn() {
 }
 
 void startNetworkServices(bool apOnly) {
-  if (wifiServicesRunning) return;
+  if (wifiServicesRunning) {
+    if (apOnly) return;
+    MDNS.end();
+    NBNS.end();
+  }
 
-  Serial.println(apOnly ? "\nAP-only mode active!" : "\nWi-Fi connected!");
+  Serial.println(apOnly ? "\nAP mode active!" : "\nWi-Fi connected!");
 
   if (!MDNS.begin(activeHostName.c_str())) {
     Serial.println("Error starting mDNS service!");
@@ -309,11 +316,16 @@ void startNetworkServices(bool apOnly) {
   Serial.print(".local or http://");
   Serial.print(activeHostName.c_str());
   if (apOnly) {
-    Serial.println(" or by AP IP address (usually 192.168.4.1):");
+    Serial.println(":");
+    Serial.printf("AP(%s) IP address: ", activeApSSID.c_str());
     Serial.println(WiFi.softAPIP());
   } else {
     Serial.println(" or by IP address:");
     Serial.println(WiFi.localIP());
+    if (apEnabled) {
+      Serial.printf("AP(%s) IP address: ", activeApSSID.c_str());
+      Serial.println(WiFi.softAPIP());
+    }
   }
   wifiServicesRunning = true;
 }
@@ -325,6 +337,7 @@ void stopNetworkServices() {
   MDNS.end();
   NBNS.end();
   wifiServicesRunning = false;
+  staServicesActive = false;
 }
 
 void resetPrimaryScan() {
@@ -372,7 +385,9 @@ bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
 }
 
 void connectWiFi(bool fallback) {
-  stopNetworkServices();
+  if (staServicesActive) {
+    stopNetworkServices();
+  }
   resetPrimaryScan();
   usingFallback = fallback;
   wasStaConnected = false;
@@ -426,14 +441,20 @@ void manageWiFi() {
   }
 
   if (WiFi.status() != WL_CONNECTED) {
-    stopNetworkServices();
+    if (staServicesActive) {
+      stopNetworkServices();
+    }
+    if (apEnabled) {
+      startNetworkServices(true);
+    }
 
     if (!fallbackEnabled && currentTime - previousAttemptTime >= retryInterval) {
       Serial.println("WiFi connection missing, waiting for auto-reconnect...");
       previousAttemptTime = currentTime;
     }
-  } else {
+  } else if (!staServicesActive) {
     startNetworkServices(false);
+    staServicesActive = true;
   }
 }
 
@@ -447,11 +468,12 @@ void setup() {
   activePrimaryPassword.copyFrom(getWifiPassword());
   activeFallbackSSID.copyFrom(getFallbackSSID());
   activeFallbackPassword.copyFrom(getFallbackPassword());
+  activeApSSID.copyFrom(getApSSID());
   activeHostName.copyFrom(getHostName());
 
   staEnabled = !activePrimarySSID.isEmpty();
   fallbackEnabled = staEnabled && !activeFallbackSSID.isEmpty();
-  bool apEnabled = strlen(getApSSID()) > 0;
+  apEnabled = !activeApSSID.isEmpty();
 
   if (apEnabled) {
       size_t apPassLen = strlen(getApPassword());
@@ -464,9 +486,9 @@ void setup() {
   if (staEnabled && apEnabled) {
       WiFi.mode(WIFI_AP_STA);
       if (strlen(getApPassword()) > 0) {
-          WiFi.softAP(getApSSID(), getApPassword());
+          WiFi.softAP(activeApSSID.c_str(), getApPassword());
       } else {
-          WiFi.softAP(getApSSID());
+          WiFi.softAP(activeApSSID.c_str());
       }
       WiFi.setAutoReconnect(!fallbackEnabled);
       connectWiFi(false);
@@ -481,9 +503,9 @@ void setup() {
   } else if (apEnabled) {
       WiFi.mode(WIFI_AP);
       if (strlen(getApPassword()) > 0) {
-          WiFi.softAP(getApSSID(), getApPassword());
+          WiFi.softAP(activeApSSID.c_str(), getApPassword());
       } else {
-          WiFi.softAP(getApSSID());
+          WiFi.softAP(activeApSSID.c_str());
       }
       WiFi.setSleep(false);
       wifiEnabled = true;
