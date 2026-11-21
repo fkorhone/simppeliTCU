@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optional secondary Wi-Fi station network configured via serial CLI (`set fallback_ssid <ssid>`, `set fallback_password <password>`).
   - Automatically switches to the fallback network if connecting to the primary network fails after a 10-second attempt, and periodically scans in the background while on fallback to switch back to the primary network once it is detected twice at least 5 seconds apart.
 
+### Fixed
+- **AP + STA Mode Service Availability & Status Logging**:
+  - Started mDNS/NBNS services and printed the Access Point SSID and IP (`AP(<ap_ssid>) IP address: <ip>`) in `AP+STA` mode even while the STA connection is disconnected or retrying, and included the AP IP alongside the STA IP when connected.
+- **Boot-Time Wi-Fi Configuration Isolation**:
+  - Latched active Wi-Fi credentials and mode flags at boot so in-progress serial CLI configuration edits do not partially alter active reconnection or scan behavior before `reboot`.
+
 ## [v0.3.0] - 2026-11-16
 
 ### Added
