@@ -416,7 +416,7 @@ void manageWiFi() {
   if (WiFi.status() != WL_CONNECTED) {
     stopNetworkServices();
 
-    if (currentTime - previousAttemptTime >= retryInterval) {
+    if (!fallbackEnabled && currentTime - previousAttemptTime >= retryInterval) {
       Serial.println("WiFi connection missing, waiting for auto-reconnect...");
       previousAttemptTime = currentTime;
     }
