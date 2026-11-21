@@ -15,6 +15,8 @@ WebServer server(80);
 // State variables
 bool wifiEnabled = false;
 bool carIsAwake = false;
+static bool staEnabled = false;
+static bool fallbackEnabled = false;
 static bool wifiServicesRunning = false;
 static bool usingFallback = false;
 static bool wasStaConnected = false;
@@ -369,8 +371,6 @@ void connectWiFi(bool fallback) {
 
 void manageWiFi() {
   if(!wifiEnabled) return;
-  bool staEnabled = strlen(getWifiSSID()) > 0;
-  bool fallbackEnabled = staEnabled && strlen(getFallbackSSID()) > 0;
 
   if (!staEnabled) {
     // AP-only mode, no STA connection to manage
@@ -431,7 +431,8 @@ void setup() {
   Serial.println("\nsimppeliTCU " FW_FULL_VERSION);
   initConfiguration();
 
-  bool staEnabled = strlen(getWifiSSID()) > 0;
+  staEnabled = strlen(getWifiSSID()) > 0;
+  fallbackEnabled = staEnabled && strlen(getFallbackSSID()) > 0;
   bool apEnabled = strlen(getApSSID()) > 0;
 
   if (apEnabled) {
@@ -449,13 +450,13 @@ void setup() {
       } else {
           WiFi.softAP(getApSSID());
       }
-      WiFi.setAutoReconnect(strlen(getFallbackSSID()) == 0);
+      WiFi.setAutoReconnect(!fallbackEnabled);
       connectWiFi(false);
       WiFi.setSleep(false);
       wifiEnabled = true;
   } else if (staEnabled) {
       WiFi.mode(WIFI_STA);
-      WiFi.setAutoReconnect(strlen(getFallbackSSID()) == 0);
+      WiFi.setAutoReconnect(!fallbackEnabled);
       connectWiFi(false);
       WiFi.setSleep(false);
       wifiEnabled = true;
