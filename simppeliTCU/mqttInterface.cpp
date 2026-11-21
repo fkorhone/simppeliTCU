@@ -136,11 +136,16 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 }
 
 boolean reconnectMQTT() {
+  // After a WiFi drop the broker may still hold the old, dead session until its keepalive expires; with a random ID that stale session's Last Will ("no")
+  // would fire *after* we reconnect and published "yes", leaving Home Assistant entities stuck unavailable. With the same ID the broker takes over the old  session immediately, so its will is delivered before our "yes".
+  uint8_t mac[6];
+  WiFi.macAddress(mac);
   StringBuffer<32> clientId;
-  clientId.format("simppeliTCU-%04X", (unsigned int)random(0xffff));
-  
+  clientId.format("simppeliTCU-%02X%02X%02X", mac[3], mac[4], mac[5]);
+
+  // Last Will: the broker publishes "no" (retained) when the connection is lost (e.g. WiFi breaks). Used by the OVMS app and as the HASS availability topic.
   StringBuffer<128> willTopic;
-  willTopic.format("%smetric/s/v3/connected", mqttPrefix.c_str());
+  willTopic.format("%s%s", mqttPrefix.c_str(), ovmsMetrics.connected);
   
   bool connected = false;
   if (strlen(getMqttUser()) > 0) {
@@ -193,7 +198,7 @@ void setupMQTT() {
   mqttClient.setServer(getMqttServer(), getMqttPort());
   
   // OVMS messages have longer topics, so enlarging buffer is recommended
-  mqttClient.setBufferSize(1024);
+  mqttClient.setBufferSize(1280); // also fits HASS discovery payloads
   mqttClient.setCallback(mqttCallback);
 }
 

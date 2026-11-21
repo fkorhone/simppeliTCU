@@ -7,13 +7,27 @@
 // Define the global instance of the metric topics
 const OvmsMetrics ovmsMetrics;
 
+// Appends the fields shared by every entity: availability (bound to the MQTT
+// Last Will topic, so entities go unavailable when the TCU drops off the
+// network) and device info. Closes the JSON object.
+static void appendCommonFields(StringBuffer<1024>& payload, const StringBuffer<128>& mqttPrefix) {
+  const char* vid = getVehicleId();
+  StringBuffer<256> extra;
+  extra.format(",\"availability_topic\":\"%s%s\",\"payload_available\":\"yes\",\"payload_not_available\":\"no\"",
+               mqttPrefix.c_str(), ovmsMetrics.connected);
+  payload.append(extra.c_str());
+
+  extra.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
+  payload.append(extra.c_str());
+}
+
 // Helper function to publish a single HASS config message
 void publishHassConfigForMetric(PubSubClient& mqttClient, const StringBuffer<128>& mqttPrefix, const HassMqttMetric& metric) {
   const char* vid = getVehicleId();
   StringBuffer<128> topic;
   topic.format("homeassistant/%s/simppeliTCU_%s/%s/config", metric.hassComponent, vid, metric.entityId);
 
-  StringBuffer<768> payload;
+  StringBuffer<1024> payload;
   payload.copyFrom("{");
 
   payload.append("\"unique_id\":\"simppeliTCU_");
@@ -39,10 +53,7 @@ void publishHassConfigForMetric(PubSubClient& mqttClient, const StringBuffer<128
     }
   }
 
-  // Add common device information
-  StringBuffer<256> device;
-  device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
-  payload.append(device.c_str());
+  appendCommonFields(payload, mqttPrefix);
 
   mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
 }
@@ -259,14 +270,11 @@ void mqttPublishHassDiscovery(PubSubClient& mqttClient, const StringBuffer<128>&
     StringBuffer<128> topic;
     topic.format("homeassistant/binary_sensor/simppeliTCU_%s/%s/config", vid, door.entityId);
 
-    StringBuffer<768> payload;
+    StringBuffer<1024> payload;
     payload.format("{\"unique_id\":\"simppeliTCU_%s_%s\",\"name\":\"%s\",\"state_topic\":\"%s%s\",\"device_class\":\"door\",\"payload_on\":\"yes\",\"payload_off\":\"no\"",
                    vid, door.entityId, door.name, mqttPrefix.c_str(), door.stateTopic);
 
-    // Add common device information
-    StringBuffer<256> device;
-    device.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
-    payload.append(device.c_str());
+    appendCommonFields(payload, mqttPrefix);
 
     mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
   }

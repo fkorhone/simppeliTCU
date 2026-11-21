@@ -27,6 +27,9 @@ struct OvmsMetrics {
   const char* ventilationMode = "metric/v/e/cabinvent";
   const char* latitude = "metric/v/p/latitude";
   const char* longitude = "metric/v/p/longitude";
+  // Server connection status ("yes"/"no"), also used as MQTT Last Will and as
+  // the Home Assistant availability topic.
+  const char* connected = "metric/s/v3/connected";
 };
 extern const OvmsMetrics ovmsMetrics;
 
