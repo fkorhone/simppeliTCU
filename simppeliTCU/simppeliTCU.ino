@@ -321,6 +321,14 @@ void stopNetworkServices() {
   wifiServicesRunning = false;
 }
 
+void resetPrimaryScan() {
+  if (primaryScanRunning) {
+    WiFi.scanDelete();
+    primaryScanRunning = false;
+  }
+  primarySeen = false;
+}
+
 bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
   if (primaryScanRunning) {
     int networks = WiFi.scanComplete();
@@ -359,6 +367,7 @@ bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
 
 void connectWiFi(bool fallback) {
   stopNetworkServices();
+  resetPrimaryScan();
   usingFallback = fallback;
   wasStaConnected = false;
   wifiAttemptStart = millis();
@@ -402,9 +411,6 @@ void manageWiFi() {
         connectWiFi(false);
       }
     } else if (wasStaConnected) {
-      wasStaConnected = false;
-      primaryScanRunning = false;
-      primarySeen = false;
       // Give primary a fresh connection attempt before falling back.
       connectWiFi(false);
     } else if (currentTime - wifiAttemptStart >= retryInterval) {
