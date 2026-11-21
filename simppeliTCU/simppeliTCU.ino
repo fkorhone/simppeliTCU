@@ -356,6 +356,7 @@ bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
 }
 
 void connectWiFi(bool fallback) {
+  stopNetworkServices();
   usingFallback = fallback;
   wasStaConnected = false;
   wifiAttemptStart = millis();
