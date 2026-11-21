@@ -7,6 +7,7 @@
 #include "canLeafZE1.h"
 #include "ui.h"
 #include "mqttInterface.h"
+#include "stringBuffer.h"
 #include "version.h"
 
 WebServer server(80);
@@ -17,6 +18,11 @@ bool wifiEnabled = false;
 bool carIsAwake = false;
 static bool staEnabled = false;
 static bool fallbackEnabled = false;
+static StringBuffer<64> activePrimarySSID;
+static StringBuffer<64> activePrimaryPassword;
+static StringBuffer<64> activeFallbackSSID;
+static StringBuffer<64> activeFallbackPassword;
+static StringBuffer<64> activeHostName;
 static bool wifiServicesRunning = false;
 static bool usingFallback = false;
 static bool wasStaConnected = false;
@@ -286,22 +292,22 @@ void startNetworkServices(bool apOnly) {
 
   Serial.println(apOnly ? "\nAP-only mode active!" : "\nWi-Fi connected!");
 
-  if (!MDNS.begin(getHostName())) {
+  if (!MDNS.begin(activeHostName.c_str())) {
     Serial.println("Error starting mDNS service!");
   } else {
     Serial.println("mDNS service started.");
     MDNS.addService("http", "tcp", 80);
   }
-  if (!NBNS.begin(getHostName())) {
+  if (!NBNS.begin(activeHostName.c_str())) {
     Serial.println("Error starting NBNS service!");
   } else {
     Serial.println("NBNS service started.");
   }
 
   Serial.print("You can find the UI in the browser at: http://");
-  Serial.print(getHostName());
+  Serial.print(activeHostName.c_str());
   Serial.print(".local or http://");
-  Serial.print(getHostName());
+  Serial.print(activeHostName.c_str());
   if (apOnly) {
     Serial.println(" or by AP IP address (usually 192.168.4.1):");
     Serial.println(WiFi.softAPIP());
@@ -335,7 +341,7 @@ bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
     if (networks >= 0) {
       bool foundPrimary = false;
       for (int i = 0; i < networks; ++i) {
-        if (WiFi.SSID(i) == getWifiSSID()) {
+        if (WiFi.SSID(i) == activePrimarySSID.c_str()) {
           foundPrimary = true;
           break;
         }
@@ -371,11 +377,11 @@ void connectWiFi(bool fallback) {
   usingFallback = fallback;
   wasStaConnected = false;
   wifiAttemptStart = millis();
-  Serial.printf("[WiFi] Connecting to %s: %s\n", fallback ? "fallback" : "primary",
-                fallback ? getFallbackSSID() : getWifiSSID());
+  const char* ssid = fallback ? activeFallbackSSID.c_str() : activePrimarySSID.c_str();
+  const char* password = fallback ? activeFallbackPassword.c_str() : activePrimaryPassword.c_str();
+  Serial.printf("[WiFi] Connecting to %s: %s\n", fallback ? "fallback" : "primary", ssid);
   if (WiFi.status() == WL_CONNECTED) WiFi.disconnect(false, false);
-  WiFi.begin(fallback ? getFallbackSSID() : getWifiSSID(),
-             fallback ? getFallbackPassword() : getWifiPassword());
+  WiFi.begin(ssid, password);
 }
 
 void manageWiFi() {
@@ -392,7 +398,7 @@ void manageWiFi() {
   unsigned long currentTime = millis();
 
   if (fallbackEnabled) {
-    const char* targetSSID = usingFallback ? getFallbackSSID() : getWifiSSID();
+    const char* targetSSID = usingFallback ? activeFallbackSSID.c_str() : activePrimarySSID.c_str();
     bool isConnectedToTarget = (WiFi.status() == WL_CONNECTED) &&
                                (wasStaConnected || WiFi.SSID() == targetSSID);
 
@@ -437,8 +443,14 @@ void setup() {
   Serial.println("\nsimppeliTCU " FW_FULL_VERSION);
   initConfiguration();
 
-  staEnabled = strlen(getWifiSSID()) > 0;
-  fallbackEnabled = staEnabled && strlen(getFallbackSSID()) > 0;
+  activePrimarySSID.copyFrom(getWifiSSID());
+  activePrimaryPassword.copyFrom(getWifiPassword());
+  activeFallbackSSID.copyFrom(getFallbackSSID());
+  activeFallbackPassword.copyFrom(getFallbackPassword());
+  activeHostName.copyFrom(getHostName());
+
+  staEnabled = !activePrimarySSID.isEmpty();
+  fallbackEnabled = staEnabled && !activeFallbackSSID.isEmpty();
   bool apEnabled = strlen(getApSSID()) > 0;
 
   if (apEnabled) {
