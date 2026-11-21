@@ -48,7 +48,7 @@ void resetData() {
 void handleRoot() {
   bool sequenceActive = (activeSequence != CanSequence::NONE);
   bool trackingEnabled = getTrackingEnabled();
-  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, trackingEnabled ? currentGpsData : LeafGpsData{}, trackingEnabled);
+  sendMainPage(server, currentSOC, cabinTemp, isChargingNow, currentChargerState, isHvacOn, sequenceActive, getLockingEnabled(), lockState, currentSetpoint, currentFanSpeed, isHeatingEnabled, isCoolingEnabled, currentVentilationMode, trackingEnabled ? currentGpsData : LeafGpsData{}, trackingEnabled, currentOdometer);
 }
 
 void handleCarAwake() {

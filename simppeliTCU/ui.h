@@ -7,7 +7,7 @@
 #include "version.h"
 
 // 1. Main page (HTML UI)
-void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode, const LeafGpsData& gpsData, bool gpsTrackingEnabled) {
+void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isCharging, ChargerState chargerState, bool isHvacOn, bool sequenceActive, bool lockingEnabled, int8_t lockState, float currentSetpoint, float currentFanSpeed, bool isHeatingEnabled, bool isCoolingEnabled, VentilationMode ventilationMode, const LeafGpsData& gpsData, bool gpsTrackingEnabled, int32_t currentOdometer) {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/html", "");
 
@@ -37,7 +37,15 @@ void sendMainPage(WebServer& server, float currentSOC, float cabinTemp, bool isC
   }
 
   server.sendContent(F("<div class='data-box'>\n<h3>Car Status</h3>\n"));
-  
+
+  if (currentOdometer >= 0) {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Odometer:</b> "));
+    server.sendContent(String(currentOdometer));
+    server.sendContent(F(" km</p>\n"));
+  } else {
+    server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Odometer:</b> Waiting...</p>\n"));
+  }
+
   if (currentSOC >= 0) {
     server.sendContent(F("<p style='font-size: 20px; margin: 5px;'><b>Battery:</b> "));
     server.sendContent(String(currentSOC, 1));
