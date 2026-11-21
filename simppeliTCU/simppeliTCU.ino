@@ -15,6 +15,7 @@ WebServer server(80);
 // State variables
 bool wifiEnabled = false;
 bool carIsAwake = false;
+static bool wifiServicesRunning = false;
 static bool usingFallback = false;
 static bool wasStaConnected = false;
 static unsigned long wifiAttemptStart = 0;
@@ -278,6 +279,82 @@ void handleMqttChargeOn() {
   startSequence(CanSequence::CHARGE_ON, millis());
 }
 
+void startNetworkServices(bool apOnly) {
+  if (wifiServicesRunning) return;
+
+  Serial.println(apOnly ? "\nAP-only mode active!" : "\nWi-Fi connected!");
+
+  if (!MDNS.begin(getHostName())) {
+    Serial.println("Error starting mDNS service!");
+  } else {
+    Serial.println("mDNS service started.");
+    MDNS.addService("http", "tcp", 80);
+  }
+  if (!NBNS.begin(getHostName())) {
+    Serial.println("Error starting NBNS service!");
+  } else {
+    Serial.println("NBNS service started.");
+  }
+
+  Serial.print("You can find the UI in the browser at: http://");
+  Serial.print(getHostName());
+  Serial.print(".local or http://");
+  Serial.print(getHostName());
+  if (apOnly) {
+    Serial.println(" or by AP IP address (usually 192.168.4.1):");
+    Serial.println(WiFi.softAPIP());
+  } else {
+    Serial.println(" or by IP address:");
+    Serial.println(WiFi.localIP());
+  }
+  wifiServicesRunning = true;
+}
+
+void stopNetworkServices() {
+  if (!wifiServicesRunning) return;
+
+  Serial.println("WiFi disconnected, stopping mDNS/NBNS services...");
+  MDNS.end();
+  NBNS.end();
+  wifiServicesRunning = false;
+}
+
+bool pollPrimaryNetworkAvailable(unsigned long currentTime) {
+  if (primaryScanRunning) {
+    int networks = WiFi.scanComplete();
+    if (networks >= 0) {
+      bool foundPrimary = false;
+      for (int i = 0; i < networks; ++i) {
+        if (WiFi.SSID(i) == getWifiSSID()) {
+          foundPrimary = true;
+          break;
+        }
+      }
+      WiFi.scanDelete();
+      primaryScanRunning = false;
+      if (foundPrimary) {
+        if (primarySeen && currentTime - primarySeenSince >= 5000) {
+          primarySeen = false;
+          return true;
+        } else if (!primarySeen) {
+          primarySeen = true;
+          primarySeenSince = currentTime;
+        }
+      } else {
+        primarySeen = false;
+      }
+    } else if (networks != WIFI_SCAN_RUNNING) {
+      primaryScanRunning = false;
+      primarySeen = false;
+    }
+  } else if (currentTime - lastPrimaryScan >= (primarySeen ? 5000UL : 30000UL)) {
+    WiFi.scanNetworks(true);
+    primaryScanRunning = true;
+    lastPrimaryScan = currentTime;
+  }
+  return false;
+}
+
 void connectWiFi(bool fallback) {
   usingFallback = fallback;
   wasStaConnected = false;
@@ -293,33 +370,10 @@ void manageWiFi() {
   if(!wifiEnabled) return;
   bool staEnabled = strlen(getWifiSSID()) > 0;
   bool fallbackEnabled = staEnabled && strlen(getFallbackSSID()) > 0;
-  static bool wifiAvailable = false;
 
   if (!staEnabled) {
     // AP-only mode, no STA connection to manage
-    if (!wifiAvailable) {
-      Serial.println("\nAP-only mode active!");
-      
-      if (!MDNS.begin(getHostName())) {
-        Serial.println("Error starting mDNS service!");
-      } else {
-        Serial.println("mDNS service started.");
-        MDNS.addService("http", "tcp", 80);
-      }
-      if (!NBNS.begin(getHostName())) {
-        Serial.println("Error starting NBNS service!");
-      } else {
-        Serial.println("NBNS service started.");
-      }
-
-      Serial.print("You can find the UI in the browser at: http://");
-      Serial.print(getHostName());
-      Serial.print(".local or http://");
-      Serial.print(getHostName());
-      Serial.println(" or by AP IP address (usually 192.168.4.1):");
-      Serial.println(WiFi.softAPIP());
-      wifiAvailable = true;
-    }
+    startNetworkServices(true);
     return;
   }
 
@@ -328,8 +382,11 @@ void manageWiFi() {
   unsigned long currentTime = millis();
 
   if (fallbackEnabled) {
-    if (WiFi.status() == WL_CONNECTED &&
-        (wasStaConnected || WiFi.SSID() == (usingFallback ? getFallbackSSID() : getWifiSSID()))) {
+    const char* targetSSID = usingFallback ? getFallbackSSID() : getWifiSSID();
+    bool isConnectedToTarget = (WiFi.status() == WL_CONNECTED) &&
+                               (wasStaConnected || WiFi.SSID() == targetSSID);
+
+    if (isConnectedToTarget) {
       if (!wasStaConnected) {
         Serial.printf("[WiFi] Connected to %s\n", usingFallback ? "fallback" : "primary");
         Serial.print("[WiFi] IP: ");
@@ -338,41 +395,10 @@ void manageWiFi() {
         lastPrimaryScan = currentTime - 30000;
       }
 
-      if (usingFallback) {
-        if (primaryScanRunning) {
-          int networks = WiFi.scanComplete();
-          if (networks >= 0) {
-            bool foundPrimary = false;
-            for (int i = 0; i < networks; ++i) {
-              if (WiFi.SSID(i) == getWifiSSID()) {
-                foundPrimary = true;
-                break;
-              }
-            }
-            WiFi.scanDelete();
-            primaryScanRunning = false;
-            if (foundPrimary) {
-              if (primarySeen && currentTime - primarySeenSince >= 5000) {
-                Serial.println("[WiFi] Primary network available again");
-                Serial.println("[WiFi] Switching to primary");
-                primarySeen = false;
-                connectWiFi(false);
-              } else if (!primarySeen) {
-                primarySeen = true;
-                primarySeenSince = currentTime;
-              }
-            } else {
-              primarySeen = false;
-            }
-          } else if (networks != WIFI_SCAN_RUNNING) {
-            primaryScanRunning = false;
-            primarySeen = false;
-          }
-        } else if (currentTime - lastPrimaryScan >= (primarySeen ? 5000UL : 30000UL)) {
-          WiFi.scanNetworks(true);
-          primaryScanRunning = true;
-          lastPrimaryScan = currentTime;
-        }
+      if (usingFallback && pollPrimaryNetworkAvailable(currentTime)) {
+        Serial.println("[WiFi] Primary network available again");
+        Serial.println("[WiFi] Switching to primary");
+        connectWiFi(false);
       }
     } else if (wasStaConnected) {
       wasStaConnected = false;
@@ -386,42 +412,15 @@ void manageWiFi() {
     }
   }
 
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    if (wifiAvailable) {
-      Serial.println("WiFi disconnected, stopping mDNS/NBNS services...");
-      MDNS.end();
-      NBNS.end();
-      wifiAvailable = false;
-    }
+  if (WiFi.status() != WL_CONNECTED) {
+    stopNetworkServices();
 
     if (currentTime - previousAttemptTime >= retryInterval) {
       Serial.println("WiFi connection missing, waiting for auto-reconnect...");
       previousAttemptTime = currentTime;
     }
-  }
-  else if (!wifiAvailable) {
-    Serial.println("\nWi-Fi connected!");
-  
-    if (!MDNS.begin(getHostName())) {
-      Serial.println("Error starting mDNS service!");
-    } else {
-      Serial.println("mDNS service started.");
-      MDNS.addService("http", "tcp", 80);
-    }
-    if (!NBNS.begin(getHostName())) {
-      Serial.println("Error starting NBNS service!");
-    } else {
-      Serial.println("NBNS service started.");
-    }
-
-    Serial.print("You can find the UI in the browser at: http://");
-    Serial.print(getHostName());
-    Serial.print(".local or http://");
-    Serial.print(getHostName());
-    Serial.println(" or by IP address:");
-    Serial.println(WiFi.localIP());
-    wifiAvailable = true;
+  } else {
+    startNetworkServices(false);
   }
 }
 
