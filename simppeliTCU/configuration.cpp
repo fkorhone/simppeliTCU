@@ -97,7 +97,7 @@ public:
 static ConfigString<64> conf_ssid("ssid", "");
 static ConfigString<64> conf_password("password", "");
 static ConfigString<64> conf_fallback_ssid("fallback_ssid", "");
-static ConfigString<64> conf_fallback_password("fallback_password", "");
+static ConfigString<64> conf_fallback_password("fallback_pass", "");
 static ConfigString<64> conf_ap_ssid("ap_ssid", "");
 static ConfigString<64> conf_ap_password("ap_password", "");
 static ConfigString<64> conf_hostName("hostName", "leaf");
