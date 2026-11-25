@@ -31,7 +31,7 @@ Huomio! Projekti on hahmotelmavaiheessa ja koodit on suurelta osin generoitu tek
 * **Ilmoitusruudun automaattinen kuittaus (Nag Screen Auto-Dismiss):** [https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV](https://youtu.be/FWOML1giRBo?si=TElSWKBwn389HtfV)
 
 ## Laitteistovaatimukset
-1. **Lilygo T-2CAN** (ESP32-S3-mikrokontrolleri sisäänrakennetuilla CAN-piireillä) — *tai vaihtoehtoisesti **Waveshare ESP32-S3-RS485-CAN** (yksi CAN-väylä, sisäänrakennettu 7–36V DC -regulaattori)*.
+1. **Lilygo T-2CAN** (ESP32-S3 kahdella CAN-liitännällä `IT-CAN`- ja `AV-CAN`-väylille) — *tai vaihtoehtoisesti **Waveshare ESP32-S3-RS485-CAN** (sisäänrakennettu 7–36V DC -regulaattori, yksi CAN-väylä: kytkettävissä joko `IT-CAN`- tai pelkkään `AV-CAN`-väylään)*.
 2. **12V -> 5V autokäyttöön tarkoitettu jännitteenalennin** (Vahva suositus Lilygo T-2CAN:lle: upotettava 12V USB-autopistorasia) + **2A johtosulake**.
 3. Pinnit/liittimet alkuperäisen TCU-johtosarjan sovittamiseen (esim. 16-nastainen Sumitomo NH `.025"` -liitinsarja).
 
@@ -42,7 +42,8 @@ Huomio! Projekti on hahmotelmavaiheessa ja koodit on suurelta osin generoitu tek
 * Irrota `IT-CAN`-johdot (`#6` ja `#7`) alkuperäisen TCU:n liittimestä (jätä/kierrätä `+12V` ja `GND` alkuperäiselle TCU:lle, jos haluat auton handsfree-mikrofonin toimivan edelleen).
 * Ota 12V-virta TCU:n johtosarjasta **2A sulakkeen** ja autokäyttöön tarkoitetun 12V->5V USB-muuntimen läpi (tai Waveshare-kortin `DC 7–36V` -ruuviliittimeen).
 * Syötä Lilygolle virta tavallisella USB-kaapelilla 5V-muuntimesta.
-* Kytke `CAN-H`, `CAN-L` ja `SGNDB` (signaalimaa) Lilygon TWAI-ruuviliittimiin (**Port B**: tässä koodissa TX 7, RX 6).
+* Kytke `CAN-H` (`#6`), `CAN-L` (`#7`) ja `SGNDB` (signaalimaa) Lilygon TWAI-ruuviliittimiin (**Port B**: tässä koodissa TX 7, RX 6).
+* *(Valinnainen AV-CAN ilmoitusruudun kuittaukseen ja GPS-paikannukseen)* Irrota `M CAN-H` (`#26`, vaaleansininen SB) ja `M CAN-L` (`#27`, vaaleanvihreä LG) TCU-liittimestä ja kytke ne (`SGNDA`:n kanssa) Lilygon MCP2515-ruuviliittimiin (**Port A**).
 
 ## Asetukset
 
