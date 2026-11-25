@@ -1,274 +1,300 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 780" width="1420" height="780">
-  <title>Option A: Non-Destructive 16-Pin Sumitomo Adapter Wiring (LilyGo T-2CAN &amp; Nissan Leaf ZE1 TCU)</title>
-  <rect x="0" y="0" width="1420" height="780" fill="#ffffff"/>
-  <rect x="16" y="14" width="1388" height="54" rx="8" fill="#0f172a" stroke="#0f172a" stroke-width="1.5"/>
-  <text x="34" y="39" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="start">Option A (Recommended): Non-Destructive 16-Pin Adapter Harness — LilyGo T-2CAN</text>
-  <text x="34" y="58" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="normal" fill="#cbd5e1" text-anchor="start">All connector pinouts shown from WIRE-SIDE VIEW (looking into wire-entry back of connector, lock tab on top — matches tcu_pins.jpg).</text>
-  <rect x="16" y="80" width="640" height="682" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 850" width="1440" height="850">
+  <title>Option A: Non-Destructive 16-Pin Sumitomo Adapter Wiring (LilyGo T-2CAN, IT-CAN + Optional AV-CAN)</title>
+  <rect x="0" y="0" width="1440" height="850" fill="#ffffff"/>
+  <rect x="16" y="14" width="1408" height="54" rx="8" fill="#0f172a" stroke="#0f172a" stroke_width="1.5"/>
+  <text x="34" y="39" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="18.5" font-weight="bold" fill="#ffffff" text-anchor="start">Option A (Recommended): Non-Destructive 16-Pin Adapter — LilyGo T-2CAN (IT-CAN + Optional AV-CAN)</text>
+  <text x="34" y="58" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#cbd5e1" text-anchor="start">All connector pinouts shown from WIRE-SIDE VIEW (looking into wire-entry back of connector, lock tab on top — matches tcu_pins.jpg). Dashed lines = optional AV-CAN.</text>
+  <rect x="16" y="80" width="646" height="754" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke_width="1.5"/>
   <text x="34" y="106" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#0f172a" text-anchor="start">1. DEVICE SIDE (Build &amp; Pre-Flash on Bench)</text>
-  <rect x="764" y="80" width="640" height="682" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-  <text x="782" y="106" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#0f172a" text-anchor="start">2. CAR SIDE (Behind Glovebox — No Factory Wires Cut)</text>
-  <rect x="54" y="136" width="266" height="218" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="2.2"/>
-  <text x="70" y="160" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="start">LilyGo T-2CAN Board</text>
-  <text x="70" y="178" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#94a3b8" text-anchor="start">ESP32-S3 (Flash &amp; Config via USB-C)</text>
-  <rect x="76" y="194" width="96" height="82" rx="4" fill="#475569" stroke="#94a3b8" stroke-width="1.4"/>
-  <text x="124" y="233" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">ESP32-S3</text>
-  <text x="124" y="250" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="normal" fill="#cbd5e1" text-anchor="middle">Wi-Fi / MCU</text>
-  <rect x="42" y="220" width="18" height="34" rx="3" fill="#cbd5e1" stroke="#334155" stroke-width="1.6"/>
-  <text x="70" y="302" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#f8fafc" text-anchor="start">USB-C Port:</text>
-  <text x="70" y="317" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#cbd5e1" text-anchor="start">5V Power +</text>
-  <text x="70" y="331" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#cbd5e1" text-anchor="start">Serial CLI</text>
-  <rect x="204" y="190" width="108" height="96" rx="4" fill="#14532d" stroke="#4ade80" stroke-width="1.8"/>
-  <text x="212" y="206" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#bbf7d0" text-anchor="start">PORT B (IT-CAN)</text>
-  <text x="212" y="219" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9.5" font-weight="normal" fill="#86efac" text-anchor="start">TWAI GPIO 7 / 6</text>
-  <text x="272" y="239" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="end">CANHB</text>
-  <circle cx="292" cy="235" r="6.5" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
-  <line x1="288" y1="232" x2="296" y2="238" stroke="#334155" stroke-width="1.4" stroke-linecap="round"/>
-  <text x="272" y="259" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="end">CANLB</text>
-  <circle cx="292" cy="255" r="6.5" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
-  <line x1="288" y1="252" x2="296" y2="258" stroke="#334155" stroke-width="1.4" stroke-linecap="round"/>
-  <text x="272" y="279" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="end">SGNDB</text>
-  <circle cx="292" cy="275" r="6.5" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
-  <line x1="288" y1="272" x2="296" y2="278" stroke="#334155" stroke-width="1.4" stroke-linecap="round"/>
-  <rect x="204" y="294" width="108" height="48" rx="4" fill="#334155" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,3"/>
-  <text x="258" y="314" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9.5" font-weight="bold" fill="#cbd5e1" text-anchor="middle">PORT A (MCP2515)</text>
-  <text x="258" y="329" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9.5" font-weight="normal" fill="#94a3b8" text-anchor="middle">Optional AV-CAN</text>
-  <rect x="54" y="366" width="294" height="52" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.2"/>
-  <text x="64" y="385" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#1e3a8a" text-anchor="start">Note on SGNDB (Signal Ground):</text>
-  <text x="64" y="401" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#1e40af" text-anchor="start">Connected by default (recommended for isolated</text>
-  <text x="64" y="414" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#1e40af" text-anchor="start">CAN transceiver; usually works without it too).</text>
-  <rect x="54" y="444" width="232" height="138" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.8"/>
-  <text x="170" y="466" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">Automotive 12V -&gt; 5V USB</text>
-  <text x="170" y="482" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Step-Down Socket / Converter</text>
-  <rect x="68" y="504" width="54" height="52" rx="6" fill="#e2e8f0" stroke="#334155" stroke-width="1.5"/>
-  <text x="95" y="527" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="middle">5V USB</text>
-  <text x="95" y="543" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="normal" fill="#475569" text-anchor="middle">OUT</text>
-  <circle cx="264" cy="507" r="7" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.4"/>
-  <text x="248" y="511" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="end">- GND</text>
-  <circle cx="264" cy="551" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.4"/>
-  <text x="248" y="555" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#dc2626" text-anchor="end">+ 12V</text>
-  <polyline points="68,530 28,530 28,237 42,237" fill="none" stroke="#ca8a04" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="36" y="436" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#854d0e" text-anchor="start">5V USB Cable</text>
-  <text x="516" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" MALE</text>
-  <text x="516" y="165" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Wire-Side View (6 male pins used)</text>
-  <rect x="489.0" y="268" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>
-  <rect x="503.0" y="272" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke-width="1.2"/>
-  <rect x="402" y="280" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke-width="2.0"/>
-  <rect x="413.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="425.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
-  <rect x="439.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="451.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
-  <rect x="465.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="477.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">6</text>
-  <rect x="491.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="503.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">5</text>
-  <rect x="517.5" y="291.5" width="23" height="23" rx="3" fill="#bbf7d0" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="529.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#14532d" text-anchor="middle">4</text>
-  <rect x="543.5" y="291.5" width="23" height="23" rx="3" fill="#fef08a" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="555.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#713f12" text-anchor="middle">3</text>
-  <rect x="569.5" y="291.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="581.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
-  <rect x="595.5" y="291.5" width="23" height="23" rx="3" fill="#fee2e2" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="607.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">1</text>
-  <rect x="413.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="425.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
-  <rect x="439.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="451.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
-  <rect x="465.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="477.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">14</text>
-  <rect x="491.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="503.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">13</text>
-  <rect x="517.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="529.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">12</text>
-  <rect x="543.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="555.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">11</text>
-  <rect x="569.5" y="325.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="581.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
-  <rect x="595.5" y="325.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="607.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
-  <polyline points="312,235 555.0,235 555.0,290.0" fill="none" stroke="#eab308" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="390" y="229" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#854d0e" text-anchor="start">CAN-H (Pin 3)</text>
-  <polyline points="312,255 529.0,255 529.0,290.0" fill="none" stroke="#16a34a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="390" y="249" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#166534" text-anchor="start">CAN-L (Pin 4)</text>
-  <polyline points="581.0,290.0 581.0,206 374,206 374,507" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="581.0,350.0 581.0,396 374,396" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="312,275 374,275" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="264,507 374,507" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="374" cy="275" r="4.5" fill="#1e293b" stroke="none" stroke-width="1.5"/>
-  <circle cx="374" cy="396" r="4.5" fill="#1e293b" stroke="none" stroke-width="1.5"/>
-  <circle cx="374" cy="507" r="4.5" fill="#1e293b" stroke="none" stroke-width="1.5"/>
-  <text x="384" y="503" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#0f172a" text-anchor="start">GND splice (4 ends)</text>
-  <polyline points="607.0,290.0 607.0,190 640,190 640,551" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="607.0,350.0 607.0,414 640,414" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="640" cy="414" r="4.5" fill="#dc2626" stroke="none" stroke-width="1.5"/>
-  <polyline points="640,551 497,551" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="439,551 264,551" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="439.0" y="539.0" width="58" height="24" rx="4" fill="#fff7ed" stroke="#c2410c" stroke-width="2.0"/>
-  <path d="M 439.0 551 L 454 551 Q 461 544, 468 551 T 482 551 L 497.0 551" fill="none" stroke="#c2410c" stroke-width="2.2"/>
-  <circle cx="452" cy="551" r="2.5" fill="#c2410c" stroke="none" stroke-width="1.5"/>
-  <circle cx="484" cy="551" r="2.5" fill="#c2410c" stroke="none" stroke-width="1.5"/>
-  <text x="468" y="534" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#9a3412" text-anchor="middle">2A Inline Fuse</text>
-  <text x="572" y="542" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#991b1b" text-anchor="middle">+12V splice (3 ends)</text>
-  <rect x="54" y="604" width="586" height="140" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.3"/>
-  <text x="70" y="626" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="bold" fill="#0f172a" text-anchor="start">Device-Side Harness Summary (Step 2 on Bench):</text>
-  <text x="70" y="646" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="normal" fill="#334155" text-anchor="start">• +12V (Red, 3 ends): Male Pin 1  +  loop to Male Pin 9  +  via 2A Inline Fuse to 12V-&gt;USB (+)</text>
-  <text x="70" y="665" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="normal" fill="#334155" text-anchor="start">• GND (Black, 4 ends): Male Pin 2  +  loop to Male Pin 10  +  12V-&gt;USB (-)  +  LilyGo SGNDB</text>
-  <text x="70" y="684" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="normal" fill="#334155" text-anchor="start">• IT-CAN: Male Pin 3 -&gt; LilyGo CANHB   |   Male Pin 4 -&gt; LilyGo CANLB</text>
-  <text x="70" y="705" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="bold" fill="#0f172a" text-anchor="start">• Why loop Pins 1-&gt;9 &amp; 2-&gt;10? Routes +12V &amp; GND back to the factory TCU so the car's hands-free</text>
-  <text x="80" y="722" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.3" font-weight="bold" fill="#0f172a" text-anchor="start">microphone keeps working, without cutting or splicing any original car wires!</text>
-  <line x1="632" y1="320" x2="784" y2="320" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,4"/>
-  <rect x="647.0" y="308.0" width="122" height="24" rx="4" fill="#0284c7" stroke="#0369a1" stroke-width="1.2"/>
-  <text x="708" y="324" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">PLUGS TOGETHER</text>
-  <text x="900" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" FEMALE</text>
-  <text x="900" y="165" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Wire-Side View (4 OEM + 2 return pins)</text>
-  <rect x="873.0" y="268" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>
-  <rect x="887.0" y="272" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke-width="1.2"/>
-  <rect x="786" y="280" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke-width="2.0"/>
-  <rect x="797.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="809.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="middle">1</text>
-  <rect x="823.5" y="291.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="835.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
-  <rect x="849.5" y="291.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="861.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">3</text>
-  <rect x="875.5" y="291.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="887.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#4c1d95" text-anchor="middle">4</text>
-  <rect x="901.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="913.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">5</text>
-  <rect x="927.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="939.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">6</text>
-  <rect x="953.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="965.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
-  <rect x="979.5" y="291.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="991.0" y="307.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
-  <rect x="797.5" y="325.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="809.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
-  <rect x="823.5" y="325.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="835.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
-  <rect x="849.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="861.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">11</text>
-  <rect x="875.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="887.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">12</text>
-  <rect x="901.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="913.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">13</text>
-  <rect x="927.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="939.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">14</text>
-  <rect x="953.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="965.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
-  <rect x="979.5" y="325.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
-  <text x="991.0" y="341.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
-  <rect x="1092" y="136" width="292" height="134" rx="8" fill="#e2e8f0" stroke="#475569" stroke-width="1.8"/>
-  <text x="1106" y="158" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="bold" fill="#0f172a" text-anchor="start">Car Wiring Harness Loom</text>
-  <text x="1106" y="176" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">4 wires unpinned from 40-pin TCU plug</text>
-  <text x="1106" y="191" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">click straight into 16-pin Female:</text>
-  <text x="1106" y="212" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="start">• OEM #1 (White): +12V BAT -&gt; Fem Pin 1</text>
-  <text x="1106" y="229" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="start">• OEM #28 (Black): GND -&gt; Fem Pin 2</text>
-  <text x="1106" y="246" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0369a1" text-anchor="start">• OEM #6 (Sky Blue): CAN-H -&gt; Fem Pin 3</text>
-  <text x="1106" y="262" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#6d28d9" text-anchor="start">• OEM #7 (Violet): CAN-L -&gt; Fem Pin 4</text>
-  <polyline points="1092,186 809.0,186 809.0,290.0" fill="none" stroke="#334155" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="1092,186 809.0,186 809.0,290.0" fill="none" stroke="#f8fafc" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="1092,202 835.0,202 835.0,290.0" fill="none" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="1092,218 861.0,218 861.0,290.0" fill="none" stroke="#0ea5e9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="1092,234 887.0,234 887.0,290.0" fill="none" stroke="#8b5cf6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="1364,270 1364,480 1340,480" fill="none" stroke="#94a3b8" stroke-width="6.0" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="1354" y="332" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#475569" text-anchor="end" font-style="italic">Other 36 OEM wires</text>
-  <text x="1354" y="347" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#475569" text-anchor="end" font-style="italic">(stay in 40-pin plug)</text>
-  <text x="1122" y="446" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">Original 40-Pin Nissan TCU Connector — Wire-Side View</text>
-  <text x="1122" y="461" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#475569" text-anchor="middle">(Plugs back into original TCU so hands-free microphone stays powered)</text>
-  <rect x="1082.0" y="464" width="80" height="14" rx="2" fill="#334155" stroke="#0f172a" stroke-width="1.6"/>
-  <text x="1122.0" y="474" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">LOCK TAB</text>
-  <rect x="904" y="476" width="436" height="70" rx="5" fill="#1e293b" stroke="#0f172a" stroke-width="2.0"/>
-  <rect x="913.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="922.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">20</text>
-  <rect x="934.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="943.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">19</text>
-  <rect x="955.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="964.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">18</text>
-  <rect x="976.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="985.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">17</text>
-  <rect x="997.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1006.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">16</text>
-  <rect x="1018.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1027.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">15</text>
-  <rect x="1039.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1048.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">14</text>
-  <rect x="1060.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1069.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">13</text>
-  <rect x="1081.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1090.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">12</text>
-  <rect x="1102.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1111.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">11</text>
-  <rect x="1123.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1132.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">10</text>
-  <rect x="1144.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1153.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">9</text>
-  <rect x="1165.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1174.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">8</text>
-  <rect x="1186" y="485" width="19" height="22" rx="2" fill="#0f172a" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,2"/>
-  <text x="1195.5" y="500.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#fca5a5" text-anchor="middle">7</text>
-  <rect x="1207" y="485" width="19" height="22" rx="2" fill="#0f172a" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="3,2"/>
-  <text x="1216.5" y="500.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#fca5a5" text-anchor="middle">6</text>
-  <rect x="1228.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1237.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">5</text>
-  <rect x="1249.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1258.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">4</text>
-  <rect x="1270.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1279.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">3</text>
-  <rect x="1291.5" y="485.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1300.5" y="499.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">2</text>
-  <rect x="1312" y="485" width="19" height="22" rx="2" fill="#fecaca" stroke="#ffffff" stroke-width="1.8"/>
-  <text x="1321.5" y="500.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">1</text>
-  <rect x="913.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="922.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">40</text>
-  <rect x="934.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="943.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">39</text>
-  <rect x="955.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="964.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">38</text>
-  <rect x="976.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="985.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">37</text>
-  <rect x="997.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1006.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">36</text>
-  <rect x="1018.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1027.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">35</text>
-  <rect x="1039.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1048.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">34</text>
-  <rect x="1060.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1069.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">33</text>
-  <rect x="1081.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1090.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">32</text>
-  <rect x="1102.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1111.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">31</text>
-  <rect x="1123.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1132.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">30</text>
-  <rect x="1144.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1153.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">29</text>
-  <rect x="1165" y="515" width="19" height="22" rx="2" fill="#e2e8f0" stroke="#ffffff" stroke-width="1.8"/>
-  <text x="1174.5" y="530.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#0f172a" text-anchor="middle">28</text>
-  <rect x="1186.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1195.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">27</text>
-  <rect x="1207.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1216.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">26</text>
-  <rect x="1228.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1237.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">25</text>
-  <rect x="1249.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1258.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">24</text>
-  <rect x="1270.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1279.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">23</text>
-  <rect x="1291.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1300.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">22</text>
-  <rect x="1312.5" y="515.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke-width="0.9"/>
-  <text x="1321.5" y="529.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">21</text>
-  <line x1="1206.0" y1="484.0" x2="1206.0" y2="428" stroke="#dc2626" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3,2"/>
-  <rect x="1124.0" y="408.0" width="164" height="20" rx="4" fill="#fef2f2" stroke="#f87171" stroke-width="1.2"/>
-  <text x="1206.0" y="422" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#991b1b" text-anchor="middle">Pins #6 &amp; #7 LEFT EMPTY</text>
-  <polyline points="809.0,350.0 809.0,388 1350,388 1350,496.0 1331.5,496.0" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="852" y="381" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#991b1b" text-anchor="start">+12V return wire (Fem Pin 9 -&gt; TCU #1)</text>
-  <polyline points="835.0,350.0 835.0,572 1174.5,572 1174.5,538.0" fill="none" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="835" y="588" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#0f172a" text-anchor="start">GND return wire (Fem Pin 10 -&gt; TCU #28)</text>
-  <rect x="782" y="604" width="604" height="140" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.3"/>
-  <text x="798" y="626" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="bold" fill="#0f172a" text-anchor="start">Nissan Leaf ZE1 40-Pin TCU Reference &amp; Car-Side Pin Mapping:</text>
-  <text x="798" y="646" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• TCU #1  (White, +12V BAT)  : Unpin OEM wire -&gt; 16-pin Fem #1   |  Return wire: Fem #9 -&gt; TCU #1</text>
-  <text x="798" y="665" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• TCU #28 (Black, GND)       : Unpin OEM wire -&gt; 16-pin Fem #2   |  Return wire: Fem #10 -&gt; TCU #28</text>
-  <text x="798" y="684" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• TCU #6  (Sky Blue, CAN-H)  : Unpin OEM wire -&gt; 16-pin Fem #3   |  Leave TCU #6 socket EMPTY</text>
-  <text x="798" y="703" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• TCU #7  (Violet, CAN-L)    : Unpin OEM wire -&gt; 16-pin Fem #4   |  Leave TCU #7 socket EMPTY</text>
-  <text x="798" y="724" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="start">• Terminal compatibility: NH .025" female pins from the 16-pin kit fit directly into TCU #1 &amp; #28.</text>
+  <rect x="778" y="80" width="646" height="754" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke_width="1.5"/>
+  <text x="796" y="106" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#0f172a" text-anchor="start">2. CAR SIDE (Behind Glovebox — No Factory Wires Cut)</text>
+  <rect x="54" y="134" width="270" height="256" rx="8" fill="#1e293b" stroke="#0f172a" stroke_width="2.2"/>
+  <text x="70" y="158" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="start">LilyGo T-2CAN Board</text>
+  <text x="70" y="176" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#94a3b8" text-anchor="start">ESP32-S3 (Dual CAN: TWAI + MCP2515)</text>
+  <rect x="74" y="194" width="98" height="84" rx="4" fill="#475569" stroke="#94a3b8" stroke_width="1.4"/>
+  <text x="123" y="233" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">ESP32-S3</text>
+  <text x="123" y="250" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="normal" fill="#cbd5e1" text-anchor="middle">Wi-Fi / MCU</text>
+  <rect x="42" y="222" width="18" height="34" rx="3" fill="#cbd5e1" stroke="#334155" stroke_width="1.6"/>
+  <text x="70" y="304" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#f8fafc" text-anchor="start">USB-C Port:</text>
+  <text x="70" y="319" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#cbd5e1" text-anchor="start">5V Power +</text>
+  <text x="70" y="334" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#cbd5e1" text-anchor="start">Serial CLI</text>
+  <rect x="204" y="186" width="112" height="92" rx="4" fill="#14532d" stroke="#4ade80" stroke_width="1.8"/>
+  <text x="212" y="201" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#bbf7d0" text-anchor="start">PORT B (IT-CAN)</text>
+  <text x="212" y="214" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9.5" font-weight="normal" fill="#86efac" text-anchor="start">TWAI GPIO 7 / 6</text>
+  <text x="274" y="233" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">CANHB</text>
+  <circle cx="294" cy="229" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="226" x2="298" y2="232" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="274" y="252" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">CANLB</text>
+  <circle cx="294" cy="248" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="245" x2="298" y2="251" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="274" y="271" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">SGNDB</text>
+  <circle cx="294" cy="267" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="264" x2="298" y2="270" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <rect x="204" y="286" width="112" height="92" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke_width="1.6" stroke-dasharray="5,3"/>
+  <text x="212" y="301" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#dbeafe" text-anchor="start">PORT A (Opt. AV)</text>
+  <text x="212" y="314" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9.5" font-weight="normal" fill="#93c5fd" text-anchor="start">MCP2515 SPI</text>
+  <text x="274" y="333" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">CANHA</text>
+  <circle cx="294" cy="329" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="326" x2="298" y2="332" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="274" y="352" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">CANLA</text>
+  <circle cx="294" cy="348" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="345" x2="298" y2="351" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <text x="274" y="371" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#ffffff" text-anchor="end">SGNDA</text>
+  <circle cx="294" cy="367" r="6.2" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.3"/>
+  <line x1="290" y1="364" x2="298" y2="370" stroke="#334155" stroke-width="1.3" stroke-linecap="round"/>
+  <rect x="54" y="400" width="290" height="54" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke_width="1.2"/>
+  <text x="64" y="418" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#1e3a8a" text-anchor="start">Note on SGNDB / SGNDA (Signal GND):</text>
+  <text x="64" y="433" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="normal" fill="#1e40af" text-anchor="start">Connected by default (recommended for isolated</text>
+  <text x="64" y="447" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="normal" fill="#1e40af" text-anchor="start">transceivers; usually works without them too).</text>
+  <rect x="54" y="474" width="232" height="136" rx="8" fill="#ffffff" stroke="#475569" stroke_width="1.8"/>
+  <text x="170" y="496" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">Automotive 12V -&gt; 5V USB</text>
+  <text x="170" y="512" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Step-Down Socket / Converter</text>
+  <rect x="68" y="532" width="54" height="52" rx="6" fill="#e2e8f0" stroke="#334155" stroke_width="1.5"/>
+  <text x="95" y="555" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="middle">5V USB</text>
+  <text x="95" y="571" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="normal" fill="#475569" text-anchor="middle">OUT</text>
+  <circle cx="264" cy="535" r="7" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.4"/>
+  <text x="248" y="539" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="end">- GND</text>
+  <circle cx="264" cy="579" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.4"/>
+  <text x="248" y="583" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#dc2626" text-anchor="end">+ 12V</text>
+  <polyline points="68,558 28,558 28,239 42,239" fill="none" stroke="#ca8a04" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="36" y="466" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#854d0e" text-anchor="start">5V USB Cable</text>
+  <text x="522" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" MALE</text>
+  <text x="522" y="165" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Wire-Side View (6 std + 2 opt. AV pins)</text>
+  <rect x="495.0" y="284" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke_width="1.6"/>
+  <rect x="509.0" y="288" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke_width="1.2"/>
+  <rect x="408" y="296" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke_width="2.0"/>
+  <rect x="419.5" y="307.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="431.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
+  <rect x="445.5" y="307.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="457.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
+  <rect x="471.5" y="307.5" width="23" height="23" rx="3" fill="#d9f99d" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <text x="483.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">6</text>
+  <rect x="497.5" y="307.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <text x="509.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">5</text>
+  <rect x="523.5" y="307.5" width="23" height="23" rx="3" fill="#bbf7d0" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="535.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#14532d" text-anchor="middle">4</text>
+  <rect x="549.5" y="307.5" width="23" height="23" rx="3" fill="#fef08a" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="561.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#713f12" text-anchor="middle">3</text>
+  <rect x="575.5" y="307.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="587.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+  <rect x="601.5" y="307.5" width="23" height="23" rx="3" fill="#fee2e2" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="613.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">1</text>
+  <rect x="419.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="431.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
+  <rect x="445.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="457.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
+  <rect x="471.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="483.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">14</text>
+  <rect x="497.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="509.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">13</text>
+  <rect x="523.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="535.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">12</text>
+  <rect x="549.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="561.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">11</text>
+  <rect x="575.5" y="341.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="587.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
+  <rect x="601.5" y="341.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="613.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
+  <polyline points="316,229 561.0,229 561.0,306.0" fill="none" stroke="#eab308" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="448" y="224" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#854d0e" text-anchor="start">IT-CAN H (Pin 3)</text>
+  <polyline points="316,248 535.0,248 535.0,306.0" fill="none" stroke="#16a34a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="440" y="243" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#166534" text-anchor="start">IT-CAN L (Pin 4)</text>
+  <polyline points="316,329 374,329 374,262 509.0,262 509.0,306.0" fill="none" stroke="#0284c7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+  <polyline points="316,348 388,348 388,276 483.0,276 483.0,306.0" fill="none" stroke="#65a30d" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+  <text x="404" y="405" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#1e40af" text-anchor="start">Dashed Pin 5 &amp; 6 = Opt. AV-CAN</text>
+  <text x="404" y="419" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="normal" fill="#3b82f6" text-anchor="start">(Nag Dismiss &amp; GPS Tracking)</text>
+  <polyline points="587.0,306.0 587.0,204 352,204 352,535" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="587.0,366.0 587.0,438 352,438" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="316,267 352,267" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="316,367 352,367" fill="none" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,4"/>
+  <polyline points="264,535 352,535" fill="none" stroke="#1e293b" stroke-width="3.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="352" cy="267" r="4.2" fill="#1e293b" stroke="none" stroke-width="1.5"/>
+  <circle cx="352" cy="367" r="4.2" fill="#1e293b" stroke="none" stroke-width="1.5"/>
+  <circle cx="352" cy="438" r="4.2" fill="#1e293b" stroke="none" stroke-width="1.5"/>
+  <circle cx="352" cy="535" r="4.5" fill="#1e293b" stroke="none" stroke-width="1.5"/>
+  <text x="362" y="531" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="start">GND splice (4 ends, or 5 w/ SGNDA)</text>
+  <polyline points="613.0,306.0 613.0,188 648,188 648,579" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="613.0,366.0 613.0,456 648,456" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="648" cy="456" r="4.5" fill="#dc2626" stroke="none" stroke-width="1.5"/>
+  <polyline points="648,579 497,579" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="439,579 264,579" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="439.0" y="567.0" width="58" height="24" rx="4" fill="#fff7ed" stroke="#c2410c" stroke_width="2.0"/>
+  <path d="M 439.0 579 L 454 579 Q 461 572, 468 579 T 482 579 L 497.0 579" fill="none" stroke="#c2410c" stroke-width="2.2"/>
+  <circle cx="452" cy="579" r="2.5" fill="#c2410c" stroke="none" stroke-width="1.5"/>
+  <circle cx="484" cy="579" r="2.5" fill="#c2410c" stroke="none" stroke-width="1.5"/>
+  <text x="468" y="562" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#9a3412" text-anchor="middle">2A Inline Fuse</text>
+  <text x="576" y="570" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#991b1b" text-anchor="middle">+12V splice (3 ends)</text>
+  <rect x="54" y="626" width="594" height="192" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke_width="1.3"/>
+  <text x="70" y="648" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="bold" fill="#0f172a" text-anchor="start">Device-Side Harness Summary (Step 2 on Bench):</text>
+  <text x="70" y="668" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• +12V (Red, 3 ends): Male Pin 1  +  loop to Male Pin 9  +  via 2A Fuse to 12V-&gt;USB (+)</text>
+  <text x="70" y="687" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• GND (Black, 4 or 5 ends): Male Pin 2 + loop to Pin 10 + 12V-&gt;USB (-) + SGNDB (+ opt. SGNDA)</text>
+  <text x="70" y="706" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#334155" text-anchor="start">• IT-CAN (Required): Male Pin 3 -&gt; Port B CANHB   |   Male Pin 4 -&gt; Port B CANLB</text>
+  <text x="70" y="725" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="start">• AV-CAN / M-CAN (Optional): Male Pin 5 -&gt; Port A CANHA   |   Male Pin 6 -&gt; Port A CANLA</text>
+  <text x="80" y="742" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#334155" text-anchor="start">(Enables automatic infotainment nag-screen dismissal &amp; GPS location tracking)</text>
+  <text x="70" y="764" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="start">• Why loop Pins 1-&gt;9 &amp; 2-&gt;10? Routes +12V &amp; GND back to the factory TCU so the cabin</text>
+  <text x="80" y="781" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="start">hands-free microphone keeps working, without cutting any factory wires!</text>
+  <text x="70" y="803" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#475569" text-anchor="start" font-style="italic">• Passive-monitoring option: See wiring_can_loopback.svg to loop CAN back via Pins 11–14.</text>
+  <line x1="638" y1="336" x2="800" y2="336" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,4"/>
+  <rect x="659.0" y="324.0" width="122" height="24" rx="4" fill="#0284c7" stroke="#0369a1" stroke_width="1.2"/>
+  <text x="720" y="340" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff" text-anchor="middle">PLUGS TOGETHER</text>
+  <text x="916" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" FEMALE</text>
+  <text x="916" y="165" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11" font-weight="normal" fill="#475569" text-anchor="middle">Wire-Side View (4–6 OEM + 2 return pins)</text>
+  <rect x="889.0" y="284" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke_width="1.6"/>
+  <rect x="903.0" y="288" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke_width="1.2"/>
+  <rect x="802" y="296" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke_width="2.0"/>
+  <rect x="813.5" y="307.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="825.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="middle">1</text>
+  <rect x="839.5" y="307.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="851.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
+  <rect x="865.5" y="307.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="877.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">3</text>
+  <rect x="891.5" y="307.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="903.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#4c1d95" text-anchor="middle">4</text>
+  <rect x="917.5" y="307.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <text x="929.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0369a1" text-anchor="middle">5</text>
+  <rect x="943.5" y="307.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <text x="955.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">6</text>
+  <rect x="969.5" y="307.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="981.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
+  <rect x="995.5" y="307.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="1007.0" y="323.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
+  <rect x="813.5" y="341.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="825.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
+  <rect x="839.5" y="341.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="851.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
+  <rect x="865.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="877.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">11</text>
+  <rect x="891.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="903.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">12</text>
+  <rect x="917.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="929.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">13</text>
+  <rect x="943.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="955.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">14</text>
+  <rect x="969.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="981.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
+  <rect x="995.5" y="341.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <text x="1007.0" y="357.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
+  <rect x="1102" y="126" width="304" height="166" rx="8" fill="#e2e8f0" stroke="#475569" stroke_width="1.8"/>
+  <text x="1116" y="147" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="bold" fill="#0f172a" text-anchor="start">Car Wiring Harness Loom</text>
+  <text x="1116" y="164" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#334155" text-anchor="start">Unpinned from 40-pin TCU -&gt; 16-pin Female:</text>
+  <text x="1116" y="183" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.4" font-weight="bold" fill="#0f172a" text-anchor="start">• OEM #1 (W, White): +12V -&gt; Fem Pin 1</text>
+  <text x="1116" y="199" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.4" font-weight="bold" fill="#0f172a" text-anchor="start">• OEM #28 (B, Black): GND -&gt; Fem Pin 2</text>
+  <text x="1116" y="215" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.4" font-weight="bold" fill="#0369a1" text-anchor="start">• OEM #6 (SB, Sky Blue): IT-CAN H -&gt; Fem Pin 3</text>
+  <text x="1116" y="231" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.4" font-weight="bold" fill="#6d28d9" text-anchor="start">• OEM #7 (V, Violet): IT-CAN L -&gt; Fem Pin 4</text>
+  <line x1="1116" y1="240" x2="1392" y2="240" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round"/>
+  <text x="1116" y="256" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#1e40af" text-anchor="start">Optional AV-CAN (Nag Dismiss &amp; GPS):</text>
+  <text x="1116" y="271" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#0284c7" text-anchor="start">• OEM #26 (SB, Sky Blue): M CAN-H -&gt; Fem Pin 5</text>
+  <text x="1116" y="286" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#4d7c0f" text-anchor="start">• OEM #27 (LG, Lt Green): M CAN-L -&gt; Fem Pin 6</text>
+  <polyline points="1102,184 825.0,184 825.0,306.0" fill="none" stroke="#334155" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="1102,184 825.0,184 825.0,306.0" fill="none" stroke="#f8fafc" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="1102,198 851.0,198 851.0,306.0" fill="none" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="1102,212 877.0,212 877.0,306.0" fill="none" stroke="#0ea5e9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="1102,226 903.0,226 903.0,306.0" fill="none" stroke="#8b5cf6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="1102,240 929.0,240 929.0,306.0" fill="none" stroke="#0284c7" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+  <polyline points="1102,254 955.0,254 955.0,306.0" fill="none" stroke="#65a30d" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,4"/>
+  <polyline points="1384,292 1384,514 1358,514" fill="none" stroke="#94a3b8" stroke-width="6.0" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1374" y="355" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#475569" text-anchor="end" font-style="italic">Remaining OEM wires</text>
+  <text x="1374" y="370" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#475569" text-anchor="end" font-style="italic">(stay in 40-pin plug)</text>
+  <text x="1140" y="468" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">Original 40-Pin Nissan TCU Connector — Wire-Side View</text>
+  <text x="1140" y="483" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#475569" text-anchor="middle">(Plugs back into original TCU so hands-free microphone stays powered)</text>
+  <rect x="1100.0" y="486" width="80" height="14" rx="2" fill="#334155" stroke="#0f172a" stroke_width="1.6"/>
+  <text x="1140.0" y="496" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">LOCK TAB</text>
+  <rect x="922" y="498" width="436" height="70" rx="5" fill="#1e293b" stroke="#0f172a" stroke_width="2.0"/>
+  <rect x="931.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="940.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">20</text>
+  <rect x="952.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="961.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">19</text>
+  <rect x="973.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="982.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">18</text>
+  <rect x="994.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1003.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">17</text>
+  <rect x="1015.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1024.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">16</text>
+  <rect x="1036.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1045.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">15</text>
+  <rect x="1057.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1066.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">14</text>
+  <rect x="1078.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1087.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">13</text>
+  <rect x="1099.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1108.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">12</text>
+  <rect x="1120.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1129.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">11</text>
+  <rect x="1141.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1150.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">10</text>
+  <rect x="1162.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1171.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">9</text>
+  <rect x="1183.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1192.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">8</text>
+  <rect x="1204" y="507" width="19" height="22" rx="2" fill="#0f172a" stroke="#ef4444" stroke_width="1.8" stroke-dasharray="3,2"/>
+  <text x="1213.5" y="522.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#fca5a5" text-anchor="middle">7</text>
+  <rect x="1225" y="507" width="19" height="22" rx="2" fill="#0f172a" stroke="#ef4444" stroke_width="1.8" stroke-dasharray="3,2"/>
+  <text x="1234.5" y="522.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#fca5a5" text-anchor="middle">6</text>
+  <rect x="1246.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1255.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">5</text>
+  <rect x="1267.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1276.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">4</text>
+  <rect x="1288.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1297.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">3</text>
+  <rect x="1309.5" y="507.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1318.5" y="521.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">2</text>
+  <rect x="1330" y="507" width="19" height="22" rx="2" fill="#fecaca" stroke="#ffffff" stroke_width="1.8"/>
+  <text x="1339.5" y="522.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#991b1b" text-anchor="middle">1</text>
+  <rect x="931.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="940.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">40</text>
+  <rect x="952.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="961.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">39</text>
+  <rect x="973.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="982.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">38</text>
+  <rect x="994.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1003.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">37</text>
+  <rect x="1015.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1024.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">36</text>
+  <rect x="1036.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1045.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">35</text>
+  <rect x="1057.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1066.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">34</text>
+  <rect x="1078.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1087.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">33</text>
+  <rect x="1099.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1108.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">32</text>
+  <rect x="1120.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1129.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">31</text>
+  <rect x="1141.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1150.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">30</text>
+  <rect x="1162.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1171.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">29</text>
+  <rect x="1183" y="537" width="19" height="22" rx="2" fill="#e2e8f0" stroke="#ffffff" stroke_width="1.8"/>
+  <text x="1192.5" y="552.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#0f172a" text-anchor="middle">28</text>
+  <rect x="1204" y="537" width="19" height="22" rx="2" fill="#0f172a" stroke="#84cc16" stroke_width="1.8" stroke-dasharray="3,2"/>
+  <text x="1213.5" y="552.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#bef264" text-anchor="middle">27</text>
+  <rect x="1225" y="537" width="19" height="22" rx="2" fill="#0f172a" stroke="#38bdf8" stroke_width="1.8" stroke-dasharray="3,2"/>
+  <text x="1234.5" y="552.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#93c5fd" text-anchor="middle">26</text>
+  <rect x="1246.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1255.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">25</text>
+  <rect x="1267.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1276.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">24</text>
+  <rect x="1288.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1297.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">23</text>
+  <rect x="1309.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1318.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">22</text>
+  <rect x="1330.5" y="537.5" width="18" height="21" rx="2" fill="#334155" stroke="#64748b" stroke_width="0.9"/>
+  <text x="1339.5" y="551.5" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="8.5" font-weight="normal" fill="#cbd5e1" text-anchor="middle">21</text>
+  <line x1="1224.0" y1="506.0" x2="1224.0" y2="450" stroke="#dc2626" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="3,2"/>
+  <rect x="1100.0" y="430.0" width="248" height="20" rx="4" fill="#fef2f2" stroke="#f87171" stroke_width="1.2"/>
+  <text x="1224.0" y="444" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#991b1b" text-anchor="middle">#6, #7 EMPTY (+ #26, #27 if AV-CAN used)</text>
+  <polyline points="825.0,366.0 825.0,404 1368,404 1368,518.0 1349.5,518.0" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="868" y="397" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#991b1b" text-anchor="start">+12V return wire (Fem Pin 9 -&gt; TCU #1)</text>
+  <polyline points="851.0,366.0 851.0,592 1192.5,592 1192.5,560.0" fill="none" stroke="#1e293b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="868" y="608" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#0f172a" text-anchor="start">GND return wire (Fem Pin 10 -&gt; TCU #28)</text>
+  <rect x="796" y="626" width="610" height="192" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke_width="1.3"/>
+  <text x="812" y="648" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="bold" fill="#0f172a" text-anchor="start">Nissan Leaf ZE1 40-Pin TCU Reference &amp; Car-Side Pin Mapping:</text>
+  <text x="812" y="668" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#334155" text-anchor="start">• TCU #1  (W, White — +12V BAT)  : Unpin OEM -&gt; Fem #1   |  Return wire: Fem #9 -&gt; TCU #1</text>
+  <text x="812" y="687" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#334155" text-anchor="start">• TCU #28 (B, Black — GND)       : Unpin OEM -&gt; Fem #2   |  Return wire: Fem #10 -&gt; TCU #28</text>
+  <text x="812" y="706" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#334155" text-anchor="start">• TCU #6  (SB, Sky Blue — IT-CAN H): Unpin OEM -&gt; Fem #3 |  Leave TCU #6 EMPTY*</text>
+  <text x="812" y="725" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#334155" text-anchor="start">• TCU #7  (V, Violet — IT-CAN L)   : Unpin OEM -&gt; Fem #4 |  Leave TCU #7 EMPTY*</text>
+  <text x="812" y="744" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#1e40af" text-anchor="start">• TCU #26 (SB, Sky Blue — M CAN-H) : [Optional AV-CAN] Unpin OEM -&gt; Fem #5 | Leave #26 EMPTY*</text>
+  <text x="812" y="763" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="bold" fill="#1e40af" text-anchor="start">• TCU #27 (LG, Lt Green — M CAN-L) : [Optional AV-CAN] Unpin OEM -&gt; Fem #6 | Leave #27 EMPTY*</text>
+  <text x="812" y="784" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#9a3412" text-anchor="start">*Note: Two Sky Blue (SB) wires exist (#6 top row vs #26 bottom row)—tag them before unpinning!</text>
+  <text x="812" y="803" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#0f172a" text-anchor="start"> NH .025" female pins from the 16-pin kit fit directly into the 40-pin TCU connector.</text>
 </svg>
