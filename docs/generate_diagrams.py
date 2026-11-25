@@ -45,7 +45,7 @@ class SvgBuilder:
         dash_attr = f' stroke-dasharray="{dash}"' if dash else ""
         self.add(
             f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{rx}" '
-            f'fill="{fill}" stroke="{stroke}" stroke_width="{stroke_width}"{dash_attr}/>'
+            f'fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}"{dash_attr}/>'
         )
 
     def circle(
@@ -391,7 +391,7 @@ def generate_lilygo_adapter() -> None:
     for t_name, ty in [("CANHA", pa_y + 43), ("CANLA", pa_y + 62), ("SGNDA", pa_y + 81)]:
         s.text(pa_x + 70, ty + 4, t_name, size=10.2, fill="#ffffff", weight="bold", anchor="end")
         s.circle(pa_x + 90, ty, 6.2, fill="#cbd5e1", stroke="#0f172a", stroke_width=1.3)
-        s.line(pb_x + 86, ty - 3, pb_x + 94, ty + 3, stroke="#334155", stroke_width=1.3)
+        s.line(pa_x + 86, ty - 3, pa_x + 94, ty + 3, stroke="#334155", stroke_width=1.3)
         term_coords[t_name] = (pa_x + 112, ty)
 
     # Note about SGNDB/SGNDA right under LilyGo

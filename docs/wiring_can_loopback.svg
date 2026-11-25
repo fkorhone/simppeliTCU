@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1420 560" width="1420" height="560">
   <title>Optional CAN Loopback Wiring: Monitoring Alongside an Active Original TCU</title>
   <rect x="0" y="0" width="1420" height="560" fill="#ffffff"/>
-  <rect x="16" y="14" width="1388" height="54" rx="8" fill="#0f172a" stroke="#0f172a" stroke_width="1.5"/>
+  <rect x="16" y="14" width="1388" height="54" rx="8" fill="#0f172a" stroke="#0f172a" stroke-width="1.5"/>
   <text x="34" y="39" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="start">Optional Adapter Variation: Looping CAN Buses Back to Original TCU (Passive Monitoring Mode)</text>
   <text x="34" y="58" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#cbd5e1" text-anchor="start">Routes IT-CAN (3-&gt;11, 4-&gt;12) and/or M-CAN / AV-CAN (5-&gt;13, 6-&gt;14) back to the factory TCU so the original TCU stays connected.</text>
-  <rect x="16" y="80" width="646" height="378" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke_width="1.5"/>
+  <rect x="16" y="80" width="646" height="378" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
   <text x="34" y="106" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14.5" font-weight="bold" fill="#0f172a" text-anchor="start">1. DEVICE SIDE (16-Pin Male — Add Loopback Jumpers)</text>
-  <rect x="758" y="80" width="646" height="378" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke_width="1.5"/>
+  <rect x="758" y="80" width="646" height="378" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
   <text x="776" y="106" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="14.5" font-weight="bold" fill="#0f172a" text-anchor="start">2. CAR SIDE (16-Pin Female -&gt; Returns to 40-Pin TCU)</text>
-  <rect x="42" y="134" width="240" height="224" rx="8" fill="#1e293b" stroke="#0f172a" stroke_width="2.0"/>
+  <rect x="42" y="134" width="240" height="224" rx="8" fill="#1e293b" stroke="#0f172a" stroke-width="2.0"/>
   <text x="162" y="158" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13.5" font-weight="bold" fill="#ffffff" text-anchor="middle">simppeliTCU (LilyGo T-2CAN)</text>
   <text x="162" y="175" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#94a3b8" text-anchor="middle">(+ 2A Fuse &amp; 12V-&gt;5V USB Supply)</text>
   <text x="270" y="206" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.2" font-weight="bold" fill="#f8fafc" text-anchor="end">+12V (via 2A Fuse)</text>
@@ -25,40 +25,40 @@
   <circle cx="278" cy="326" r="4" fill="#cbd5e1" stroke="none" stroke-width="1.5"/>
   <text x="524" y="132" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" MALE (Wire-Side)</text>
   <text x="524" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#475569" text-anchor="middle">Top row (1–6) loops to Bottom row (9–14)</text>
-  <rect x="497.0" y="224" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke_width="1.6"/>
-  <rect x="511.0" y="228" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke_width="1.2"/>
-  <rect x="410" y="236" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke_width="2.0"/>
-  <rect x="421.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="497.0" y="224" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>
+  <rect x="511.0" y="228" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke-width="1.2"/>
+  <rect x="410" y="236" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke-width="2.0"/>
+  <rect x="421.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="433.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
-  <rect x="447.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="447.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="459.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
-  <rect x="473.5" y="247.5" width="23" height="23" rx="3" fill="#d9f99d" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="473.5" y="247.5" width="23" height="23" rx="3" fill="#d9f99d" stroke="#0f172a" stroke-width="1.6"/>
   <text x="485.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">6</text>
-  <rect x="499.5" y="247.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="499.5" y="247.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke-width="1.6"/>
   <text x="511.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">5</text>
-  <rect x="525.5" y="247.5" width="23" height="23" rx="3" fill="#bbf7d0" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="525.5" y="247.5" width="23" height="23" rx="3" fill="#bbf7d0" stroke="#0f172a" stroke-width="1.6"/>
   <text x="537.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#14532d" text-anchor="middle">4</text>
-  <rect x="551.5" y="247.5" width="23" height="23" rx="3" fill="#fef08a" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="551.5" y="247.5" width="23" height="23" rx="3" fill="#fef08a" stroke="#0f172a" stroke-width="1.6"/>
   <text x="563.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#713f12" text-anchor="middle">3</text>
-  <rect x="577.5" y="247.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="577.5" y="247.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="1.6"/>
   <text x="589.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
-  <rect x="603.5" y="247.5" width="23" height="23" rx="3" fill="#fee2e2" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="603.5" y="247.5" width="23" height="23" rx="3" fill="#fee2e2" stroke="#0f172a" stroke-width="1.6"/>
   <text x="615.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">1</text>
-  <rect x="421.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="421.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="433.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
-  <rect x="447.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="447.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="459.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
-  <rect x="473.5" y="281.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="473.5" y="281.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="485.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">14</text>
-  <rect x="499.5" y="281.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="499.5" y="281.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="511.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">13</text>
-  <rect x="525.5" y="281.5" width="23" height="23" rx="3" fill="#dcfce7" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="525.5" y="281.5" width="23" height="23" rx="3" fill="#dcfce7" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="537.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#14532d" text-anchor="middle">12</text>
-  <rect x="551.5" y="281.5" width="23" height="23" rx="3" fill="#fef9c3" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="551.5" y="281.5" width="23" height="23" rx="3" fill="#fef9c3" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="563.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#713f12" text-anchor="middle">11</text>
-  <rect x="577.5" y="281.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="577.5" y="281.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke-width="1.6"/>
   <text x="589.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
-  <rect x="603.5" y="281.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="603.5" y="281.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke-width="1.6"/>
   <text x="615.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
   <polyline points="282,202 312,202" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="615.0,246.0 615.0,164 312,164 312,424 615.0,424 615.0,306.0" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -80,46 +80,46 @@
   <circle cx="382" cy="326" r="3.8" fill="#65a30d" stroke="none" stroke-width="1.5"/>
   <text x="339" y="444" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.3" font-weight="bold" fill="#1e40af" text-anchor="middle">Dashed loops (11–14): populate for whichever bus(es) should also reach Original TCU</text>
   <line x1="640" y1="276" x2="780" y2="276" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,4"/>
-  <rect x="652.0" y="265.0" width="116" height="22" rx="4" fill="#0284c7" stroke="#0369a1" stroke_width="1.2"/>
+  <rect x="652.0" y="265.0" width="116" height="22" rx="4" fill="#0284c7" stroke="#0369a1" stroke-width="1.2"/>
   <text x="710" y="280" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">PLUGS TOGETHER</text>
   <text x="896" y="132" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">16-Pin NH .025" FEMALE (Wire-Side)</text>
   <text x="896" y="148" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.8" font-weight="normal" fill="#475569" text-anchor="middle">Pins 1–6: Unpinned OEM | Pins 9–14: Return to TCU</text>
-  <rect x="869.0" y="224" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke_width="1.6"/>
-  <rect x="883.0" y="228" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke_width="1.2"/>
-  <rect x="782" y="236" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke_width="2.0"/>
-  <rect x="793.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="869.0" y="224" width="54" height="14" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>
+  <rect x="883.0" y="228" width="26" height="8" rx="1" fill="#94a3b8" stroke="#475569" stroke-width="1.2"/>
+  <rect x="782" y="236" width="228" height="80" rx="5" fill="#f1f5f9" stroke="#334155" stroke-width="2.0"/>
+  <rect x="793.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#0f172a" stroke-width="1.6"/>
   <text x="805.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="middle">1</text>
-  <rect x="819.5" y="247.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="819.5" y="247.5" width="23" height="23" rx="3" fill="#1e293b" stroke="#0f172a" stroke-width="1.6"/>
   <text x="831.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">2</text>
-  <rect x="845.5" y="247.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="845.5" y="247.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke-width="1.6"/>
   <text x="857.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">3</text>
-  <rect x="871.5" y="247.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="871.5" y="247.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke-width="1.6"/>
   <text x="883.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#4c1d95" text-anchor="middle">4</text>
-  <rect x="897.5" y="247.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="897.5" y="247.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke-width="1.6"/>
   <text x="909.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0369a1" text-anchor="middle">5</text>
-  <rect x="923.5" y="247.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="923.5" y="247.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke-width="1.6"/>
   <text x="935.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">6</text>
-  <rect x="949.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="949.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="961.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">7</text>
-  <rect x="975.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="975.5" y="247.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="987.0" y="263.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">8</text>
-  <rect x="793.5" y="281.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="793.5" y="281.5" width="23" height="23" rx="3" fill="#fecaca" stroke="#0f172a" stroke-width="1.6"/>
   <text x="805.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#991b1b" text-anchor="middle">9</text>
-  <rect x="819.5" y="281.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke_width="1.6"/>
+  <rect x="819.5" y="281.5" width="23" height="23" rx="3" fill="#334155" stroke="#0f172a" stroke-width="1.6"/>
   <text x="831.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">10</text>
-  <rect x="845.5" y="281.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="845.5" y="281.5" width="23" height="23" rx="3" fill="#bae6fd" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="857.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">11</text>
-  <rect x="871.5" y="281.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="871.5" y="281.5" width="23" height="23" rx="3" fill="#ddd6fe" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="883.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#4c1d95" text-anchor="middle">12</text>
-  <rect x="897.5" y="281.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="897.5" y="281.5" width="23" height="23" rx="3" fill="#e0f2fe" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="909.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0369a1" text-anchor="middle">13</text>
-  <rect x="923.5" y="281.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke_width="1.6" stroke-dasharray="3,2"/>
+  <rect x="923.5" y="281.5" width="23" height="23" rx="3" fill="#ecfccb" stroke="#0f172a" stroke-width="1.6" stroke-dasharray="3,2"/>
   <text x="935.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#365314" text-anchor="middle">14</text>
-  <rect x="949.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="949.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="961.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">15</text>
-  <rect x="975.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke_width="1.1"/>
+  <rect x="975.5" y="281.5" width="23" height="23" rx="3" fill="#ffffff" stroke="#94a3b8" stroke-width="1.1"/>
   <text x="987.0" y="297.0" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="normal" fill="#64748b" text-anchor="middle">16</text>
-  <rect x="1096" y="126" width="290" height="124" rx="6" fill="#e2e8f0" stroke="#475569" stroke_width="1.6"/>
+  <rect x="1096" y="126" width="290" height="124" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="1.6"/>
   <text x="1110" y="146" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a" text-anchor="start">Car Loom (Unpinned OEM -&gt; Fem 1–6):</text>
   <text x="1110" y="165" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#334155" text-anchor="start">#1 (W +12V) -&gt; 1   |   #28 (B GND) -&gt; 2</text>
   <text x="1110" y="184" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.5" font-weight="bold" fill="#0369a1" text-anchor="start">#6 (SB IT-H) -&gt; 3  |   #7  (V IT-L) -&gt; 4</text>
@@ -132,7 +132,7 @@
   <polyline points="1096,197 883.0,197 883.0,246.0" fill="none" stroke="#8b5cf6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="1096,208 909.0,208 909.0,246.0" fill="none" stroke="#0284c7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="1096,219 935.0,219 935.0,246.0" fill="none" stroke="#65a30d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="1096" y="298" width="290" height="144" rx="6" fill="#1e293b" stroke="#0f172a" stroke_width="1.8"/>
+  <rect x="1096" y="298" width="290" height="144" rx="6" fill="#1e293b" stroke="#0f172a" stroke-width="1.8"/>
   <text x="1110" y="320" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="start">40-Pin Original TCU (Return Jumpers):</text>
   <text x="1110" y="341" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.3" font-weight="bold" fill="#fecaca" text-anchor="start">• Fem #9  -&gt; TCU #1  (+12V)</text>
   <text x="1110" y="358" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="10.3" font-weight="bold" fill="#e2e8f0" text-anchor="start">• Fem #10 -&gt; TCU #28 (GND)</text>
@@ -146,7 +146,7 @@
   <polyline points="883.0,306.0 883.0,376 1096,376" fill="none" stroke="#8b5cf6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>
   <polyline points="909.0,306.0 909.0,362 1096,362" fill="none" stroke="#0284c7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>
   <polyline points="935.0,306.0 935.0,348 1096,348" fill="none" stroke="#65a30d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5,3"/>
-  <rect x="16" y="470" width="1388" height="74" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke_width="1.5"/>
+  <rect x="16" y="470" width="1388" height="74" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
   <text x="34" y="493" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="12.5" font-weight="bold" fill="#92400e" text-anchor="start">Important — Avoid Active CAN Transmit Collisions When Looping CAN Back to the Original TCU:</text>
   <text x="34" y="513" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.2" font-weight="normal" fill="#78350f" text-anchor="start">• If IT-CAN (#6/#7 via Pins 11–12) is looped back to an active original TCU, use simppeliTCU for PASSIVE MONITORING ONLY (do not trigger climate, charge,</text>
   <text x="34" y="531" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="11.2" font-weight="normal" fill="#78350f" text-anchor="start">  or lock commands, as both TCUs transmitting 0x56E frames will collide). You can also loop one bus while isolating the other simply by adding/removing jumpers!</text>

@@ -139,10 +139,13 @@ Doing the flashing, initial setup, and crimping indoors at a desk makes the in-c
      ![40-pin TCU connector end cap](end_cap.jpg)
 
    * **6.2.** Release the secondary terminal locking bar on the side of the 40-pin connector housing. *(Tip: Prying this lock bar up to its unlocked position takes patience and a small flat screwdriver/pick—work gently from each end so the plastic tabs don't crack.)*
-   * **6.3.** Using a fine unpinning pick from the front face, lift the internal plastic locking lance inside each cavity while gently pulling the wire out from the back:
-     * **Standard IT-CAN (`Option A / C`):** Extract **`#1`** (White `+12V`), **`#6`** (Sky Blue `IT-CAN H`), **`#7`** (Violet `IT-CAN L`), and **`#28`** (Black `GND`).
-     * **Optional AV-CAN (`Nag Dismiss & GPS`):** Also extract **`#26`** (Sky Blue `M CAN-H`) and **`#27`** (Light Green `M CAN-L`)—**label `#6` vs `#26` immediately** since both are Sky Blue!
-     * **Option B:** Extract only the CAN wires (`#6, #7`, plus optional `#26, #27`); leave `#1` and `#28` in the connector and tap them on the harness, avoiding insulation-displacement clips (*"rosvoliitin"*) on CAN data wires.
+   * **6.3.** Extract each pin cleanly without fighting the locking tab:
+     1. First **push the wire gently forward (into the back of the connector)** so there is no tension binding the internal plastic locking lance.
+     2. Insert a thin flat screwdriver or depinning pick from the front face to lift/release the plastic locking lance inside the cavity.
+     3. While holding the lance released, **pull the wire backwards and out** of the housing:
+        * **Standard IT-CAN (`Option A / C`):** Extract **`#1`** (White `+12V`), **`#6`** (Sky Blue `IT-CAN H`), **`#7`** (Violet `IT-CAN L`), and **`#28`** (Black `GND`).
+        * **Optional AV-CAN (`Nag Dismiss & GPS`):** Also extract **`#26`** (Sky Blue `M CAN-H`) and **`#27`** (Light Green `M CAN-L`)—**label `#6` vs `#26` immediately** since both are Sky Blue!
+        * **Option B:** Extract only the CAN wires (`#6, #7`, plus optional `#26, #27`); leave `#1` and `#28` in the connector and tap them on the harness, avoiding insulation-displacement clips (*"rosvoliitin"*) on CAN data wires.
 
 7. **Populate & Lock the 16-Pin Female Housing (Option A):**
    * Release/open the secondary lock on the new **16-pin Female housing**.
