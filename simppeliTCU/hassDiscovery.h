@@ -47,6 +47,7 @@ struct HassMqttMetric {
   const HassMqttProperty* properties;
   size_t propertyCount;
   bool requiresGpsTracking = false; // Skip this entity when location tracking is disabled
+  bool useAvailability = true;      // Include availability_topic (false: entity stays available when TCU is offline)
 };
 
 void mqttPublishHassDiscovery(PubSubClient& mqttClient, const StringBuffer<128>& mqttPrefix);

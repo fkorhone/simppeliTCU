@@ -9,13 +9,16 @@ const OvmsMetrics ovmsMetrics;
 
 // Appends the fields shared by every entity: availability (bound to the MQTT
 // Last Will topic, so entities go unavailable when the TCU drops off the
-// network) and device info. Closes the JSON object.
-static void appendCommonFields(StringBuffer<1024>& payload, const StringBuffer<128>& mqttPrefix) {
+// network) and device info. Closes the JSON object. Pass withAvailability=false
+// for entities that must stay available while the TCU is offline.
+static void appendCommonFields(StringBuffer<1024>& payload, const StringBuffer<128>& mqttPrefix, bool withAvailability = true) {
   const char* vid = getVehicleId();
   StringBuffer<256> extra;
-  extra.format(",\"availability_topic\":\"%s%s\",\"payload_available\":\"yes\",\"payload_not_available\":\"no\"",
-               mqttPrefix.c_str(), ovmsMetrics.connected);
-  payload.append(extra.c_str());
+  if (withAvailability) {
+    extra.format(",\"availability_topic\":\"%s%s\",\"payload_available\":\"yes\",\"payload_not_available\":\"no\"",
+                 mqttPrefix.c_str(), ovmsMetrics.connected);
+    payload.append(extra.c_str());
+  }
 
   extra.format(",\"device\":{\"identifiers\":[\"simppeliTCU_%s\"],\"name\":\"simppeliTCU %s\",\"manufacturer\":\"simppeliTCU\",\"model\":\"TCU\",\"sw_version\":\"%s\"}}", vid, vid, FW_FULL_VERSION);
   payload.append(extra.c_str());
@@ -53,7 +56,7 @@ void publishHassConfigForMetric(PubSubClient& mqttClient, const StringBuffer<128
     }
   }
 
-  appendCommonFields(payload, mqttPrefix);
+  appendCommonFields(payload, mqttPrefix, metric.useAvailability);
 
   mqttClient.publish(topic.c_str(), (const uint8_t*)payload.c_str(), payload.length(), true);
 }
@@ -170,6 +173,17 @@ static const HassMqttProperty coolingProps[] = {
   {"payload_off", "no"}
 };
 
+// Binary Sensor: Server Connection (no availability_topic, so it shows
+// "off" instead of "unavailable" when the TCU disconnects)
+static const HassMqttProperty connectedProps[] = {
+  {"name", "Connected"},
+  {"device_class", "connectivity"},
+  {"entity_category", "diagnostic"},
+  {"state_topic", ovmsMetrics.connected},
+  {"payload_on", "yes"},
+  {"payload_off", "no"}
+};
+
 // Binary Sensor: Door Status (template for all doors)
 static const HassMqttProperty doorProps[] = {
   {"device_class", "door"},
@@ -233,6 +247,7 @@ static const HassMqttMetric hassMetrics[] = {
   {"binary_sensor", "locked", lockProps, sizeof(lockProps)/sizeof(HassMqttProperty)},
   {"binary_sensor", "heating", heatingProps, sizeof(heatingProps)/sizeof(HassMqttProperty)},
   {"binary_sensor", "cooling", coolingProps, sizeof(coolingProps)/sizeof(HassMqttProperty)},
+  {"binary_sensor", "connected", connectedProps, sizeof(connectedProps)/sizeof(HassMqttProperty), false, false},
 
   // Switches
   {"switch", "hvac_switch", hvacSwProps, sizeof(hvacSwProps)/sizeof(HassMqttProperty)},
