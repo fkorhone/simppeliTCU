@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **New property Odometer metric**
   - Car odometer from CAN message `0x5C5` is shown in the web UI, published on MQTT (`metric/v/p/odometer`) and announced via Home Assistant discovery.
+- **New property Connected for Home Assistant**
+  - A new Home Assistant entity Connected which follows the connected (`metric/s/v3/connected`) topic without the availability feature. Therefor when simppeliTCU is not connected to wifi/broker the MQTT 'last will' will publish the connected topic to `no`. Making the Connected entity show `Disconnected` while the others are `Unavailable`. This is a nicer way to showcase that simppeliTCU is not connected to Home Assistant.
 
 ## [v0.3.0] - 2026-11-16
 
