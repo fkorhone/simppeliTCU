@@ -23,6 +23,12 @@ ConfigStatus setWifiSSID(const char* value);
 const char* getWifiPassword();
 ConfigStatus setWifiPassword(const char* value);
 
+const char* getFallbackSSID();
+ConfigStatus setFallbackSSID(const char* value);
+
+const char* getFallbackPassword();
+ConfigStatus setFallbackPassword(const char* value);
+
 const char* getApSSID();
 ConfigStatus setApSSID(const char* value);
 
