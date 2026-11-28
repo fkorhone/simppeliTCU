@@ -64,6 +64,7 @@ set password MySecretPassword
 set ap_ssid LeafLocalAP
 set ap_password LeafLocalPassword
 set mqtt_server 192.168.1.100
+set vehicle_id MyLeaf
 set locking_enabled true
 reboot
 ```
